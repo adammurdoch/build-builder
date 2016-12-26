@@ -4,12 +4,10 @@ import joptsimple.ArgumentAcceptingOptionSpec;
 import joptsimple.OptionException;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
-import org.gradle.builds.assemblers.AndroidModelBuilder;
-import org.gradle.builds.assemblers.CppModelBuilder;
-import org.gradle.builds.assemblers.JavaModelBuilder;
-import org.gradle.builds.assemblers.StructureBuilder;
+import org.gradle.builds.assemblers.*;
 import org.gradle.builds.generators.AndroidManifestGenerator;
 import org.gradle.builds.generators.BuildFileGenerator;
+import org.gradle.builds.generators.JavaSourceGenerator;
 import org.gradle.builds.generators.SettingsFileGenerator;
 import org.gradle.builds.model.*;
 
@@ -49,16 +47,16 @@ public class Main {
             return fail(parser, "No project directory specified.");
         }
 
-        ModelBuilder modelBuilder;
+        ModelAssembler modelAssembler;
         switch (parsedOptions.valueOf(typeOption)) {
             case "java":
-                modelBuilder = new JavaModelBuilder();
+                modelAssembler = new JavaModelAssembler();
                 break;
             case "android":
-                modelBuilder = new AndroidModelBuilder();
+                modelAssembler = new AndroidModelAssembler();
                 break;
             case "cpp":
-                modelBuilder = new CppModelBuilder();
+                modelAssembler = new CppModelAssembler();
                 break;
             default:
                 return fail(parser, "Unknown build type '" + parsedOptions.valueOf(typeOption) + "' specified");
@@ -73,13 +71,14 @@ public class Main {
         Build build = new Build(projectDir);
 
         // Create model
-        new StructureBuilder().populate(projects, build);
-        modelBuilder.populate(build);
+        new StructureAssembler().populate(projects, build);
+        modelAssembler.populate(build);
 
         // Generate files
         new SettingsFileGenerator().generate(build);
         new BuildFileGenerator().generate(build);
         new AndroidManifestGenerator().generate(build);
+        new JavaSourceGenerator().generate(build);
 
         return true;
     }

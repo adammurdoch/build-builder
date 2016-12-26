@@ -8,13 +8,16 @@ public class Project {
     public enum Role {
         Application, Library, Empty
     }
+
+    private final Project parent;
     private final String name;
     private final Path projectDir;
     private final BuildScript buildScript = new BuildScript();
     private final Set<Component> components = new LinkedHashSet<>();
     private Role role = Role.Empty;
 
-    public Project(String name, Path projectDir) {
+    public Project(Project parent, String name, Path projectDir) {
+        this.parent = parent;
         this.name = name;
         this.projectDir = projectDir;
     }
@@ -25,6 +28,10 @@ public class Project {
 
     public Path getProjectDir() {
         return projectDir;
+    }
+
+    public Project getParent() {
+        return parent;
     }
 
     public Role getRole() {

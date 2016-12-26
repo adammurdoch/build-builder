@@ -1,6 +1,6 @@
 package org.gradle.builds.model;
 
-public class AndroidComponent extends Component {
+public class AndroidComponent extends HasJavaSource {
     private String packageName;
 
     public String getPackageName() {
