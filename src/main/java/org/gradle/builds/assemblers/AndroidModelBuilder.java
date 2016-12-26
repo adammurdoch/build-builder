@@ -1,4 +1,6 @@
-package org.gradle.builds.model;
+package org.gradle.builds.assemblers;
+
+import org.gradle.builds.model.*;
 
 public class AndroidModelBuilder extends ModelBuilder {
     @Override

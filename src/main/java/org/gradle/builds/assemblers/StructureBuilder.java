@@ -1,4 +1,7 @@
-package org.gradle.builds.model;
+package org.gradle.builds.assemblers;
+
+import org.gradle.builds.model.Build;
+import org.gradle.builds.model.Project;
 
 public class StructureBuilder {
     public void populate(int projects, Build build) {
