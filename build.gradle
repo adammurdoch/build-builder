@@ -1,0 +1,19 @@
+plugins {
+    id 'java'
+    id 'groovy'
+    id 'application'
+}
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile 'net.sf.jopt-simple:jopt-simple:5.0.2'
+
+    testCompile 'org.codehaus.groovy:groovy:2.4.7'
+    testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
+}
+
+sourceCompatibility = 1.8
+mainClassName = "org.gradle.builds.Main"
