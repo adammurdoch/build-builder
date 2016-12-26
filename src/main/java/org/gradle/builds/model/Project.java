@@ -1,11 +1,39 @@
 package org.gradle.builds.model;
 
+import java.nio.file.Path;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class Project {
+    public enum Role {
+        Application, Library, Empty
+    }
+    private final String name;
+    private final Path projectDir;
     private final BuildScript buildScript = new BuildScript();
     private final Set<Component> components = new LinkedHashSet<>();
+    private Role role = Role.Empty;
+
+    public Project(String name, Path projectDir) {
+        this.name = name;
+        this.projectDir = projectDir;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Path getProjectDir() {
+        return projectDir;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
 
     public BuildScript getBuildScript() {
         return buildScript;

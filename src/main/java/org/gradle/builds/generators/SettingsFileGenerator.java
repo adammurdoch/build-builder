@@ -1,6 +1,7 @@
 package org.gradle.builds.generators;
 
 import org.gradle.builds.model.Build;
+import org.gradle.builds.model.Project;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -12,7 +13,11 @@ public class SettingsFileGenerator {
         Path settingsFile = build.getRootDir().resolve("settings.gradle");
         Files.createDirectories(settingsFile.getParent());
         try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(settingsFile))) {
-            printWriter.println("rootProject.name = '" + build.getRootDir().getFileName() + "'");
+            printWriter.println("// GENERATED SETTINGS SCRIPT");
+            printWriter.println("rootProject.name = '" + build.getRootProject().getName() + "'");
+            for (Project project : build.getSubprojects()) {
+                printWriter.println("include '" + project.getName() + "'");
+            }
         }
     }
 }

@@ -31,8 +31,9 @@ public class Main {
     private boolean run(String[] args) throws IOException {
         OptionParser parser = new OptionParser();
         ArgumentAcceptingOptionSpec<String> projectOption = parser.accepts("root-dir", "The directory to generate into").withRequiredArg();
-        ArgumentAcceptingOptionSpec<String> typeOption = parser.accepts("type", "The build type to generate (java, android, cpp)").withRequiredArg()
-                .defaultsTo("java");
+        ArgumentAcceptingOptionSpec<String> typeOption = parser.accepts("type", "The build type to generate (java, android, cpp)").withRequiredArg().defaultsTo("java");
+        ArgumentAcceptingOptionSpec<String> projectCountOption = parser.accepts("projects", "The number of projects to include").withRequiredArg().defaultsTo("1");
+
         OptionSet parsedOptions;
         try {
             parsedOptions = parser.parse(args);
@@ -43,6 +44,7 @@ public class Main {
         if (!parsedOptions.has(projectOption)) {
             return fail(parser, "No project directory specified.");
         }
+
         ModelBuilder modelBuilder;
         switch (parsedOptions.valueOf(typeOption)) {
             case "java":
@@ -58,12 +60,16 @@ public class Main {
                 return fail(parser, "Unknown build type '" + parsedOptions.valueOf(typeOption) + "' specified");
         }
 
+        int projects = Integer.valueOf(parsedOptions.valueOf(projectCountOption));
+
         Path projectDir = new File(parsedOptions.valueOf(projectOption)).toPath();
         System.out.println("* Generating build in " + projectDir);
+        System.out.println("* Projects: " + projects);
 
         Build build = new Build(projectDir);
 
         // Create model
+        new StructureBuilder().populate(projects, build);
         modelBuilder.populate(build);
 
         // Generate files
