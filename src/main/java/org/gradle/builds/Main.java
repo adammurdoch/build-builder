@@ -4,13 +4,13 @@ import joptsimple.ArgumentAcceptingOptionSpec;
 import joptsimple.OptionException;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
+import org.gradle.builds.generators.AndroidManifestGenerator;
 import org.gradle.builds.generators.BuildFileGenerator;
 import org.gradle.builds.generators.SettingsFileGenerator;
 import org.gradle.builds.model.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class Main {
@@ -63,13 +63,13 @@ public class Main {
 
         Build build = new Build(projectDir);
 
-        // Model
+        // Create model
         modelBuilder.populate(build);
 
-        // Generate
-        Files.createDirectories(projectDir);
+        // Generate files
         new SettingsFileGenerator().generate(build);
         new BuildFileGenerator().generate(build);
+        new AndroidManifestGenerator().generate(build);
 
         return true;
     }

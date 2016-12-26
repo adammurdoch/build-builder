@@ -1,41 +1,27 @@
 package org.gradle.builds.model;
 
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.Set;
 
 public class Project {
-    private final Set<String> buildScriptClasspath = new LinkedHashSet<>();
-    private final Set<String> plugins = new LinkedHashSet<>();
-    private final Map<String, ScriptBlock> blocks = new LinkedHashMap<>();
+    private final BuildScript buildScript = new BuildScript();
+    private final Set<Component> components = new LinkedHashSet<>();
 
-    public Set<String> getPlugins() {
-        return plugins;
+    public BuildScript getBuildScript() {
+        return buildScript;
     }
 
-    public void requirePlugin(String id) {
-        plugins.add(id);
-    }
-
-    public Set<String> getBuildScriptClasspath() {
-        return buildScriptClasspath;
-    }
-
-    public void requireOnBuildScriptClasspath(String gav) {
-        buildScriptClasspath.add(gav);
-    }
-
-    public Set<ScriptBlock> getBlocks() {
-        return new LinkedHashSet<>(blocks.values());
-    }
-
-    public ScriptBlock block(String name) {
-        ScriptBlock scriptBlock = blocks.get(name);
-        if (scriptBlock == null) {
-            scriptBlock = new ScriptBlock(name);
-            blocks.put(name, scriptBlock);
+    public <T extends Component> T component(Class<T> type) {
+        for (Component component : components) {
+            if (type.isInstance(component)) {
+                return type.cast(component);
+            }
         }
-        return scriptBlock;
+        return null;
+    }
+
+    public <T extends Component> T addComponent(T component) {
+        components.add(component);
+        return component;
     }
 }

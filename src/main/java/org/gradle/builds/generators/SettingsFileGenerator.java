@@ -10,6 +10,7 @@ import java.nio.file.Path;
 public class SettingsFileGenerator {
     public void generate(Build build) throws IOException {
         Path settingsFile = build.getRootDir().resolve("settings.gradle");
+        Files.createDirectories(settingsFile.getParent());
         try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(settingsFile))) {
             printWriter.println("rootProject.name = '" + build.getRootDir().getFileName() + "'");
         }
