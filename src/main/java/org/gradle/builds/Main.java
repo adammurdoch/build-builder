@@ -32,7 +32,7 @@ public class Main {
         System.exit(0);
     }
 
-    private boolean run(String[] args) throws IOException {
+    public boolean run(String[] args) throws IOException {
         OptionParser parser = new OptionParser();
         ArgumentAcceptingOptionSpec<String> projectOption = parser.accepts("root-dir", "The directory to generate into").withRequiredArg();
         ArgumentAcceptingOptionSpec<String> typeOption = parser.accepts("type", "The build type to generate (java, android, cpp)").withRequiredArg().defaultsTo("java");
