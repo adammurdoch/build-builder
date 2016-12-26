@@ -3,7 +3,7 @@ package org.gradle.builds.model;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class ScriptBlock {
+public class ScriptBlock extends Scope {
     private final String name;
     private final Map<String, Object> properties = new LinkedHashMap<>();
 

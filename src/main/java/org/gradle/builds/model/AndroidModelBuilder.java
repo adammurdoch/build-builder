@@ -14,5 +14,11 @@ public class AndroidModelBuilder extends ModelBuilder {
         ScriptBlock androidBlock = buildScript.block("android");
         androidBlock.property("buildToolsVersion", "25.0.0");
         androidBlock.property("compileSdkVersion", 25);
+        ScriptBlock configBlock = androidBlock.block("defaultConfig");
+        configBlock.property("applicationId", "org.gradle.example");
+        configBlock.property("minSdkVersion", 21);
+        configBlock.property("targetSdkVersion", 25);
+        configBlock.property("versionCode", 1);
+        configBlock.property("versionName", "1.0");
     }
 }

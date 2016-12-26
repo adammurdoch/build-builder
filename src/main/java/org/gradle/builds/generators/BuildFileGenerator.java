@@ -2,6 +2,7 @@ package org.gradle.builds.generators;
 
 import org.gradle.builds.model.Build;
 import org.gradle.builds.model.BuildScript;
+import org.gradle.builds.model.Scope;
 import org.gradle.builds.model.ScriptBlock;
 
 import java.io.IOException;
@@ -37,18 +38,24 @@ public class BuildFileGenerator {
                     printWriter.println("apply plugin: '" + pluginId + "'");
                 }
             }
-            for (ScriptBlock scriptBlock : buildScript.getBlocks()) {
-                printWriter.println();
-                printWriter.println(scriptBlock.getName() + " {");
-                for (Map.Entry<String, Object> entry : scriptBlock.getProperties().entrySet()) {
-                    if (entry.getValue() instanceof Number) {
-                        printWriter.println("  " + entry.getKey() + " = " + entry.getValue());
-                    } else {
-                        printWriter.println("  " + entry.getKey() + " = '" + entry.getValue() + "'");
-                    }
+            writeBlocks(buildScript, "", printWriter);
+        }
+    }
+
+    private void writeBlocks(Scope scope, String indent, PrintWriter printWriter) {
+        for (ScriptBlock block : scope.getBlocks()) {
+            printWriter.println();
+            printWriter.println(indent + block.getName() + " {");
+            String nestedIndent = indent + "    ";
+            for (Map.Entry<String, Object> entry : block.getProperties().entrySet()) {
+                if (entry.getValue() instanceof Number) {
+                    printWriter.println(nestedIndent + entry.getKey() + " = " + entry.getValue());
+                } else {
+                    printWriter.println(nestedIndent + entry.getKey() + " = '" + entry.getValue() + "'");
                 }
-                printWriter.println("}");
             }
+            writeBlocks(block, nestedIndent, printWriter);
+            printWriter.println(indent + "}");
         }
     }
 }
