@@ -4,9 +4,14 @@ import joptsimple.ArgumentAcceptingOptionSpec;
 import joptsimple.OptionException;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
+import org.gradle.builds.generators.BuildFileGenerator;
+import org.gradle.builds.generators.SettingsFileGenerator;
+import org.gradle.builds.model.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class Main {
     public static void main(String[] args) {
@@ -25,8 +30,9 @@ public class Main {
 
     private boolean run(String[] args) throws IOException {
         OptionParser parser = new OptionParser();
-        ArgumentAcceptingOptionSpec<String> projectOption = parser.accepts("project-dir", "The directory to generate to").withRequiredArg();
-        ArgumentAcceptingOptionSpec<String> typeOption = parser.accepts("type", "The build type to generate (java, android, cpp)").withRequiredArg();
+        ArgumentAcceptingOptionSpec<String> projectOption = parser.accepts("root-dir", "The directory to generate into").withRequiredArg();
+        ArgumentAcceptingOptionSpec<String> typeOption = parser.accepts("type", "The build type to generate (java, android, cpp)").withRequiredArg()
+                .defaultsTo("java");
         OptionSet parsedOptions;
         try {
             parsedOptions = parser.parse(args);
@@ -37,9 +43,33 @@ public class Main {
         if (!parsedOptions.has(projectOption)) {
             return fail(parser, "No project directory specified.");
         }
+        ModelBuilder modelBuilder;
+        switch (parsedOptions.valueOf(typeOption)) {
+            case "java":
+                modelBuilder = new JavaModelBuilder();
+                break;
+            case "android":
+                modelBuilder = new AndroidModelBuilder();
+                break;
+            case "cpp":
+                modelBuilder = new CppModelBuilder();
+                break;
+            default:
+                return fail(parser, "Unknown build type '" + parsedOptions.valueOf(typeOption) + "' specified");
+        }
 
-        File projectDir = new File(parsedOptions.valueOf(projectOption));
+        Path projectDir = new File(parsedOptions.valueOf(projectOption)).toPath();
         System.out.println("* Generating build in " + projectDir);
+
+        Build build = new Build(projectDir);
+
+        // Model
+        modelBuilder.populate(build);
+
+        // Generate
+        Files.createDirectories(projectDir);
+        new SettingsFileGenerator().generate(build);
+        new BuildFileGenerator().generate(build);
 
         return true;
     }
