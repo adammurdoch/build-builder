@@ -21,8 +21,13 @@ public class JavaSourceGenerator extends ProjectFileGenerator {
             Path sourceFile = project.getProjectDir().resolve("src/main/java/" + javaClass.getName().replace(".", "/") + ".java");
             Files.createDirectories(sourceFile.getParent());
             try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(sourceFile))) {
+                printWriter.println("// GENERATED SOURCE FILE");
                 printWriter.println("package " + javaClass.getPackage() + ";");
-                printWriter.println("public class " + javaClass.getSimpleName() + " { }");
+                printWriter.println("public class " + javaClass.getSimpleName() + " {");
+                printWriter.println("    public static void main(String[] args) {");
+                printWriter.println("        System.out.println(\"it works\");");
+                printWriter.println("    }");
+                printWriter.println("}");
             }
         }
     }

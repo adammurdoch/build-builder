@@ -5,11 +5,8 @@ import joptsimple.OptionException;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.gradle.builds.assemblers.*;
-import org.gradle.builds.generators.AndroidManifestGenerator;
-import org.gradle.builds.generators.BuildFileGenerator;
-import org.gradle.builds.generators.JavaSourceGenerator;
-import org.gradle.builds.generators.SettingsFileGenerator;
-import org.gradle.builds.model.*;
+import org.gradle.builds.generators.*;
+import org.gradle.builds.model.Build;
 
 import java.io.File;
 import java.io.IOException;
@@ -79,6 +76,7 @@ public class Main {
         new BuildFileGenerator().generate(build);
         new AndroidManifestGenerator().generate(build);
         new JavaSourceGenerator().generate(build);
+        new CppSourceGenerator().generate(build);
 
         return true;
     }

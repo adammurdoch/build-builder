@@ -40,6 +40,17 @@ public class BuildFileGenerator extends ProjectFileGenerator {
                 }
             }
             writeBlock(buildScript, "", printWriter);
+            if (!buildScript.getComponentDeclarations().isEmpty()) {
+                printWriter.println();
+                printWriter.println("model {");
+                printWriter.println("    components {");
+                for (Map.Entry<String, String> entry : buildScript.getComponentDeclarations().entrySet()) {
+                    printWriter.println("        " + entry.getKey() + "(" + entry.getValue() + ") {");
+                    printWriter.println("        }");
+                }
+                printWriter.println("    }");
+                printWriter.println("}");
+            }
         }
     }
 
