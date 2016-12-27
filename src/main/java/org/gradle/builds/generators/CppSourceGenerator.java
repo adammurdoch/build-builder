@@ -27,13 +27,13 @@ public class CppSourceGenerator extends ProjectFileGenerator {
                     printWriter.println("#include <stdio.h>");
                     printWriter.println();
                     printWriter.println("int main() {");
-                    for (CppClass cppClass : cppSource.getClasses()) {
+                    for (CppClass cppClass : cppSource.getMainFunctionReferencedClasses()) {
                         String varName = cppClass.getName().toLowerCase();
                         printWriter.println("    " + cppClass.getName() + " " + varName + ";");
                         printWriter.println("    " + varName + ".doSomething();");
                     }
-                    printWriter.println("     printf(\"it works\\n\");");
-                    printWriter.println("     return 0;");
+                    printWriter.println("    printf(\"it works\\n\");");
+                    printWriter.println("    return 0;");
                     printWriter.println("}");
                 }
                 for (CppClass cppClass : cppSource.getClasses()) {
@@ -58,13 +58,17 @@ public class CppSourceGenerator extends ProjectFileGenerator {
                 printWriter.println("// GENERATED SOURCE FILE");
                 printWriter.println("#ifndef " + macro);
                 printWriter.println("#define " + macro);
+                for (CppHeaderFile headerFile : cppHeader.getHeaderFiles()) {
+                    printWriter.println("#include \"" + headerFile.getName() + "\"");
+                }
                 for (CppClass cppClass : cppHeader.getClasses()) {
                     printWriter.println();
-                    printWriter.println("class " + cppClass.getName() + "{");
+                    printWriter.println("class " + cppClass.getName() + " {");
                     printWriter.println("  public:");
                     printWriter.println("    void doSomething();");
                     printWriter.println("};");
                 }
+                printWriter.println();
                 printWriter.println("#endif");
                 printWriter.println();
             }

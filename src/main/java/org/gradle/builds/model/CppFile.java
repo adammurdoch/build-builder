@@ -6,6 +6,7 @@ import java.util.Set;
 public abstract class CppFile {
     private final String name;
     private final Set<CppClass> classes = new LinkedHashSet<>();
+    private final Set<CppHeaderFile> headers = new LinkedHashSet<>();
 
     protected CppFile(String name) {
         this.name = name;
@@ -21,5 +22,13 @@ public abstract class CppFile {
 
     public void addClass(CppClass cppClass) {
         classes.add(cppClass);
+    }
+
+    public Set<CppHeaderFile> getHeaderFiles() {
+        return headers;
+    }
+
+    public void addHeader(CppHeaderFile header) {
+        headers.add(header);
     }
 }

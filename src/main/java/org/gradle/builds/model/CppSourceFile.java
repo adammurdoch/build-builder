@@ -5,7 +5,7 @@ import java.util.Set;
 
 public class CppSourceFile extends CppFile {
     private boolean mainFunction;
-    private final Set<CppHeaderFile> headers = new LinkedHashSet<>();
+    private Set<CppClass> usesClass = new LinkedHashSet<>();
 
     public CppSourceFile(String name) {
         super(name);
@@ -15,15 +15,12 @@ public class CppSourceFile extends CppFile {
         return mainFunction;
     }
 
-    public void addMainFunction() {
+    public Set<CppClass> getMainFunctionReferencedClasses() {
+        return usesClass;
+    }
+
+    public void addMainFunction(CppClass usesClass) {
+        this.usesClass.add(usesClass);
         mainFunction = true;
-    }
-
-    public Set<CppHeaderFile> getHeaderFiles() {
-        return headers;
-    }
-
-    public void addHeader(CppHeaderFile header) {
-        headers.add(header);
     }
 }

@@ -8,18 +8,29 @@ public class CppModelAssembler extends ModelAssembler {
         if (project.getRole() == Project.Role.Library) {
             NativeLibrary lib = project.addComponent(new NativeLibrary());
 
-            CppClass libClass = new CppClass(className(project));
-            lib.setApiClass(libClass);
-            addReferences(project, libClass);
+            CppClass implClass = new CppClass(className(project) + "Impl");
+            addReferences(project, implClass);
 
-            CppHeaderFile headerFile = lib.addHeaderFile(fileName(project) + ".h");
-            headerFile.addClass(libClass);
-            lib.setApiHeader(headerFile);
+            CppClass apiClass = new CppClass(className(project));
+            apiClass.uses(implClass);
+            lib.setApiClass(apiClass);
 
-            CppSourceFile sourceFile = lib.addSourceFile(fileName(project) + ".cpp");
-            sourceFile.addClass(libClass);
-            sourceFile.addHeader(headerFile);
-            addLibHeaders(project, sourceFile);
+            CppHeaderFile apiHeader = lib.addHeaderFile(fileName(project) + ".h");
+            apiHeader.addClass(apiClass);
+            lib.setApiHeader(apiHeader);
+
+            CppHeaderFile implHeader = lib.addHeaderFile(fileName(project) + "_impl.h");
+            implHeader.addClass(implClass);
+            implHeader.addHeader(apiHeader);
+
+            CppSourceFile apiSourceFile = lib.addSourceFile(fileName(project) + ".cpp");
+            apiSourceFile.addClass(apiClass);
+            apiSourceFile.addHeader(implHeader);
+
+            CppSourceFile implSourceFile = lib.addSourceFile(fileName(project) + "_impl.cpp");
+            implSourceFile.addClass(implClass);
+            implSourceFile.addHeader(implHeader);
+            addLibHeaders(project, implSourceFile);
 
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("native-component");
@@ -35,11 +46,14 @@ public class CppModelAssembler extends ModelAssembler {
             CppHeaderFile headerFile = app.addHeaderFile(fileName(project) + ".h");
             headerFile.addClass(appClass);
 
-            CppSourceFile sourceFile = app.addSourceFile(fileName(project) + ".cpp");
-            sourceFile.addMainFunction();
-            sourceFile.addClass(appClass);
-            sourceFile.addHeader(headerFile);
-            addLibHeaders(project, sourceFile);
+            CppSourceFile mainSourceFile = app.addSourceFile(fileName(project) + ".cpp");
+            mainSourceFile.addMainFunction(appClass);
+            mainSourceFile.addHeader(headerFile);
+
+            CppSourceFile implSourceFile = app.addSourceFile(fileName(project) + "_impl.cpp");
+            implSourceFile.addClass(appClass);
+            implSourceFile.addHeader(headerFile);
+            addLibHeaders(project, implSourceFile);
 
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("native-component");
