@@ -11,15 +11,19 @@ public class HasNativeSource implements Component {
         return headerFiles;
     }
 
-    public void addHeaderFile(String name) {
-        headerFiles.add(new CppHeaderFile(name));
+    public CppHeaderFile addHeaderFile(String name) {
+        CppHeaderFile headerFile = new CppHeaderFile(name);
+        headerFiles.add(headerFile);
+        return headerFile;
     }
 
     public Set<CppSourceFile> getSourceFiles() {
         return sourceFiles;
     }
 
-    public void addSourceFile(String name) {
-        sourceFiles.add(new CppSourceFile(name));
+    public CppSourceFile addSourceFile(String name) {
+        CppSourceFile sourceFile = new CppSourceFile(name);
+        sourceFiles.add(sourceFile);
+        return sourceFile;
     }
 }

@@ -54,6 +54,7 @@ public class BuildFileGenerator extends ProjectFileGenerator {
                 printWriter.println("    components {");
                 for (SoftwareModelDeclaration component : buildScript.getComponentDeclarations()) {
                     printWriter.println("        " + component.getName() + "(" + component.getType() + ") {");
+                    printWriter.println("            baseName = project.name");
                     if (!component.getDependencies().isEmpty()) {
                         printWriter.println("            sources {");
                         printWriter.println("                all {");

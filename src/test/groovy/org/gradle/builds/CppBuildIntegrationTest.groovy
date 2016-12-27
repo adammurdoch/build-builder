@@ -7,7 +7,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
 
         then:
         buildSucceeds(":installMain")
-        exeSucceeds(file("build/install/main/main"))
+        exeSucceeds(file("build/install/main/testApp"))
 
         buildSucceeds("build")
     }
@@ -18,7 +18,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
 
         then:
         buildSucceeds(":installMain")
-        exeSucceeds(file("build/install/main/main"))
+        exeSucceeds(file("build/install/main/testApp"))
 
         buildSucceeds("build")
     }

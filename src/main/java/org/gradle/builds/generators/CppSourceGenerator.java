@@ -1,9 +1,6 @@
 package org.gradle.builds.generators;
 
-import org.gradle.builds.model.CppHeaderFile;
-import org.gradle.builds.model.CppSourceFile;
-import org.gradle.builds.model.HasNativeSource;
-import org.gradle.builds.model.Project;
+import org.gradle.builds.model.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -23,11 +20,33 @@ public class CppSourceGenerator extends ProjectFileGenerator {
             Files.createDirectories(sourceFile.getParent());
             try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(sourceFile))) {
                 printWriter.println("// GENERATED SOURCE FILE");
-                printWriter.println("#include <stdio.h>");
-                printWriter.println("int main() {");
-                printWriter.println("   printf(\"it works\\n\");");
-                printWriter.println("   return 0;");
-                printWriter.println("}");
+                for (CppHeaderFile headerFile : cppSource.getHeaderFiles()) {
+                    printWriter.println("#include \"" + headerFile.getName() + "\"");
+                }
+                if (cppSource.hasMainFunction()) {
+                    printWriter.println("#include <stdio.h>");
+                    printWriter.println();
+                    printWriter.println("int main() {");
+                    for (CppClass cppClass : cppSource.getClasses()) {
+                        String varName = cppClass.getName().toLowerCase();
+                        printWriter.println("    " + cppClass.getName() + " " + varName + ";");
+                        printWriter.println("    " + varName + ".doSomething();");
+                    }
+                    printWriter.println("     printf(\"it works\\n\");");
+                    printWriter.println("     return 0;");
+                    printWriter.println("}");
+                }
+                for (CppClass cppClass : cppSource.getClasses()) {
+                    printWriter.println();
+                    printWriter.println("void " + cppClass.getName() + "::doSomething() {");
+                    for (CppClass dep : cppClass.getReferencedClasses()) {
+                        String varName = dep.getName().toLowerCase();
+                        printWriter.println("    " + dep.getName() + " " + varName + ";");
+                        printWriter.println("    " + varName + ".doSomething();");
+                    }
+                    printWriter.println("}");
+                }
+                printWriter.println();
             }
         }
 
@@ -35,7 +54,19 @@ public class CppSourceGenerator extends ProjectFileGenerator {
             Path sourceFile = project.getProjectDir().resolve("src/main/headers/" + cppHeader.getName());
             Files.createDirectories(sourceFile.getParent());
             try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(sourceFile))) {
+                String macro = "_" + cppHeader.getName().replace(".", "_").toUpperCase() + "_";
                 printWriter.println("// GENERATED SOURCE FILE");
+                printWriter.println("#ifndef " + macro);
+                printWriter.println("#define " + macro);
+                for (CppClass cppClass : cppHeader.getClasses()) {
+                    printWriter.println();
+                    printWriter.println("class " + cppClass.getName() + "{");
+                    printWriter.println("  public:");
+                    printWriter.println("    void doSomething();");
+                    printWriter.println("};");
+                }
+                printWriter.println("#endif");
+                printWriter.println();
             }
         }
     }
