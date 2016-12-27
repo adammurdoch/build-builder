@@ -6,7 +6,10 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         new Main().run("--root-dir", projectDir.absolutePath, "--type", "java")
 
         then:
-        succeeds("build")
+        buildSucceeds(":installDist")
+        exeSucceeds(file("build/install/testApp/bin/testApp"))
+
+        buildSucceeds("build")
     }
 
     def "can generate multi-project build"() {
@@ -14,7 +17,9 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         new Main().run("--root-dir", projectDir.absolutePath, "--type", "java", "--projects", "5")
 
         then:
-        succeeds("build")
-    }
+        buildSucceeds(":installDist")
+        exeSucceeds(file("build/install/testApp/bin/testApp"))
 
+        buildSucceeds("build")
+    }
 }

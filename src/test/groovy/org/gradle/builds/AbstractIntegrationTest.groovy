@@ -14,9 +14,21 @@ abstract class AbstractIntegrationTest extends Specification {
         projectDir = tmpDir.newFolder("generated-root-dir")
     }
 
-    void succeeds(String... tasks) {
+    File file(String path) {
+        return new File(projectDir, path)
+    }
+
+    void buildSucceeds(String... tasks) {
         def commandLine = ["/Users/adam/gradle/current/bin/gradle", "-S"] + (tasks as List)
         println "RUNNING: " + commandLine
+        runCommand(commandLine)
+    }
+
+    void exeSucceeds(File path) {
+        runCommand([path.absolutePath])
+    }
+
+    private void runCommand(List<String> commandLine) {
         def builder = new ProcessBuilder(commandLine)
         builder.directory(projectDir)
         builder.environment().put("JAVA_HOME", System.getProperty("java.home"))

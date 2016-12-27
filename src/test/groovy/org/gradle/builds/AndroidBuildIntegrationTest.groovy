@@ -6,7 +6,10 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
         new Main().run("--root-dir", projectDir.absolutePath, "--type", "android")
 
         then:
-        succeeds("build")
+        buildSucceeds(":assembleDebug")
+        file("build/outputs/apk/testApp-debug.apk").exists()
+
+        buildSucceeds("build")
     }
 
     def "can generate multi-project build"() {
@@ -14,6 +17,9 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
         new Main().run("--root-dir", projectDir.absolutePath, "--type", "android", "--projects", "5")
 
         then:
-        succeeds("build")
+        buildSucceeds(":assembleDebug")
+        file("build/outputs/apk/testApp-debug.apk").exists()
+
+        buildSucceeds("build")
     }
 }

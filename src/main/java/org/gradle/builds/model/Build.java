@@ -13,7 +13,7 @@ public class Build {
 
     public Build(Path rootDir) {
         this.rootDir = rootDir;
-        rootProject = new Project(null, rootDir.getFileName().toString(), rootDir);
+        rootProject = new Project(null, "testApp", rootDir);
     }
 
     public Path getRootDir() {

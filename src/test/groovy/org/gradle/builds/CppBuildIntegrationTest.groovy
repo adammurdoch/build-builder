@@ -6,7 +6,10 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         new Main().run("--root-dir", projectDir.absolutePath, "--type", "cpp")
 
         then:
-        succeeds("build")
+        buildSucceeds(":installMain")
+        exeSucceeds(file("build/install/main/main"))
+
+        buildSucceeds("build")
     }
 
     def "can generate multi-project build"() {
@@ -14,6 +17,9 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         new Main().run("--root-dir", projectDir.absolutePath, "--type", "cpp", "--projects", "5")
 
         then:
-        succeeds("build")
+        buildSucceeds(":installMain")
+        exeSucceeds(file("build/install/main/main"))
+
+        buildSucceeds("build")
     }
 }
