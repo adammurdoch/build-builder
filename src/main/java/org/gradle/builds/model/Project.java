@@ -23,6 +23,11 @@ public class Project {
         this.projectDir = projectDir;
     }
 
+    @Override
+    public String toString() {
+        return getPath();
+    }
+
     public String getName() {
         return name;
     }

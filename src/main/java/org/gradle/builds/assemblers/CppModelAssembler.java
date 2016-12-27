@@ -2,6 +2,9 @@ package org.gradle.builds.assemblers;
 
 import org.gradle.builds.model.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class CppModelAssembler extends ModelAssembler {
     @Override
     protected void populate(Project project) {
@@ -84,8 +87,20 @@ public class CppModelAssembler extends ModelAssembler {
     }
 
     private void addDependencies(Project project, SoftwareModelDeclaration componentDeclaration) {
+        // Need to include transitive dependencies
+        HashSet<Project> seen = new HashSet<>();
         for (Project dep : project.getDependencies()) {
-            componentDeclaration.dependsOn(dep.getPath());
+            addDependencies(componentDeclaration, dep, seen);
+        }
+    }
+
+    private void addDependencies(SoftwareModelDeclaration componentDeclaration, Project project, Set<Project> seen) {
+        if (!seen.add(project)) {
+            return;
+        }
+        componentDeclaration.dependsOn(project.getPath());
+        for (Project dep : project.getDependencies()) {
+            addDependencies(componentDeclaration, dep, seen);
         }
     }
 }

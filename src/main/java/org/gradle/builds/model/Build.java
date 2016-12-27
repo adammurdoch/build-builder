@@ -1,15 +1,15 @@
 package org.gradle.builds.model;
 
 import java.nio.file.Path;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 public class Build {
     private final Path rootDir;
     private final Project rootProject;
-    private final Map<String, Project> subprojects = new TreeMap<>();
+    private final Map<String, Project> subprojects = new LinkedHashMap<>();
 
     public Build(Path rootDir) {
         this.rootDir = rootDir;
