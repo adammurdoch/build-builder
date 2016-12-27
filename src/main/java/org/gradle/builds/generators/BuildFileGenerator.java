@@ -1,15 +1,13 @@
 package org.gradle.builds.generators;
 
-import org.gradle.builds.model.BuildScript;
-import org.gradle.builds.model.Project;
-import org.gradle.builds.model.Scope;
-import org.gradle.builds.model.ScriptBlock;
+import org.gradle.builds.model.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.Set;
 
 public class BuildFileGenerator extends ProjectFileGenerator {
     @Override
@@ -39,27 +37,50 @@ public class BuildFileGenerator extends ProjectFileGenerator {
                     printWriter.println("apply plugin: '" + pluginId + "'");
                 }
             }
+            if (!buildScript.getDependencies().isEmpty()) {
+                printWriter.println();
+                printWriter.println("dependencies {");
+                for (Map.Entry<String, Set<String>> entry : buildScript.getDependencies().entrySet()) {
+                    for (String dep : entry.getValue()) {
+                        printWriter.println("    " + entry.getKey() + " project('" + dep + "')");
+                    }
+                }
+                printWriter.println("}");
+            }
             writeBlock(buildScript, "", printWriter);
             if (!buildScript.getComponentDeclarations().isEmpty()) {
                 printWriter.println();
                 printWriter.println("model {");
                 printWriter.println("    components {");
-                for (Map.Entry<String, String> entry : buildScript.getComponentDeclarations().entrySet()) {
-                    printWriter.println("        " + entry.getKey() + "(" + entry.getValue() + ") {");
+                for (SoftwareModelDeclaration component : buildScript.getComponentDeclarations()) {
+                    printWriter.println("        " + component.getName() + "(" + component.getType() + ") {");
+                    if (!component.getDependencies().isEmpty()) {
+                        printWriter.println("            sources {");
+                        printWriter.println("                all {");
+                        for (String dep : component.getDependencies()) {
+                            printWriter.println("                    lib project: '" + dep + "', library: 'main'");
+                        }
+                        printWriter.println("                }");
+                        printWriter.println("            }");
+                    }
                     printWriter.println("        }");
                 }
                 printWriter.println("    }");
                 printWriter.println("}");
             }
+            printWriter.println();
         }
     }
 
     private void writeBlock(Scope block, String indent, PrintWriter printWriter) {
-        for (Map.Entry<String, Object> entry : block.getProperties().entrySet()) {
-            if (entry.getValue() instanceof Number) {
-                printWriter.println(indent + entry.getKey() + " = " + entry.getValue());
-            } else {
-                printWriter.println(indent + entry.getKey() + " = '" + entry.getValue() + "'");
+        if (!block.getProperties().isEmpty()) {
+            printWriter.println();
+            for (Map.Entry<String, Object> entry : block.getProperties().entrySet()) {
+                if (entry.getValue() instanceof Number) {
+                    printWriter.println(indent + entry.getKey() + " = " + entry.getValue());
+                } else {
+                    printWriter.println(indent + entry.getKey() + " = '" + entry.getValue() + "'");
+                }
             }
         }
         for (ScriptBlock childBlock : block.getBlocks()) {

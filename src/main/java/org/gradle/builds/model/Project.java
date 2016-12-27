@@ -6,13 +6,14 @@ import java.util.Set;
 
 public class Project {
     public enum Role {
-        Application, Library, Empty
+        Application, Library, Empty;
     }
 
     private final Project parent;
     private final String name;
     private final Path projectDir;
     private final BuildScript buildScript = new BuildScript();
+    private final Set<Project> dependencies = new LinkedHashSet<>();
     private final Set<Component> components = new LinkedHashSet<>();
     private Role role = Role.Empty;
 
@@ -24,6 +25,17 @@ public class Project {
 
     public String getName() {
         return name;
+    }
+
+    public String getPath() {
+        if (parent == null) {
+            return ":";
+        }
+        String parentPath = parent.getPath();
+        if (parentPath.equals(":")) {
+            return ":" + name;
+        }
+        return parentPath + ":" + name;
     }
 
     public Path getProjectDir() {
@@ -44,6 +56,14 @@ public class Project {
 
     public BuildScript getBuildScript() {
         return buildScript;
+    }
+
+    public Set<Project> getDependencies() {
+        return dependencies;
+    }
+
+    public void dependsOn(Project project) {
+        this.dependencies.add(project);
     }
 
     public <T extends Component> T component(Class<T> type) {

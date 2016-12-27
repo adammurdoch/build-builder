@@ -1,9 +1,6 @@
 package org.gradle.builds.assemblers;
 
-import org.gradle.builds.model.Build;
-import org.gradle.builds.model.BuildScript;
-import org.gradle.builds.model.HasNativeSource;
-import org.gradle.builds.model.Project;
+import org.gradle.builds.model.*;
 
 public class CppModelAssembler extends ModelAssembler {
     @Override
@@ -17,7 +14,8 @@ public class CppModelAssembler extends ModelAssembler {
                 BuildScript buildScript = project.getBuildScript();
                 buildScript.requirePlugin("native-component");
                 buildScript.requirePlugin("cpp-lang");
-                buildScript.componentDeclaration("main", "NativeLibrarySpec");
+                SoftwareModelDeclaration componentDeclaration = buildScript.componentDeclaration("main", "NativeLibrarySpec");
+                addDependencies(project, componentDeclaration);
             } else if (project.getRole() == Project.Role.Application) {
                 HasNativeSource app = project.addComponent(new HasNativeSource());
                 app.addSourceFile(project.getName() + ".cpp");
@@ -25,8 +23,15 @@ public class CppModelAssembler extends ModelAssembler {
                 BuildScript buildScript = project.getBuildScript();
                 buildScript.requirePlugin("native-component");
                 buildScript.requirePlugin("cpp-lang");
-                buildScript.componentDeclaration("main", "NativeExecutableSpec");
+                SoftwareModelDeclaration componentDeclaration = buildScript.componentDeclaration("main", "NativeExecutableSpec");
+                addDependencies(project, componentDeclaration);
             }
+        }
+    }
+
+    private void addDependencies(Project project, SoftwareModelDeclaration componentDeclaration) {
+        for (Project dep : project.getDependencies()) {
+            componentDeclaration.dependsOn(dep.getPath());
         }
     }
 }

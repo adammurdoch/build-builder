@@ -9,15 +9,16 @@ public class AndroidModelAssembler extends ModelAssembler {
         buildScript.requireOnBuildScriptClasspath("com.android.tools.build:gradle:2.2.2");
 
         for (Project project : build.getProjects()) {
+
             if (project.getRole() == Project.Role.Application) {
                 AndroidApplication androidApplication = project.addComponent(new AndroidApplication());
                 androidApplication.setPackageName(javaIdentifierFor(project));
                 JavaClass mainActivity = androidApplication.addClass(androidApplication.getPackageName() + ".AppActivity");
-                JavaClass implClass = androidApplication.addClass(androidApplication.getPackageName() + ".AppImpl");
-                mainActivity.uses(implClass);
+                addSourceFiles(androidApplication, mainActivity);
 
                 buildScript = project.getBuildScript();
                 buildScript.requirePlugin("com.android.application");
+                addDependencies(project, buildScript);
 
                 ScriptBlock androidBlock = buildScript.block("android");
                 androidBlock.property("buildToolsVersion", "25.0.0");
@@ -32,11 +33,11 @@ public class AndroidModelAssembler extends ModelAssembler {
                 AndroidLibrary androidLibrary = project.addComponent(new AndroidLibrary());
                 androidLibrary.setPackageName(javaIdentifierFor(project));
                 JavaClass libraryActivity = androidLibrary.addClass(androidLibrary.getPackageName() + ".LibraryActivity");
-                JavaClass implClass = androidLibrary.addClass(androidLibrary.getPackageName() + ".LibraryImpl");
-                libraryActivity.uses(implClass);
+                addSourceFiles(androidLibrary, libraryActivity);
 
                 buildScript = project.getBuildScript();
                 buildScript.requirePlugin("com.android.library");
+                addDependencies(project, buildScript);
 
                 ScriptBlock androidBlock = buildScript.block("android");
                 androidBlock.property("buildToolsVersion", "25.0.0");
@@ -48,5 +49,16 @@ public class AndroidModelAssembler extends ModelAssembler {
                 configBlock.property("versionName", "1.0");
             }
         }
+    }
+
+    private void addDependencies(Project project, BuildScript buildScript) {
+        for (Project dep : project.getDependencies()) {
+            buildScript.dependency("compile", dep.getPath());
+        }
+    }
+
+    private void addSourceFiles(AndroidComponent androidComponent, JavaClass activity) {
+        JavaClass implClass = androidComponent.addClass(activity.getName() + "Impl");
+        activity.uses(implClass);
     }
 }
