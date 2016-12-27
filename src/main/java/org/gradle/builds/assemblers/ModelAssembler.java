@@ -9,7 +9,7 @@ public abstract class ModelAssembler {
     /**
      * Returns an identifier for the project, can be used in Java package names.
      */
-    protected String identifierFor(Project project) {
+    protected String javaIdentifierFor(Project project) {
         if (project.getParent() == null) {
             return "org.gradle.example";
         }

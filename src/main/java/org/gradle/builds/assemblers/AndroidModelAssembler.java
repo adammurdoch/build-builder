@@ -11,8 +11,10 @@ public class AndroidModelAssembler extends ModelAssembler {
         for (Project project : build.getProjects()) {
             if (project.getRole() == Project.Role.Application) {
                 AndroidApplication androidApplication = project.addComponent(new AndroidApplication());
-                androidApplication.setPackageName(identifierFor(project));
-                androidApplication.addClass(androidApplication.getPackageName() + ".AppActivity");
+                androidApplication.setPackageName(javaIdentifierFor(project));
+                JavaClass mainActivity = androidApplication.addClass(androidApplication.getPackageName() + ".AppActivity");
+                JavaClass implClass = androidApplication.addClass(androidApplication.getPackageName() + ".AppImpl");
+                mainActivity.uses(implClass);
 
                 buildScript = project.getBuildScript();
                 buildScript.requirePlugin("com.android.application");
@@ -28,8 +30,10 @@ public class AndroidModelAssembler extends ModelAssembler {
                 configBlock.property("versionName", "1.0");
             } else if (project.getRole() == Project.Role.Library) {
                 AndroidLibrary androidLibrary = project.addComponent(new AndroidLibrary());
-                androidLibrary.setPackageName(identifierFor(project));
-                androidLibrary.addClass(androidLibrary.getPackageName() + ".LibraryActivity");
+                androidLibrary.setPackageName(javaIdentifierFor(project));
+                JavaClass libraryActivity = androidLibrary.addClass(androidLibrary.getPackageName() + ".LibraryActivity");
+                JavaClass implClass = androidLibrary.addClass(androidLibrary.getPackageName() + ".LibraryImpl");
+                libraryActivity.uses(implClass);
 
                 buildScript = project.getBuildScript();
                 buildScript.requirePlugin("com.android.library");
