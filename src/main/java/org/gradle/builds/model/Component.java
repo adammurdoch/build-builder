@@ -1,4 +1,4 @@
 package org.gradle.builds.model;
 
-public abstract class Component {
+public interface Component {
 }

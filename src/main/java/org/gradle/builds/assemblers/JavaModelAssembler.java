@@ -4,28 +4,27 @@ import org.gradle.builds.model.*;
 
 public class JavaModelAssembler extends ModelAssembler {
     @Override
-    public void populate(Build build) {
-        for (Project project : build.getProjects()) {
-            if (project.getRole() == Project.Role.Library) {
-                JavaLibrary library = project.addComponent(new JavaLibrary());
-                JavaClass apiClass = library.addClass(javaIdentifierFor(project) + ".Library");
-                addSource(library, apiClass);
+    protected void populate(Project project) {
+        if (project.getRole() == Project.Role.Library) {
+            JavaLibrary library = project.addComponent(new JavaLibrary());
+            JavaClass apiClass = library.addClass(javaIdentifierFor(project) + ".Library");
+            library.setApiClass(apiClass);
+            addSource(project, library, apiClass);
 
-                BuildScript buildScript = project.getBuildScript();
-                buildScript.requirePlugin("java");
-                addDependencies(project, buildScript);
-            } else if (project.getRole() == Project.Role.Application) {
-                JavaApplication application = project.addComponent(new JavaApplication());
-                JavaClass mainClass = application.addClass(javaIdentifierFor(project) + ".App");
-                mainClass.addMainMethod();
-                addSource(application, mainClass);
+            BuildScript buildScript = project.getBuildScript();
+            buildScript.requirePlugin("java");
+            addDependencies(project, buildScript);
+        } else if (project.getRole() == Project.Role.Application) {
+            JavaApplication application = project.addComponent(new JavaApplication());
+            JavaClass mainClass = application.addClass(javaIdentifierFor(project) + ".App");
+            mainClass.addMainMethod();
+            addSource(project, application, mainClass);
 
-                BuildScript buildScript = project.getBuildScript();
-                buildScript.requirePlugin("java");
-                buildScript.requirePlugin("application");
-                addDependencies(project, buildScript);
-                buildScript.property("mainClassName", mainClass.getName());
-            }
+            BuildScript buildScript = project.getBuildScript();
+            buildScript.requirePlugin("java");
+            buildScript.requirePlugin("application");
+            addDependencies(project, buildScript);
+            buildScript.property("mainClassName", mainClass.getName());
         }
     }
 
@@ -35,8 +34,11 @@ public class JavaModelAssembler extends ModelAssembler {
         }
     }
 
-    private void addSource(HasJavaSource library, JavaClass apiClass) {
+    private void addSource(Project project, HasJavaSource library, JavaClass apiClass) {
         JavaClass implClass = library.addClass(apiClass.getName() + "Impl");
         apiClass.uses(implClass);
+        for (Project depProject : project.getDependencies()) {
+            implClass.uses(depProject.component(JvmLibrary.class).getApiClass());
+        }
     }
 }
