@@ -2,15 +2,25 @@
 
 Generates various builds that can be used for profiling and benchmarking Gradle.
 
+Supported build types:
+
 - Java
 - Android
 - C++
 
+Generates one or more projects with source files. The source files have dependencies between each other, as described below.
+
+Also generates a [gradle-profiler](https://www.github.com/gradle/gradle-profiler) scenario file for the build.
+
 ### Command line options
 
-The `--projects` option can be used to specify the number of projects. The root project will contain an application of the relevant type, and all other projects will contain a library of the relevant type. 
+The `--projects` option can be used to specify the number of projects.
 
 The `--source-files` option can be used to specify the number of source files per project.
+
+### Build structure and dependency graph
+
+The root project will contain an application of the relevant type, and all other projects will contain a library of the relevant type. 
 
 Project dependency graph:
 
