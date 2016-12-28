@@ -4,7 +4,8 @@ import org.gradle.builds.model.Build;
 import org.gradle.builds.model.Project;
 
 public class StructureAssembler {
-    public void populate(int projects, Build build) {
+    public void populate(Settings settings, Build build) {
+        int projects = settings.getProjectCount();
         build.getRootProject().setRole(Project.Role.Application);
         if (projects == 1) {
             return;

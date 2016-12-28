@@ -10,6 +10,8 @@ Generates various builds that can be used for profiling and benchmarking Gradle.
 
 The `--projects` option can be used to specify the number of projects. The root project will contain an application of the relevant type, and all other projects will contain a library of the relevant type. 
 
+The `--source-files` option can be used to specify the number of source files per project.
+
 Project dependency graph:
 
 - The application project depends on all of the library projects except `core`
@@ -25,11 +27,11 @@ Here's an example:
            
 Dependencies between source files:
 
-- Each application has a main class (or function) and two implementation classes.
-- Each library has an API class and two implementation classes.
-- The main class/API class/main function uses the implementation classes.
+- Each application has a main class (or function) and two or more implementation classes.
+- Each library has an API class and two or more implementation classes.
+- The main class/API class/main function uses each of the implementation classes.
 - One implementation class uses the API class for each library that the project depends on.
-- One implementation class has no dependencies.
+- The remaining implementation classes have no dependencies.
 
 Here's an example:
 
@@ -51,5 +53,5 @@ Here's an example:
     - No Java library projects are included.
 - There are no external dependencies.
 - There are no tests.
-- Only a shallow and wide dependency graph is available.
+- Only a shallow and wide dependency graph is available, between projects and between source files.
 - There are no transitive API classes. 

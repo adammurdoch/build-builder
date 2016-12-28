@@ -10,12 +10,12 @@ public class AndroidModelAssembler extends ModelAssembler {
     }
 
     @Override
-    protected void populate(Project project) {
+    protected void populate(Settings settings, Project project) {
         if (project.getRole() == Project.Role.Application) {
             AndroidApplication androidApplication = project.addComponent(new AndroidApplication());
             androidApplication.setPackageName(javaIdentifierFor(project));
             JavaClass mainActivity = androidApplication.addClass(androidApplication.getPackageName() + ".AppActivity");
-            addSourceFiles(project, androidApplication, mainActivity);
+            addSourceFiles(settings, project, androidApplication, mainActivity);
 
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("com.android.application");
@@ -35,7 +35,7 @@ public class AndroidModelAssembler extends ModelAssembler {
             androidLibrary.setPackageName(javaIdentifierFor(project));
             JavaClass libraryActivity = androidLibrary.addClass(androidLibrary.getPackageName() + ".LibraryActivity");
             androidLibrary.setApiClass(libraryActivity);
-            addSourceFiles(project, androidLibrary, libraryActivity);
+            addSourceFiles(settings, project, androidLibrary, libraryActivity);
 
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("com.android.library");
@@ -58,13 +58,15 @@ public class AndroidModelAssembler extends ModelAssembler {
         }
     }
 
-    private void addSourceFiles(Project project, AndroidComponent androidComponent, JavaClass activity) {
+    private void addSourceFiles(Settings settings, Project project, AndroidComponent androidComponent, JavaClass activity) {
         JavaClass implClass = androidComponent.addClass(activity.getName() + "Impl");
         activity.uses(implClass);
         for (Project depProject : project.getDependencies()) {
             implClass.uses(depProject.component(JvmLibrary.class).getApiClass());
         }
-        JavaClass noDepsClass = androidComponent.addClass(activity.getName() + "NoDeps");
-        activity.uses(noDepsClass);
+        for (int i = 2; i < settings.getSourceFileCount(); i++) {
+            JavaClass noDepsClass = androidComponent.addClass(activity.getName() + "NoDeps" + (i-1));
+            activity.uses(noDepsClass);
+        }
     }
 }

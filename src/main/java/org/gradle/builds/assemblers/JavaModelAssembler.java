@@ -4,12 +4,12 @@ import org.gradle.builds.model.*;
 
 public class JavaModelAssembler extends ModelAssembler {
     @Override
-    protected void populate(Project project) {
+    protected void populate(Settings settings, Project project) {
         if (project.getRole() == Project.Role.Library) {
             JavaLibrary library = project.addComponent(new JavaLibrary());
             JavaClass apiClass = library.addClass(javaIdentifierFor(project) + ".Library");
             library.setApiClass(apiClass);
-            addSource(project, library, apiClass);
+            addSource(settings, project, library, apiClass);
 
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("java");
@@ -18,7 +18,7 @@ public class JavaModelAssembler extends ModelAssembler {
             JavaApplication application = project.addComponent(new JavaApplication());
             JavaClass mainClass = application.addClass(javaIdentifierFor(project) + ".App");
             mainClass.addMainMethod();
-            addSource(project, application, mainClass);
+            addSource(settings, project, application, mainClass);
 
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("java");
@@ -34,13 +34,15 @@ public class JavaModelAssembler extends ModelAssembler {
         }
     }
 
-    private void addSource(Project project, HasJavaSource library, JavaClass apiClass) {
+    private void addSource(Settings settings, Project project, HasJavaSource library, JavaClass apiClass) {
         JavaClass implClass = library.addClass(apiClass.getName() + "Impl");
         apiClass.uses(implClass);
         for (Project depProject : project.getDependencies()) {
             implClass.uses(depProject.component(JvmLibrary.class).getApiClass());
         }
-        JavaClass noDepsClass = library.addClass(apiClass.getName() + "NoDeps");
-        apiClass.uses(noDepsClass);
+        for (int i = 2; i < settings.getSourceFileCount();i++) {
+            JavaClass noDepsClass = library.addClass(apiClass.getName() + "NoDeps" + (i-1));
+            apiClass.uses(noDepsClass);
+        }
     }
 }

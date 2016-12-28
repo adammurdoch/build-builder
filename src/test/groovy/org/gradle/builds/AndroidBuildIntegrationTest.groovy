@@ -12,14 +12,45 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
         buildSucceeds("build")
     }
 
-    def "can generate multi-project build"() {
+    def "can generate single project build with the specified number of source files"() {
         when:
-        new Main().run("--root-dir", projectDir.absolutePath, "--type", "android", "--projects", "5")
+        new Main().run("--root-dir", projectDir.absolutePath, "--type", "android", "--source-files", sourceFiles)
 
         then:
         buildSucceeds(":assembleDebug")
         file("build/outputs/apk/testApp-debug.apk").exists()
 
         buildSucceeds("build")
+
+        where:
+        sourceFiles << ["2", "5"]
+    }
+
+    def "can generate multi-project build"() {
+        when:
+        new Main().run("--root-dir", projectDir.absolutePath, "--type", "android", "--projects", projects)
+
+        then:
+        buildSucceeds(":assembleDebug")
+        file("build/outputs/apk/testApp-debug.apk").exists()
+
+        buildSucceeds("build")
+
+        where:
+        projects << ["2", "5"]
+    }
+
+    def "can generate multi-project build with the specified number of source files"() {
+        when:
+        new Main().run("--root-dir", projectDir.absolutePath, "--type", "android", "--projects", "4", "--source-files", sourceFiles)
+
+        then:
+        buildSucceeds(":assembleDebug")
+        file("build/outputs/apk/testApp-debug.apk").exists()
+
+        buildSucceeds("build")
+
+        where:
+        sourceFiles << ["2", "5"]
     }
 }

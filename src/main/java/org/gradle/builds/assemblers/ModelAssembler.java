@@ -7,30 +7,30 @@ import java.util.HashSet;
 import java.util.Set;
 
 public abstract class ModelAssembler {
-    public void populate(Build build) {
+    public void populate(Settings settings, Build build) {
         rootProject(build.getRootProject());
         Set<Project> seen = new HashSet<>();
         for (Project project : build.getProjects()) {
-            populate(project, seen);
+            populate(settings, project, seen);
         }
     }
 
-    private void populate(Project project, Set<Project> seen) {
+    private void populate(Settings settings, Project project, Set<Project> seen) {
         if (!seen.add(project)) {
             return;
         }
 
         for (Project dep : project.getDependencies()) {
-            populate(dep, seen);
+            populate(settings, dep, seen);
         }
 
-        populate(project);
+        populate(settings, project);
     }
 
     /**
      * Called after dependencies have been populated.
      */
-    protected abstract void populate(Project project);
+    protected abstract void populate(Settings settings, Project project);
 
     protected void rootProject(Project rootProject) {
     }

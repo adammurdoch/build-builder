@@ -7,18 +7,15 @@ import java.util.Set;
 
 public class CppModelAssembler extends ModelAssembler {
     @Override
-    protected void populate(Project project) {
+    protected void populate(Settings settings, Project project) {
         if (project.getRole() == Project.Role.Library) {
             NativeLibrary lib = project.addComponent(new NativeLibrary());
 
             CppClass implClass = new CppClass(className(project) + "Impl");
             addReferences(project, implClass);
 
-            CppClass noDepsClass = new CppClass(className(project) + "NoDeps");
-
             CppClass apiClass = new CppClass(className(project));
             apiClass.uses(implClass);
-            apiClass.uses(noDepsClass);
             lib.setApiClass(apiClass);
 
             CppHeaderFile apiHeader = lib.addHeaderFile(fileName(project) + ".h");
@@ -27,7 +24,6 @@ public class CppModelAssembler extends ModelAssembler {
 
             CppHeaderFile implHeader = lib.addHeaderFile(fileName(project) + "_impl.h");
             implHeader.addClass(implClass);
-            implHeader.addClass(noDepsClass);
             implHeader.addHeader(apiHeader);
 
             CppSourceFile apiSourceFile = lib.addSourceFile(fileName(project) + ".cpp");
@@ -36,9 +32,10 @@ public class CppModelAssembler extends ModelAssembler {
 
             CppSourceFile implSourceFile = lib.addSourceFile(fileName(project) + "_impl.cpp");
             implSourceFile.addClass(implClass);
-            implSourceFile.addClass(noDepsClass);
             implSourceFile.addHeader(implHeader);
             addLibHeaders(project, implSourceFile);
+
+            addSource(settings, project, lib, apiClass, implHeader);
 
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("native-component");
@@ -48,15 +45,11 @@ public class CppModelAssembler extends ModelAssembler {
         } else if (project.getRole() == Project.Role.Application) {
             NativeApplication app = project.addComponent(new NativeApplication());
 
-            CppClass noDepsClass = new CppClass(className(project) + "NoDeps");
-
             CppClass appClass = new CppClass(className(project));
-            appClass.uses(noDepsClass);
             addReferences(project, appClass);
 
             CppHeaderFile headerFile = app.addHeaderFile(fileName(project) + ".h");
             headerFile.addClass(appClass);
-            headerFile.addClass(noDepsClass);
 
             CppSourceFile mainSourceFile = app.addSourceFile(fileName(project) + ".cpp");
             mainSourceFile.addMainFunction(appClass);
@@ -64,15 +57,27 @@ public class CppModelAssembler extends ModelAssembler {
 
             CppSourceFile implSourceFile = app.addSourceFile(fileName(project) + "_impl.cpp");
             implSourceFile.addClass(appClass);
-            implSourceFile.addClass(noDepsClass);
             implSourceFile.addHeader(headerFile);
             addLibHeaders(project, implSourceFile);
+
+            addSource(settings, project, app, appClass, headerFile);
 
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("native-component");
             buildScript.requirePlugin("cpp-lang");
             SoftwareModelDeclaration componentDeclaration = buildScript.componentDeclaration("main", "NativeExecutableSpec");
             addDependencies(project, componentDeclaration);
+        }
+    }
+
+    private void addSource(Settings settings, Project project, HasNativeSource component, CppClass apiClass, CppHeaderFile implHeader) {
+        for (int i = 2; i<settings.getSourceFileCount();i++) {
+            CppClass noDepsClass = new CppClass(className(project) + "NoDeps" + (i-1));
+            apiClass.uses(noDepsClass);
+            implHeader.addClass(noDepsClass);
+            CppSourceFile noDepsSourceFile = component.addSourceFile(fileName(project) + "_nodeps" + (i-1) + ".cpp");
+            noDepsSourceFile.addClass(noDepsClass);
+            noDepsSourceFile.addHeader(implHeader);
         }
     }
 

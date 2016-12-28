@@ -31,7 +31,8 @@ public class Main {
         OptionParser parser = new OptionParser();
         ArgumentAcceptingOptionSpec<String> projectOption = parser.accepts("root-dir", "The directory to generate into").withRequiredArg();
         ArgumentAcceptingOptionSpec<String> typeOption = parser.accepts("type", "The build type to generate (java, android, cpp)").withRequiredArg().defaultsTo("java");
-        ArgumentAcceptingOptionSpec<String> projectCountOption = parser.accepts("projects", "The number of projects to include").withRequiredArg().defaultsTo("1");
+        ArgumentAcceptingOptionSpec<String> projectCountOption = parser.accepts("projects", "The number of projects to include in the build").withRequiredArg().defaultsTo("1");
+        ArgumentAcceptingOptionSpec<String> sourceFileCountOption = parser.accepts("source-files", "The number of source files to include in each project").withRequiredArg().defaultsTo("3");
 
         OptionSet parsedOptions;
         try {
@@ -60,16 +61,22 @@ public class Main {
         }
 
         int projects = Integer.valueOf(parsedOptions.valueOf(projectCountOption));
+        int sourceFiles = Integer.valueOf(parsedOptions.valueOf(sourceFileCountOption));
+        if (sourceFiles < 2) {
+            throw new IllegalArgumentException("Minimum of 2 source files per project.");
+        }
+        Settings settings = new Settings(projects, sourceFiles);
 
         Path projectDir = new File(parsedOptions.valueOf(projectOption)).toPath();
         System.out.println("* Generating build in " + projectDir);
         System.out.println("* Projects: " + projects);
+        System.out.println("* Source files per project: " + sourceFiles + " (total: " + (projects*sourceFiles) + ")");
 
         Build build = new Build(projectDir);
 
         // Create model
-        new StructureAssembler().populate(projects, build);
-        modelAssembler.populate(build);
+        new StructureAssembler().populate(settings, build);
+        modelAssembler.populate(settings, build);
 
         // Generate files
         new SettingsFileGenerator().generate(build);
