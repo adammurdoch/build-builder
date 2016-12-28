@@ -64,5 +64,7 @@ public class AndroidModelAssembler extends ModelAssembler {
         for (Project depProject : project.getDependencies()) {
             implClass.uses(depProject.component(JvmLibrary.class).getApiClass());
         }
+        JavaClass noDepsClass = androidComponent.addClass(activity.getName() + "NoDeps");
+        activity.uses(noDepsClass);
     }
 }

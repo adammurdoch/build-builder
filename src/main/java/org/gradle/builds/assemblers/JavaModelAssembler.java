@@ -40,5 +40,7 @@ public class JavaModelAssembler extends ModelAssembler {
         for (Project depProject : project.getDependencies()) {
             implClass.uses(depProject.component(JvmLibrary.class).getApiClass());
         }
+        JavaClass noDepsClass = library.addClass(apiClass.getName() + "NoDeps");
+        apiClass.uses(noDepsClass);
     }
 }

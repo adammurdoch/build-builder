@@ -23,6 +23,7 @@ public class JavaSourceGenerator extends ProjectFileGenerator {
             try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(sourceFile))) {
                 printWriter.println("// GENERATED SOURCE FILE");
                 printWriter.println("package " + javaClass.getPackage() + ";");
+                printWriter.println();
                 printWriter.println("public class " + javaClass.getSimpleName() + " {");
                 printWriter.println("    public static String getSomeValue() {");
                 for (JavaClass dep : javaClass.getReferencedClasses()) {
@@ -31,11 +32,13 @@ public class JavaSourceGenerator extends ProjectFileGenerator {
                 printWriter.println("        return \"" + javaClass.getName() + "\";");
                 printWriter.println("    }");
                 if (javaClass.hasMainMethod()) {
+                    printWriter.println();
                     printWriter.println("    public static void main(String[] args) {");
                     printWriter.println("        System.out.println(\"greetings from \" + getSomeValue());");
                     printWriter.println("    }");
                 }
                 printWriter.println("}");
+                printWriter.println();
             }
         }
     }

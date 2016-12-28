@@ -15,6 +15,8 @@ Project dependency graph:
 - The application project depends on all of the library projects except `core`
 - All of the library projects depend on `core`
 
+Here's an example:
+
 ```
          +-> lib1 -+
     app -|         |-> core
@@ -23,15 +25,22 @@ Project dependency graph:
            
 Dependencies between source files:
 
-- Each application has a main class (or function) and an implementation class.
-- Each library has an API class and an implementation class.
-- The main class/API class/main function uses the implementation class.
-- The implementation class uses the API class for each library that the project depends on.
+- Each application has a main class (or function) and two implementation classes.
+- Each library has an API class and two implementation classes.
+- The main class/API class/main function uses the implementation classes.
+- One implementation class uses the API class for each library that the project depends on.
+- One implementation class has no dependencies.
+
+Here's an example:
 
 ```
-               +-> lib1 api -> lib1 impl -+
-    app class -|                          |-> core api -> core impl
-               +-> lib2 api -> lib1 impl -+    
+                                             +-> lib1 nodeps
+              +-> app nodeps                 |                            +-> core nodeps
+              |                +-> lib1 api -+-> lib1 impl -+             |
+    app main -+ -> app impl ---+                            +-> core api -+-> core impl
+                               +-> lib2 api -+-> lib2 impl -+             
+                                             |
+                                             +-> lib2 nodeps                                                           
 ```
 
 ### Current limitations
