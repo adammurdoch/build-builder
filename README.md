@@ -64,4 +64,5 @@ Here's an example:
 - There are no external dependencies.
 - There are no tests.
 - Only a shallow and wide dependency graph is available, between projects and between source files.
+- Generated classes are very small.
 - There are no transitive API classes. 
