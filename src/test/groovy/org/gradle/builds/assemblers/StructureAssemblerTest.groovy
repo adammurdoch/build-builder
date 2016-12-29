@@ -12,7 +12,7 @@ class StructureAssemblerTest extends Specification {
 
     def "builds dependency graph with one project"() {
         when:
-        assembler.populate(1, build)
+        assembler.populate(projects(1), build)
 
         then:
         build.projects.size() == 1
@@ -22,7 +22,7 @@ class StructureAssemblerTest extends Specification {
 
     def "builds dependency graph with two projects"() {
         when:
-        assembler.populate(2, build)
+        assembler.populate(projects(2), build)
 
         then:
         build.projects.size() == 2
@@ -34,7 +34,7 @@ class StructureAssemblerTest extends Specification {
 
     def "builds dependency graph with three projects"() {
         when:
-        assembler.populate(3, build)
+        assembler.populate(projects(3), build)
 
         then:
         build.projects.size() == 3
@@ -46,9 +46,9 @@ class StructureAssemblerTest extends Specification {
         subprojects[0].dependencies.empty
     }
 
-    def "builds dependency graph with four or more projects"() {
+    def "builds dependency graph with four projects"() {
         when:
-        assembler.populate(4, build)
+        assembler.populate(projects(4), build)
 
         then:
         build.projects.size() == 4
@@ -59,5 +59,25 @@ class StructureAssemblerTest extends Specification {
         subprojects[1].dependencies as List == [subprojects[0]]
         subprojects[2].dependencies as List == [subprojects[0]]
         subprojects[0].dependencies.empty
+    }
+
+    def "builds dependency graph with five projects"() {
+        when:
+        assembler.populate(projects(5), build)
+
+        then:
+        build.projects.size() == 5
+        build.subprojects.size() == 4
+
+        def subprojects = build.subprojects as List
+        build.rootProject.dependencies as List == [subprojects[1], subprojects[2], subprojects[3]]
+        subprojects[1].dependencies as List == [subprojects[0]]
+        subprojects[2].dependencies as List == [subprojects[0]]
+        subprojects[3].dependencies as List == [subprojects[0]]
+        subprojects[0].dependencies.empty
+    }
+
+    def projects(int p) {
+        return new Settings(p, 3)
     }
 }
