@@ -59,11 +59,16 @@ public class AndroidModelAssembler extends ModelAssembler {
     }
 
     private void addSourceFiles(Settings settings, Project project, AndroidComponent androidComponent, JavaClass activity) {
+        String stringResourceName = project.getName().toLowerCase();
+        androidComponent.stringResource(stringResourceName);
+
         JavaClass implClass = androidComponent.addClass(activity.getName() + "Impl");
         activity.uses(implClass);
         for (Project depProject : project.getDependencies()) {
             implClass.uses(depProject.component(JvmLibrary.class).getApiClass());
         }
+        implClass.addFieldReference(androidComponent.getPackageName() + ".R.string." + stringResourceName);
+
         for (int i = 2; i < settings.getSourceFileCount(); i++) {
             JavaClass noDepsClass = androidComponent.addClass(activity.getName() + "NoDeps" + (i-1));
             activity.uses(noDepsClass);

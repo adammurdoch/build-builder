@@ -6,6 +6,7 @@ import java.util.Set;
 public class JavaClass {
     private final String name;
     private final Set<JavaClass> referencedClasses = new LinkedHashSet<>();
+    private final Set<String> fieldReferences = new LinkedHashSet<>();
     private boolean mainMethod;
 
     public JavaClass(String name) {
@@ -40,5 +41,13 @@ public class JavaClass {
 
     public void addMainMethod() {
         mainMethod = true;
+    }
+
+    public Set<String> getFieldReferences() {
+        return fieldReferences;
+    }
+
+    public void addFieldReference(String fullyQualifiedName) {
+        fieldReferences.add(fullyQualifiedName);
     }
 }

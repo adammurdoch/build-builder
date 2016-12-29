@@ -29,6 +29,9 @@ public class JavaSourceGenerator extends ProjectFileGenerator {
                 for (JavaClass dep : javaClass.getReferencedClasses()) {
                     printWriter.println("        " + dep.getName() + ".getSomeValue();");
                 }
+                for (String field : javaClass.getFieldReferences()) {
+                    printWriter.println("        String s = String.valueOf(" + field + ");");
+                }
                 printWriter.println("        return \"" + javaClass.getName() + "\";");
                 printWriter.println("    }");
                 if (javaClass.hasMainMethod()) {

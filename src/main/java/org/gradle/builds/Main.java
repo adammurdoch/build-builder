@@ -82,6 +82,7 @@ public class Main {
         new SettingsFileGenerator().generate(build);
         new BuildFileGenerator().generate(build);
         new AndroidManifestGenerator().generate(build);
+        new AndroidStringResourcesGenerator().generate(build);
         new JavaSourceGenerator().generate(build);
         new CppSourceGenerator().generate(build);
         new ScenarioFileGenerator().generate(build);
