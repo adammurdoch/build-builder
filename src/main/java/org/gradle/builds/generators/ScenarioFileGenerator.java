@@ -32,8 +32,8 @@ public class ScenarioFileGenerator {
                     apiClass = "src/main/java/org/gradle/example/AppImpl.java";
                     implClass = "src/main/java/org/gradle/example/AppImpl.java";
                 } else {
-                    apiClass = "core/src/main/java/org/gradle/example/core/Library.java";
-                    implClass = "core/src/main/java/org/gradle/example/core/LibraryImpl.java";
+                    apiClass = "core/src/main/java/org/gradle/example/core/Core.java";
+                    implClass = "core/src/main/java/org/gradle/example/core/CoreImpl.java";
                 }
 
                 printWriter.println();
