@@ -11,26 +11,27 @@ public class CppModelAssembler extends ModelAssembler {
         if (project.getRole() == Project.Role.Library) {
             NativeLibrary lib = project.addComponent(new NativeLibrary());
 
-            CppClass implClass = new CppClass(className(project) + "Impl");
+            CppClass apiClass = new CppClass(classNameFor(project));
+
+            CppClass implClass = new CppClass(apiClass.getName() + "Impl");
             addReferences(project, implClass);
 
-            CppClass apiClass = new CppClass(className(project));
             apiClass.uses(implClass);
             lib.setApiClass(apiClass);
 
-            CppHeaderFile apiHeader = lib.addHeaderFile(fileName(project) + ".h");
+            CppHeaderFile apiHeader = lib.addHeaderFile(fileNameFor(project) + ".h");
             apiHeader.addClass(apiClass);
             lib.setApiHeader(apiHeader);
 
-            CppHeaderFile implHeader = lib.addHeaderFile(fileName(project) + "_impl.h");
+            CppHeaderFile implHeader = lib.addHeaderFile(fileNameFor(project) + "_impl.h");
             implHeader.addClass(implClass);
             implHeader.addHeader(apiHeader);
 
-            CppSourceFile apiSourceFile = lib.addSourceFile(fileName(project) + ".cpp");
+            CppSourceFile apiSourceFile = lib.addSourceFile(fileNameFor(project) + ".cpp");
             apiSourceFile.addClass(apiClass);
             apiSourceFile.addHeader(implHeader);
 
-            CppSourceFile implSourceFile = lib.addSourceFile(fileName(project) + "_impl.cpp");
+            CppSourceFile implSourceFile = lib.addSourceFile(fileNameFor(project) + "_impl.cpp");
             implSourceFile.addClass(implClass);
             implSourceFile.addHeader(implHeader);
             addLibHeaders(project, implSourceFile);
@@ -45,17 +46,17 @@ public class CppModelAssembler extends ModelAssembler {
         } else if (project.getRole() == Project.Role.Application) {
             NativeApplication app = project.addComponent(new NativeApplication());
 
-            CppClass appClass = new CppClass(className(project));
+            CppClass appClass = new CppClass(classNameFor(project));
             addReferences(project, appClass);
 
-            CppHeaderFile headerFile = app.addHeaderFile(fileName(project) + ".h");
+            CppHeaderFile headerFile = app.addHeaderFile(fileNameFor(project) + ".h");
             headerFile.addClass(appClass);
 
-            CppSourceFile mainSourceFile = app.addSourceFile(fileName(project) + ".cpp");
+            CppSourceFile mainSourceFile = app.addSourceFile(fileNameFor(project) + ".cpp");
             mainSourceFile.addMainFunction(appClass);
             mainSourceFile.addHeader(headerFile);
 
-            CppSourceFile implSourceFile = app.addSourceFile(fileName(project) + "_impl.cpp");
+            CppSourceFile implSourceFile = app.addSourceFile(fileNameFor(project) + "_impl.cpp");
             implSourceFile.addClass(appClass);
             implSourceFile.addHeader(headerFile);
             addLibHeaders(project, implSourceFile);
@@ -72,10 +73,10 @@ public class CppModelAssembler extends ModelAssembler {
 
     private void addSource(Settings settings, Project project, HasNativeSource component, CppClass apiClass, CppHeaderFile implHeader) {
         for (int i = 2; i<settings.getSourceFileCount();i++) {
-            CppClass noDepsClass = new CppClass(className(project) + "NoDeps" + (i-1));
+            CppClass noDepsClass = new CppClass(apiClass.getName() + "NoDeps" + (i-1));
             apiClass.uses(noDepsClass);
             implHeader.addClass(noDepsClass);
-            CppSourceFile noDepsSourceFile = component.addSourceFile(fileName(project) + "_nodeps" + (i-1) + ".cpp");
+            CppSourceFile noDepsSourceFile = component.addSourceFile(fileNameFor(project) + "_nodeps" + (i-1) + ".cpp");
             noDepsSourceFile.addClass(noDepsClass);
             noDepsSourceFile.addHeader(implHeader);
         }
@@ -91,14 +92,6 @@ public class CppModelAssembler extends ModelAssembler {
         for (Project dep : project.getDependencies()) {
             cppClass.uses(dep.component(NativeLibrary.class).getApiClass());
         }
-    }
-
-    private String fileName(Project project) {
-        return project.getName();
-    }
-
-    private String className(Project project) {
-        return project.getName();
     }
 
     private void addDependencies(Project project, SoftwareModelDeclaration componentDeclaration) {

@@ -7,7 +7,7 @@ public class JavaModelAssembler extends ModelAssembler {
     protected void populate(Settings settings, Project project) {
         if (project.getRole() == Project.Role.Library) {
             JavaLibrary library = project.addComponent(new JavaLibrary());
-            JavaClass apiClass = library.addClass(javaIdentifierFor(project) + ".Library");
+            JavaClass apiClass = library.addClass(javaPackageFor(project) + "." + classNameFor(project));
             library.setApiClass(apiClass);
             addSource(settings, project, library, apiClass);
 
@@ -16,7 +16,7 @@ public class JavaModelAssembler extends ModelAssembler {
             addDependencies(project, buildScript);
         } else if (project.getRole() == Project.Role.Application) {
             JavaApplication application = project.addComponent(new JavaApplication());
-            JavaClass mainClass = application.addClass(javaIdentifierFor(project) + ".App");
+            JavaClass mainClass = application.addClass(javaPackageFor(project) + "." + classNameFor(project));
             mainClass.addMainMethod();
             addSource(settings, project, application, mainClass);
 

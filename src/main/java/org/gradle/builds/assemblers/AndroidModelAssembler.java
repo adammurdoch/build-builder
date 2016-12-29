@@ -13,8 +13,8 @@ public class AndroidModelAssembler extends ModelAssembler {
     protected void populate(Settings settings, Project project) {
         if (project.getRole() == Project.Role.Application) {
             AndroidApplication androidApplication = project.addComponent(new AndroidApplication());
-            androidApplication.setPackageName(javaIdentifierFor(project));
-            JavaClass mainActivity = androidApplication.addClass(androidApplication.getPackageName() + ".AppActivity");
+            androidApplication.setPackageName(javaPackageFor(project));
+            JavaClass mainActivity = androidApplication.addClass(androidApplication.getPackageName() + "." + classNameFor(project));
             addSourceFiles(settings, project, androidApplication, mainActivity);
 
             BuildScript buildScript = project.getBuildScript();
@@ -32,8 +32,8 @@ public class AndroidModelAssembler extends ModelAssembler {
             configBlock.property("versionName", "1.0");
         } else if (project.getRole() == Project.Role.Library) {
             AndroidLibrary androidLibrary = project.addComponent(new AndroidLibrary());
-            androidLibrary.setPackageName(javaIdentifierFor(project));
-            JavaClass libraryActivity = androidLibrary.addClass(androidLibrary.getPackageName() + ".LibraryActivity");
+            androidLibrary.setPackageName(javaPackageFor(project));
+            JavaClass libraryActivity = androidLibrary.addClass(androidLibrary.getPackageName() + "." + classNameFor(project));
             androidLibrary.setApiClass(libraryActivity);
             addSourceFiles(settings, project, androidLibrary, libraryActivity);
 
