@@ -24,14 +24,15 @@ The root project will contain an application of the relevant type, and all other
 
 Project dependency graph:
 
-- The application project depends on all of the library projects except `core`
-- All of the library projects depend on `core`
+- The application depends on either directly or indirectly all library projects
+- Libraries are arranged in layers of 3 - 6 projects.
+- The bottom-most libraries, with no dependencies, are called `core`.
 
 Here's an example:
 
 ```
          +-> lib1 -+
-    app -|         |-> core
+    app -|         |-> core1
          +-> lib2 -+
 ```
            
@@ -41,6 +42,7 @@ Dependencies between source files:
 - Each library has an API class and two or more implementation classes.
 - The main class/API class/main function uses each of the implementation classes.
 - One implementation class uses the API class for each library that the project depends on.
+    - For Android projects, this class also uses the generated `R` class.
 - The remaining implementation classes have no dependencies.
 
 Here's an example:
@@ -58,7 +60,6 @@ Here's an example:
 ### Current limitations
 
 - The Android application does not actually work. The other applications can be installed and executed.
-    - The `R` and other generated classes are not referenced.
     - No annotation processors are used.
     - No Java library projects are included.
 - There are no external dependencies.
