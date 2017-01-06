@@ -61,9 +61,12 @@ public class Main {
         }
 
         int projects = Integer.valueOf(parsedOptions.valueOf(projectCountOption));
+        if (projects < 1) {
+            throw new IllegalArgumentException("Minimum of 1 project.");
+        }
         int sourceFiles = Integer.valueOf(parsedOptions.valueOf(sourceFileCountOption));
-        if (sourceFiles < 2) {
-            throw new IllegalArgumentException("Minimum of 2 source files per project.");
+        if (sourceFiles < 1) {
+            throw new IllegalArgumentException("Minimum of 1 source files per project.");
         }
         Settings settings = new Settings(projects, sourceFiles);
 

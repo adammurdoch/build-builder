@@ -56,7 +56,7 @@ public class CppModelAssembler extends ModelAssembler {
     }
 
     private void addSource(Project project, HasNativeSource component, CppClass apiClass, CppSourceFile apiSourceFile, CppHeaderFile implHeader) {
-        int implLayer = project.getClassGraph().getLayers().size() - 2;
+        int implLayer = Math.max(0, project.getClassGraph().getLayers().size() - 2);
         project.getClassGraph().visit((Graph.Visitor<CppClass>) (layer, item, lastLayer, dependencies) -> {
             CppClass cppClass;
             CppSourceFile cppSourceFile;

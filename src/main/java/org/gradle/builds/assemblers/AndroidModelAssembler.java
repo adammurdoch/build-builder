@@ -15,7 +15,7 @@ public class AndroidModelAssembler extends ModelAssembler {
             AndroidApplication androidApplication = project.addComponent(new AndroidApplication());
             androidApplication.setPackageName(javaPackageFor(project));
             JavaClass mainActivity = androidApplication.addClass(androidApplication.getPackageName() + "." + classNameFor(project));
-            addSourceFiles(settings, project, androidApplication, mainActivity);
+            addSourceFiles(project, androidApplication, mainActivity);
 
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("com.android.application");
@@ -35,7 +35,7 @@ public class AndroidModelAssembler extends ModelAssembler {
             androidLibrary.setPackageName(javaPackageFor(project));
             JavaClass libraryActivity = androidLibrary.addClass(androidLibrary.getPackageName() + "." + classNameFor(project));
             androidLibrary.setApiClass(libraryActivity);
-            addSourceFiles(settings, project, androidLibrary, libraryActivity);
+            addSourceFiles(project, androidLibrary, libraryActivity);
 
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("com.android.library");
@@ -58,11 +58,11 @@ public class AndroidModelAssembler extends ModelAssembler {
         }
     }
 
-    private void addSourceFiles(Settings settings, Project project, AndroidComponent androidComponent, JavaClass activity) {
+    private void addSourceFiles(Project project, AndroidComponent androidComponent, JavaClass activity) {
         String stringResourceName = project.getName().toLowerCase();
         androidComponent.stringResource(stringResourceName);
 
-        int implLayer = project.getClassGraph().getLayers().size() - 2;
+        int implLayer = Math.max(0, project.getClassGraph().getLayers().size() - 2);
         project.getClassGraph().visit((Graph.Visitor<JavaClass>) (layer, item, lastLayer, dependencies) -> {
             JavaClass javaClass;
             if (layer == 0) {

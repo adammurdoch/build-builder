@@ -35,7 +35,7 @@ public class JavaModelAssembler extends ModelAssembler {
     }
 
     private void addSource(Project project, HasJavaSource library, JavaClass apiClass) {
-        int implLayer = project.getClassGraph().getLayers().size() - 2;
+        int implLayer = Math.max(0, project.getClassGraph().getLayers().size() - 2);
         project.getClassGraph().visit((Graph.Visitor<JavaClass>) (layer, item, lastLayer, dependencies) -> {
             JavaClass javaClass;
             if (layer == 0) {

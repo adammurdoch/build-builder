@@ -23,7 +23,7 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         buildSucceeds("build")
 
         where:
-        sourceFiles << ["2", "5"]
+        sourceFiles << ["1", "2", "5"]
     }
 
     def "can generate multi-project build"() {
@@ -51,6 +51,6 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         buildSucceeds("build")
 
         where:
-        sourceFiles << ["2", "5"]
+        sourceFiles << ["1", "2", "5"]
     }
 }
