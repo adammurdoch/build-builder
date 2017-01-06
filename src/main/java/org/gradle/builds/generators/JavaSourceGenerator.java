@@ -25,14 +25,27 @@ public class JavaSourceGenerator extends ProjectFileGenerator {
                 printWriter.println("package " + javaClass.getPackage() + ";");
                 printWriter.println();
                 printWriter.println("public class " + javaClass.getSimpleName() + " {");
+                printWriter.println("    public static final int INT_CONST = 123;");
+                printWriter.println("    public static final String STRING_CONST = \"" + javaClass.getName() + "\";");
+                printWriter.println("    private static final int PRIVATE_INT_CONST = 456;");
+                printWriter.println("    private static final String PRIVATE_STRING_CONST = \"some value\";");
+                printWriter.println();
+                printWriter.println("    private int calculateSomeValue() {");
+                printWriter.println("        int total = 0;");
+                printWriter.println("        for (int i = 0; i < INT_CONST; i++) {");
+                printWriter.println("            total += i;");
+                printWriter.println("        }");
+                printWriter.println("        return total;");
+                printWriter.println("    }");
+                printWriter.println();
                 printWriter.println("    public static String getSomeValue() {");
                 for (JavaClass dep : javaClass.getReferencedClasses()) {
                     printWriter.println("        " + dep.getName() + ".getSomeValue();");
                 }
                 for (String field : javaClass.getFieldReferences()) {
-                    printWriter.println("        String s = String.valueOf(" + field + ");");
+                    printWriter.println("        String.valueOf(" + field + ");");
                 }
-                printWriter.println("        return \"" + javaClass.getName() + "\";");
+                printWriter.println("        return STRING_CONST;");
                 printWriter.println("    }");
                 if (javaClass.hasMainMethod()) {
                     printWriter.println();
