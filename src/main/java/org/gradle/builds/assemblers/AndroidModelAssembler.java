@@ -62,16 +62,30 @@ public class AndroidModelAssembler extends ModelAssembler {
         String stringResourceName = project.getName().toLowerCase();
         androidComponent.stringResource(stringResourceName);
 
-        JavaClass implClass = androidComponent.addClass(activity.getName() + "Impl");
-        activity.uses(implClass);
-        for (Project depProject : project.getDependencies()) {
-            implClass.uses(depProject.component(JvmLibrary.class).getApiClass());
-        }
-        implClass.addFieldReference(androidComponent.getPackageName() + ".R.string." + stringResourceName);
-
-        for (int i = 2; i < settings.getSourceFileCount(); i++) {
-            JavaClass noDepsClass = androidComponent.addClass(activity.getName() + "NoDeps" + (i-1));
-            activity.uses(noDepsClass);
-        }
+        int implLayer = project.getClassGraph().getLayers().size() - 2;
+        project.getClassGraph().visit((Graph.Visitor<JavaClass>) (layer, item, lastLayer, dependencies) -> {
+            JavaClass javaClass;
+            if (layer == 0) {
+                javaClass = activity;
+            } else {
+                String name;
+                if (lastLayer) {
+                    name = "NoDeps" + (item + 1);
+                } else {
+                    name = "Impl" + (layer) + "_" + (item + 1);
+                }
+                javaClass = androidComponent.addClass(activity.getName() + name);
+            }
+            if (layer == implLayer) {
+                for (Project depProject : project.getDependencies()) {
+                    javaClass.uses(depProject.component(JvmLibrary.class).getApiClass());
+                }
+                javaClass.addFieldReference(androidComponent.getPackageName() + ".R.string." + stringResourceName);
+            }
+            for (JavaClass dep : dependencies) {
+                javaClass.uses(dep);
+            }
+            return javaClass;
+        });
     }
 }

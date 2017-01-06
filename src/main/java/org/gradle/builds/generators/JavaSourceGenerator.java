@@ -26,8 +26,9 @@ public class JavaSourceGenerator extends ProjectFileGenerator {
                 printWriter.println();
                 printWriter.println("public class " + javaClass.getSimpleName() + " {");
                 printWriter.println("    public static final int INT_CONST = 123;");
+                printWriter.println("    public static final int UNUSED_INT_CONST = 456;");
                 printWriter.println("    public static final String STRING_CONST = \"" + javaClass.getName() + "\";");
-                printWriter.println("    private static final int PRIVATE_INT_CONST = 456;");
+                printWriter.println("    private static final int PRIVATE_INT_CONST = 789;");
                 printWriter.println("    private static final String PRIVATE_STRING_CONST = \"some value\";");
                 printWriter.println();
                 printWriter.println("    private int calculateSomeValue() {");
@@ -41,6 +42,7 @@ public class JavaSourceGenerator extends ProjectFileGenerator {
                 printWriter.println("    public static String getSomeValue() {");
                 for (JavaClass dep : javaClass.getReferencedClasses()) {
                     printWriter.println("        " + dep.getName() + ".getSomeValue();");
+                    printWriter.println("        String.valueOf(" + dep.getName() + ".INT_CONST);");
                 }
                 for (String field : javaClass.getFieldReferences()) {
                     printWriter.println("        String.valueOf(" + field + ");");

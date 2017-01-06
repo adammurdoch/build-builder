@@ -12,11 +12,6 @@ public class CppModelAssembler extends ModelAssembler {
             NativeLibrary lib = project.addComponent(new NativeLibrary());
 
             CppClass apiClass = new CppClass(classNameFor(project));
-
-            CppClass implClass = new CppClass(apiClass.getName() + "Impl");
-            addReferences(project, implClass);
-
-            apiClass.uses(implClass);
             lib.setApiClass(apiClass);
 
             CppHeaderFile apiHeader = lib.addHeaderFile(fileNameFor(project) + ".h");
@@ -24,19 +19,13 @@ public class CppModelAssembler extends ModelAssembler {
             lib.setApiHeader(apiHeader);
 
             CppHeaderFile implHeader = lib.addHeaderFile(fileNameFor(project) + "_impl.h");
-            implHeader.addClass(implClass);
             implHeader.addHeader(apiHeader);
 
             CppSourceFile apiSourceFile = lib.addSourceFile(fileNameFor(project) + ".cpp");
             apiSourceFile.addClass(apiClass);
             apiSourceFile.addHeader(implHeader);
 
-            CppSourceFile implSourceFile = lib.addSourceFile(fileNameFor(project) + "_impl.cpp");
-            implSourceFile.addClass(implClass);
-            implSourceFile.addHeader(implHeader);
-            addLibHeaders(project, implSourceFile);
-
-            addSource(settings, project, lib, apiClass, implHeader);
+            addSource(project, lib, apiClass, apiSourceFile, implHeader);
 
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("native-component");
@@ -47,7 +36,6 @@ public class CppModelAssembler extends ModelAssembler {
             NativeApplication app = project.addComponent(new NativeApplication());
 
             CppClass appClass = new CppClass(classNameFor(project));
-            addReferences(project, appClass);
 
             CppHeaderFile headerFile = app.addHeaderFile(fileNameFor(project) + ".h");
             headerFile.addClass(appClass);
@@ -55,13 +43,9 @@ public class CppModelAssembler extends ModelAssembler {
             CppSourceFile mainSourceFile = app.addSourceFile(fileNameFor(project) + ".cpp");
             mainSourceFile.addMainFunction(appClass);
             mainSourceFile.addHeader(headerFile);
+            mainSourceFile.addClass(appClass);
 
-            CppSourceFile implSourceFile = app.addSourceFile(fileNameFor(project) + "_impl.cpp");
-            implSourceFile.addClass(appClass);
-            implSourceFile.addHeader(headerFile);
-            addLibHeaders(project, implSourceFile);
-
-            addSource(settings, project, app, appClass, headerFile);
+            addSource(project, app, appClass, mainSourceFile, headerFile);
 
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("native-component");
@@ -71,15 +55,36 @@ public class CppModelAssembler extends ModelAssembler {
         }
     }
 
-    private void addSource(Settings settings, Project project, HasNativeSource component, CppClass apiClass, CppHeaderFile implHeader) {
-        for (int i = 2; i<settings.getSourceFileCount();i++) {
-            CppClass noDepsClass = new CppClass(apiClass.getName() + "NoDeps" + (i-1));
-            apiClass.uses(noDepsClass);
-            implHeader.addClass(noDepsClass);
-            CppSourceFile noDepsSourceFile = component.addSourceFile(fileNameFor(project) + "_nodeps" + (i-1) + ".cpp");
-            noDepsSourceFile.addClass(noDepsClass);
-            noDepsSourceFile.addHeader(implHeader);
-        }
+    private void addSource(Project project, HasNativeSource component, CppClass apiClass, CppSourceFile apiSourceFile, CppHeaderFile implHeader) {
+        int implLayer = project.getClassGraph().getLayers().size() - 2;
+        project.getClassGraph().visit((Graph.Visitor<CppClass>) (layer, item, lastLayer, dependencies) -> {
+            CppClass cppClass;
+            CppSourceFile cppSourceFile;
+            if (layer == 0) {
+                cppClass = apiClass;
+                cppSourceFile = apiSourceFile;
+            } else {
+                String name;
+                if (lastLayer) {
+                    name = "NoDeps" + (item + 1);
+                } else {
+                    name = "Impl" + (layer) + "_" + (item + 1);
+                }
+                cppClass = new CppClass(apiClass.getName() + name);
+                implHeader.addClass(cppClass);
+                cppSourceFile = component.addSourceFile(fileNameFor(project) + "_" + name.toLowerCase() + ".cpp");
+                cppSourceFile.addClass(cppClass);
+                cppSourceFile.addHeader(implHeader);
+            }
+            if (layer == implLayer) {
+                addReferences(project, cppClass);
+                addLibHeaders(project, cppSourceFile);
+            }
+            for (CppClass dep : dependencies) {
+                cppClass.uses(dep);
+            }
+            return cppClass;
+        });
     }
 
     private void addLibHeaders(Project project, CppSourceFile sourceFile) {
@@ -96,7 +101,7 @@ public class CppModelAssembler extends ModelAssembler {
 
     private void addDependencies(Project project, SoftwareModelDeclaration componentDeclaration) {
         // Need to include transitive dependencies
-        HashSet<Project> seen = new HashSet<>();
+        Set<Project> seen = new HashSet<>();
         for (Project dep : project.getDependencies()) {
             addDependencies(componentDeclaration, dep, seen);
         }

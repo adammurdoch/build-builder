@@ -44,6 +44,27 @@ public class Graph {
         layers.get(layer).add(node);
     }
 
+    public <T> void visit(Visitor<T> visitor) {
+        Map<Graph.Node, T> values = new HashMap<>();
+        int lastLayer = getLayers().size() - 1;
+        for (int layer = lastLayer; layer >= 0; layer--) {
+            List<Graph.Node> nodes = getLayers().get(layer);
+            for (int item = 0; item < nodes.size(); item++) {
+                Graph.Node node = nodes.get(item);
+                Set<T> deps = new LinkedHashSet<T>();
+                for (Node dep : node.getDependsOn()) {
+                    deps.add(values.get(dep));
+                }
+                T value = visitor.visitNode(layer, item, lastLayer == layer, deps);
+                values.put(node, value);
+            }
+        }
+    }
+
+    public interface Visitor<T> {
+        T visitNode(int layer, int item, boolean lastLayer, Set<T> dependencies);
+    }
+
     public class Node {
         private final int layer;
 

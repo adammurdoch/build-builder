@@ -1,5 +1,7 @@
 package org.gradle.builds.model;
 
+import org.gradle.builds.assemblers.Graph;
+
 import java.nio.file.Path;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -16,6 +18,7 @@ public class Project {
     private final Set<Project> dependencies = new LinkedHashSet<>();
     private final Set<Component> components = new LinkedHashSet<>();
     private Role role = Role.Empty;
+    private Graph classGraph;
 
     public Project(Project parent, String name, Path projectDir) {
         this.parent = parent;
@@ -69,6 +72,14 @@ public class Project {
 
     public void dependsOn(Project project) {
         this.dependencies.add(project);
+    }
+
+    public void setClassGraph(Graph classGraph) {
+        this.classGraph = classGraph;
+    }
+
+    public Graph getClassGraph() {
+        return classGraph;
     }
 
     public <T extends Component> T component(Class<T> type) {

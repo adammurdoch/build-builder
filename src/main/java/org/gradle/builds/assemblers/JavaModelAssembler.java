@@ -9,7 +9,7 @@ public class JavaModelAssembler extends ModelAssembler {
             JavaLibrary library = project.addComponent(new JavaLibrary());
             JavaClass apiClass = library.addClass(javaPackageFor(project) + "." + classNameFor(project));
             library.setApiClass(apiClass);
-            addSource(settings, project, library, apiClass);
+            addSource(project, library, apiClass);
 
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("java");
@@ -18,7 +18,7 @@ public class JavaModelAssembler extends ModelAssembler {
             JavaApplication application = project.addComponent(new JavaApplication());
             JavaClass mainClass = application.addClass(javaPackageFor(project) + "." + classNameFor(project));
             mainClass.addMainMethod();
-            addSource(settings, project, application, mainClass);
+            addSource(project, application, mainClass);
 
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("java");
@@ -34,15 +34,30 @@ public class JavaModelAssembler extends ModelAssembler {
         }
     }
 
-    private void addSource(Settings settings, Project project, HasJavaSource library, JavaClass apiClass) {
-        JavaClass implClass = library.addClass(apiClass.getName() + "Impl");
-        apiClass.uses(implClass);
-        for (Project depProject : project.getDependencies()) {
-            implClass.uses(depProject.component(JvmLibrary.class).getApiClass());
-        }
-        for (int i = 2; i < settings.getSourceFileCount();i++) {
-            JavaClass noDepsClass = library.addClass(apiClass.getName() + "NoDeps" + (i-1));
-            apiClass.uses(noDepsClass);
-        }
+    private void addSource(Project project, HasJavaSource library, JavaClass apiClass) {
+        int implLayer = project.getClassGraph().getLayers().size() - 2;
+        project.getClassGraph().visit((Graph.Visitor<JavaClass>) (layer, item, lastLayer, dependencies) -> {
+            JavaClass javaClass;
+            if (layer == 0) {
+                javaClass = apiClass;
+            } else {
+                String name;
+                if (lastLayer) {
+                    name = "NoDeps" + (item + 1);
+                } else {
+                    name = "Impl" + (layer) + "_" + (item + 1);
+                }
+                javaClass = library.addClass(apiClass.getName() + name);
+            }
+            if (layer == implLayer) {
+                for (Project depProject : project.getDependencies()) {
+                    javaClass.uses(depProject.component(JvmLibrary.class).getApiClass());
+                }
+            }
+            for (JavaClass dep : dependencies) {
+                javaClass.uses(dep);
+            }
+            return javaClass;
+        });
     }
 }

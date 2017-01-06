@@ -31,39 +31,39 @@ Project dependency graph:
 Here's an example:
 
 ```
-         +-> lib1 -+
-    app -|         |-> core1
-         +-> lib2 -+
+         +-> lib1_1 -+
+    app -|           |-> core1
+         +-> lib1_2 -+
 ```
            
 Dependencies between source files:
 
 - Each application has a main class (or function) and two or more implementation classes.
 - Each library has an API class and two or more implementation classes.
-- The main class/API class/main function uses each of the implementation classes.
-- One implementation class uses the API class for each library that the project depends on.
+- The classes are arranged in layers of 3 - 6 classes.
+- The main class/API class/main function uses the first layer of implementation classes.
+- The implementation classes in the second last layer use the API class for each library that the project depends on.
     - For Android projects, this class also uses the generated `R` class.
-- The remaining implementation classes have no dependencies.
+- The implementation classes in the last layer have no dependencies, and are suffixed with `NoDeps`.
 
 Here's an example:
 
 ```
-                                             +-> lib1 nodeps
-              +-> app nodeps                 |                            +-> core nodeps
-              |                +-> lib1 api -+-> lib1 impl -+             |
-    app main -+ -> app impl ---+                            +-> core api -+-> core impl
-                               +-> lib2 api -+-> lib2 impl -+             
-                                             |
-                                             +-> lib2 nodeps                                                           
+                         +-> AppNoDeps1                        
+         +-> AppImpl1_1 -|
+    App -|               |---> Lib1_1Api --> ...
+         +-> AppImpl1_2 -+ 
 ```
 
 ### Current limitations
 
-- The Android application does not actually work. The other applications can be installed and executed.
+- The Android application does not actually work. The Java and C++ applications can be installed and executed.
     - No annotation processors are used.
     - No Java library projects are included.
 - There are no external dependencies.
 - There are no tests.
-- Only a shallow and wide dependency graph is available, between projects and between source files.
-- Generated classes are very small.
+- Only a basic dependency graph is available, between projects and between source files.
+    - Arranged in layers 
+    - Only one layer of a project references classes from other projects
+- Generated classes are small.
 - There are no transitive API classes. 

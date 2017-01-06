@@ -5,7 +5,8 @@ import java.util.List;
 
 public class GraphAssembler {
     /**
-     * Attempts to create 3 layers, then attempts to keep between 3 and 6 in each layer
+     * Attempts to create 3 layers, then attempts to keep between 3 and 6 nodes in each layer
+     * A node depends on every node in the next layer.
      */
     public void arrange(int nodes, Graph graph) {
         int remaining = nodes - 1;
