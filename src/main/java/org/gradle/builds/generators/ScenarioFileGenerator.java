@@ -29,11 +29,11 @@ public class ScenarioFileGenerator {
                 String apiClass;
                 String implClass;
                 if (build.getProjects().size() == 1) {
-                    apiClass = "src/main/java/org/gradle/example/AppImpl.java";
-                    implClass = "src/main/java/org/gradle/example/AppImpl.java";
+                    apiClass = "src/main/java/org/gradle/example/App.java";
+                    implClass = "src/main/java/org/gradle/example/AppNoDeps1.java";
                 } else {
-                    apiClass = "core/src/main/java/org/gradle/example/core/Core.java";
-                    implClass = "core/src/main/java/org/gradle/example/core/CoreImpl.java";
+                    apiClass = "core1/src/main/java/org/gradle/example/core1/Core1.java";
+                    implClass = "core1/src/main/java/org/gradle/example/core1/CoreNoDeps1.java";
                 }
 
                 printWriter.println();
