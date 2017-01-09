@@ -13,7 +13,7 @@ public class Build {
 
     public Build(Path rootDir) {
         this.rootDir = rootDir;
-        rootProject = new Project(null, "testApp", rootDir);
+        rootProject = new Project(1, null, "testApp", rootDir);
     }
 
     public Path getRootDir() {
@@ -36,7 +36,7 @@ public class Build {
     }
 
     public Project addProject(String name) {
-        Project project = new Project(rootProject, name, rootDir.resolve(name));
+        Project project = new Project(subprojects.size() + 2, rootProject, name, rootDir.resolve(name));
         subprojects.put(name, project);
         return project;
     }

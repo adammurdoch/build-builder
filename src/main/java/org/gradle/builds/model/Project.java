@@ -11,6 +11,7 @@ public class Project {
         Application, Library, Empty;
     }
 
+    private final int id;
     private final Project parent;
     private final String name;
     private final Path projectDir;
@@ -20,7 +21,8 @@ public class Project {
     private Role role = Role.Empty;
     private Graph classGraph;
 
-    public Project(Project parent, String name, Path projectDir) {
+    public Project(int id, Project parent, String name, Path projectDir) {
+        this.id = id;
         this.parent = parent;
         this.name = name;
         this.projectDir = projectDir;
@@ -29,6 +31,10 @@ public class Project {
     @Override
     public String toString() {
         return getPath();
+    }
+
+    public int getId() {
+        return id;
     }
 
     public String getName() {

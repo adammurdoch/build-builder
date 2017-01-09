@@ -17,6 +17,8 @@ public class JavaSourceGenerator extends ProjectFileGenerator {
             return;
         }
 
+        int n = project.getId() * 10000;
+
         for (JavaClass javaClass : component.getSourceFiles()) {
             Path sourceFile = project.getProjectDir().resolve("src/main/java/" + javaClass.getName().replace(".", "/") + ".java");
             Files.createDirectories(sourceFile.getParent());
@@ -25,16 +27,24 @@ public class JavaSourceGenerator extends ProjectFileGenerator {
                 printWriter.println("package " + javaClass.getPackage() + ";");
                 printWriter.println();
                 printWriter.println("public class " + javaClass.getSimpleName() + " {");
-                printWriter.println("    public static final int INT_CONST = 123;");
-                printWriter.println("    public static final int UNUSED_INT_CONST = 456;");
+                printWriter.println("    // constant with unique value, referenced by other classes");
+                printWriter.println("    public static final int INT_CONST = " + (n++) + ";");
+                printWriter.println("    // constant with unique value, not referenced by any other classes");
+                printWriter.println("    public static final int UNUSED_INT_CONST = " + (n++) + ";");
+                printWriter.println("    // constant with unique value, not referenced by any other classes");
                 printWriter.println("    public static final String STRING_CONST = \"" + javaClass.getName() + "\";");
-                printWriter.println("    private static final int PRIVATE_INT_CONST = 789;");
+                printWriter.println("    public static final Object NON_INLINED_CONST = new Object();");
+                printWriter.println();
+                printWriter.println("    private static final int PRIVATE_INT_CONST = 123;");
                 printWriter.println("    private static final String PRIVATE_STRING_CONST = \"some value\";");
+                printWriter.println();
+                printWriter.println("    public String string1 = STRING_CONST;");
+                printWriter.println("    private boolean field1 = true;");
                 printWriter.println();
                 printWriter.println("    private int calculateSomeValue() {");
                 printWriter.println("        int total = 0;");
                 printWriter.println("        for (int i = 0; i < INT_CONST; i++) {");
-                printWriter.println("            total += i;");
+                printWriter.println("            total += i * 400;");
                 printWriter.println("        }");
                 printWriter.println("        return total;");
                 printWriter.println("    }");
