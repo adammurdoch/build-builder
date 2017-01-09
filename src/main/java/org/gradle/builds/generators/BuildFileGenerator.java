@@ -70,6 +70,12 @@ public class BuildFileGenerator extends ProjectFileGenerator {
                 printWriter.println("}");
             }
             printWriter.println();
+            printWriter.println("allprojects {");
+            printWriter.println("    tasks.withType(JavaCompile) {");
+            printWriter.println("        options.incremental = true");
+            printWriter.println("    }");
+            printWriter.println("}");
+            printWriter.println();
         }
     }
 
