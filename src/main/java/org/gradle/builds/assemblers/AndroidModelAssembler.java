@@ -54,7 +54,7 @@ public class AndroidModelAssembler extends ModelAssembler {
 
     private void addDependencies(Project project, BuildScript buildScript) {
         for (Project dep : project.getDependencies()) {
-            buildScript.dependency("compile", dep.getPath());
+            buildScript.dependsOnProject("compile", dep.getPath());
         }
     }
 

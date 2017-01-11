@@ -1,5 +1,6 @@
 package org.gradle.builds.model;
 
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -7,7 +8,7 @@ public class JavaClass {
     private final String name;
     private final Set<JavaClass> referencedClasses = new LinkedHashSet<>();
     private final Set<String> fieldReferences = new LinkedHashSet<>();
-    private boolean mainMethod;
+    private final Set<ClassRole> roles = new HashSet<>();
 
     public JavaClass(String name) {
         this.name = name;
@@ -35,12 +36,17 @@ public class JavaClass {
         referencedClasses.add(javaClass);
     }
 
-    public boolean hasMainMethod() {
-        return mainMethod;
+    public <T extends ClassRole> T role(Class<T> type) {
+        for (ClassRole role : roles) {
+            if (type.isInstance(role)) {
+                return type.cast(role);
+            }
+        }
+        return null;
     }
 
-    public void addMainMethod() {
-        mainMethod = true;
+    public void addRole(ClassRole role) {
+        roles.add(role);
     }
 
     public Set<String> getFieldReferences() {

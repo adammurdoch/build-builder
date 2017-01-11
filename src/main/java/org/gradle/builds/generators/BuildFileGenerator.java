@@ -25,8 +25,8 @@ public class BuildFileGenerator extends ProjectFileGenerator {
                 printWriter.println("        jcenter()");
                 printWriter.println("    }");
                 printWriter.println("    dependencies {");
-                for (String gav : buildScript.getBuildScriptClasspath()) {
-                    printWriter.println("        classpath '" + gav + "'");
+                for (ExternalDependencyDeclaration dep : buildScript.getBuildScriptClasspath()) {
+                    printWriter.println("        classpath '" + dep.getGav() + "'");
                 }
                 printWriter.println("    }");
                 printWriter.println("}");
@@ -37,12 +37,20 @@ public class BuildFileGenerator extends ProjectFileGenerator {
                     printWriter.println("apply plugin: '" + pluginId + "'");
                 }
             }
+            if (project.getParent() == null) {
+                printWriter.println();
+                printWriter.println("allprojects {");
+                printWriter.println("    repositories {");
+                printWriter.println("        jcenter()");
+                printWriter.println("    }");
+                printWriter.println("}");
+            }
             if (!buildScript.getDependencies().isEmpty()) {
                 printWriter.println();
                 printWriter.println("dependencies {");
-                for (Map.Entry<String, Set<String>> entry : buildScript.getDependencies().entrySet()) {
-                    for (String dep : entry.getValue()) {
-                        printWriter.println("    " + entry.getKey() + " project('" + dep + "')");
+                for (Map.Entry<String, Set<DependencyDeclaration>> entry : buildScript.getDependencies().entrySet()) {
+                    for (DependencyDeclaration dep : entry.getValue()) {
+                        printWriter.println("    " + entry.getKey() + " " + format(dep));
                     }
                 }
                 printWriter.println("}");
@@ -58,8 +66,8 @@ public class BuildFileGenerator extends ProjectFileGenerator {
                     if (!component.getDependencies().isEmpty()) {
                         printWriter.println("            sources {");
                         printWriter.println("                all {");
-                        for (String dep : component.getDependencies()) {
-                            printWriter.println("                    lib project: '" + dep + "', library: 'main'");
+                        for (ProjectDependencyDeclaration dep : component.getDependencies()) {
+                            printWriter.println("                    lib project: '" + dep.getProjectPath() + "', library: 'main'");
                         }
                         printWriter.println("                }");
                         printWriter.println("            }");
@@ -69,14 +77,24 @@ public class BuildFileGenerator extends ProjectFileGenerator {
                 printWriter.println("    }");
                 printWriter.println("}");
             }
-            printWriter.println();
-            printWriter.println("allprojects {");
-            printWriter.println("    tasks.withType(JavaCompile) {");
-            printWriter.println("        options.incremental = true");
-            printWriter.println("    }");
-            printWriter.println("}");
+            if (project.getParent() == null) {
+                printWriter.println();
+                printWriter.println("allprojects {");
+                printWriter.println("    tasks.withType(JavaCompile) {");
+                printWriter.println("        options.incremental = true");
+                printWriter.println("    }");
+                printWriter.println("}");
+            }
             printWriter.println();
         }
+    }
+
+    private String format(DependencyDeclaration dep) {
+        if (dep instanceof ProjectDependencyDeclaration) {
+            ProjectDependencyDeclaration projectDependencyDeclaration = (ProjectDependencyDeclaration) dep;
+            return "project('" + projectDependencyDeclaration.getProjectPath() + "')";
+        }
+        return "'" + ((ExternalDependencyDeclaration) dep).getGav() + "'";
     }
 
     private void writeBlock(Scope block, String indent, PrintWriter printWriter) {

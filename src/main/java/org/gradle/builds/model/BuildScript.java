@@ -6,10 +6,10 @@ import java.util.Map;
 import java.util.Set;
 
 public class BuildScript extends Scope {
-    private final Set<String> buildScriptClasspath = new LinkedHashSet<>();
+    private final Set<ExternalDependencyDeclaration> buildScriptClasspath = new LinkedHashSet<>();
     private final Set<String> plugins = new LinkedHashSet<>();
     private final Set<SoftwareModelDeclaration> componentDeclarations = new LinkedHashSet<>();
-    private final Map<String, Set<String>> dependencies = new LinkedHashMap<>();
+    private final Map<String, Set<DependencyDeclaration>> dependencies = new LinkedHashMap<>();
 
     public Set<String> getPlugins() {
         return plugins;
@@ -19,12 +19,12 @@ public class BuildScript extends Scope {
         plugins.add(id);
     }
 
-    public Set<String> getBuildScriptClasspath() {
+    public Set<ExternalDependencyDeclaration> getBuildScriptClasspath() {
         return buildScriptClasspath;
     }
 
     public void requireOnBuildScriptClasspath(String gav) {
-        buildScriptClasspath.add(gav);
+        buildScriptClasspath.add(new ExternalDependencyDeclaration(gav));
     }
 
     public Set<SoftwareModelDeclaration> getComponentDeclarations() {
@@ -37,12 +37,21 @@ public class BuildScript extends Scope {
         return declaration;
     }
 
-    public Map<String, Set<String>> getDependencies() {
+    public Map<String, Set<DependencyDeclaration>> getDependencies() {
         return dependencies;
     }
 
-    public void dependency(String scope, String projectPath) {
-        Set<String> deps = dependencies.computeIfAbsent(scope, s -> new LinkedHashSet<>());
-        deps.add(projectPath);
+    private Set<DependencyDeclaration> getDepsForConfiguration(String configuration) {
+        return dependencies.computeIfAbsent(configuration, s -> new LinkedHashSet<>());
+    }
+
+    public void dependsOnProject(String configuration, String projectPath) {
+        Set<DependencyDeclaration> deps = getDepsForConfiguration(configuration);
+        deps.add(new ProjectDependencyDeclaration(projectPath));
+    }
+
+    public void dependsOnExternal(String configuration, String gav) {
+        Set<DependencyDeclaration> deps = getDepsForConfiguration(configuration);
+        deps.add(new ExternalDependencyDeclaration(gav));
     }
 }

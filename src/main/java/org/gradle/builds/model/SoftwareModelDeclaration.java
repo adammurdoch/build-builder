@@ -4,7 +4,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class SoftwareModelDeclaration {
-    private final Set<String> dependencies = new LinkedHashSet<>();
+    private final Set<ProjectDependencyDeclaration> dependencies = new LinkedHashSet<>();
     private final String name;
     private final String type;
 
@@ -21,11 +21,11 @@ public class SoftwareModelDeclaration {
         return type;
     }
 
-    public Set<String> getDependencies() {
+    public Set<ProjectDependencyDeclaration> getDependencies() {
         return dependencies;
     }
 
     public void dependsOn(String projectPath) {
-        dependencies.add(projectPath);
+        dependencies.add(new ProjectDependencyDeclaration(projectPath));
     }
 }

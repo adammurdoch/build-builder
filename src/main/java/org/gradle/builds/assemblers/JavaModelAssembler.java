@@ -2,6 +2,8 @@ package org.gradle.builds.assemblers;
 
 import org.gradle.builds.model.*;
 
+import java.util.LinkedHashSet;
+
 public class JavaModelAssembler extends ModelAssembler {
     @Override
     protected void populate(Settings settings, Project project) {
@@ -10,6 +12,7 @@ public class JavaModelAssembler extends ModelAssembler {
             JavaClass apiClass = library.addClass(javaPackageFor(project) + "." + classNameFor(project));
             library.setApiClass(apiClass);
             addSource(project, library, apiClass);
+            addTests(project, library);
 
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("java");
@@ -17,8 +20,9 @@ public class JavaModelAssembler extends ModelAssembler {
         } else if (project.getRole() == Project.Role.Application) {
             JavaApplication application = project.addComponent(new JavaApplication());
             JavaClass mainClass = application.addClass(javaPackageFor(project) + "." + classNameFor(project));
-            mainClass.addMainMethod();
+            mainClass.addRole(new AppEntryPoint());
             addSource(project, application, mainClass);
+            addTests(project, application);
 
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("java");
@@ -28,10 +32,18 @@ public class JavaModelAssembler extends ModelAssembler {
         }
     }
 
+    private void addTests(Project project, HasJavaSource application) {
+        for (JavaClass javaClass : new LinkedHashSet<>(application.getSourceFiles())) {
+            JavaClass testClass = application.addClass(javaClass.getName() + "Test");
+            testClass.addRole(new UnitTest());
+        }
+    }
+
     private void addDependencies(Project project, BuildScript buildScript) {
         for (Project dep : project.getDependencies()) {
-            buildScript.dependency("compile", dep.getPath());
+            buildScript.dependsOnProject("compile", dep.getPath());
         }
+        buildScript.dependsOnExternal("testCompile", "junit:junit:4.12");
     }
 
     private void addSource(Project project, HasJavaSource library, JavaClass apiClass) {
