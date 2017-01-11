@@ -2,16 +2,14 @@ package org.gradle.builds.assemblers;
 
 import org.gradle.builds.model.*;
 
-import java.util.LinkedHashSet;
-
-public class JavaModelAssembler extends ModelAssembler {
+public class JavaModelAssembler extends JvmModelAssembler {
     @Override
     protected void populate(Settings settings, Project project) {
         if (project.getRole() == Project.Role.Library) {
             JavaLibrary library = project.addComponent(new JavaLibrary());
             JavaClass apiClass = library.addClass(javaPackageFor(project) + "." + classNameFor(project));
             library.setApiClass(apiClass);
-            addSource(project, library, apiClass);
+            addSource(project, library, apiClass, javaClass -> {});
             addTests(project, library);
 
             BuildScript buildScript = project.getBuildScript();
@@ -21,7 +19,7 @@ public class JavaModelAssembler extends ModelAssembler {
             JavaApplication application = project.addComponent(new JavaApplication());
             JavaClass mainClass = application.addClass(javaPackageFor(project) + "." + classNameFor(project));
             mainClass.addRole(new AppEntryPoint());
-            addSource(project, application, mainClass);
+            addSource(project, application, mainClass, javaClass -> {});
             addTests(project, application);
 
             BuildScript buildScript = project.getBuildScript();
@@ -32,44 +30,10 @@ public class JavaModelAssembler extends ModelAssembler {
         }
     }
 
-    private void addTests(Project project, HasJavaSource application) {
-        for (JavaClass javaClass : new LinkedHashSet<>(application.getSourceFiles())) {
-            JavaClass testClass = application.addClass(javaClass.getName() + "Test");
-            testClass.addRole(new UnitTest());
-        }
-    }
-
     private void addDependencies(Project project, BuildScript buildScript) {
         for (Project dep : project.getDependencies()) {
             buildScript.dependsOnProject("compile", dep.getPath());
         }
         buildScript.dependsOnExternal("testCompile", "junit:junit:4.12");
-    }
-
-    private void addSource(Project project, HasJavaSource library, JavaClass apiClass) {
-        int implLayer = Math.max(0, project.getClassGraph().getLayers().size() - 2);
-        project.getClassGraph().visit((Graph.Visitor<JavaClass>) (layer, item, lastLayer, dependencies) -> {
-            JavaClass javaClass;
-            if (layer == 0) {
-                javaClass = apiClass;
-            } else {
-                String name;
-                if (lastLayer) {
-                    name = "NoDeps" + (item + 1);
-                } else {
-                    name = "Impl" + (layer) + "_" + (item + 1);
-                }
-                javaClass = library.addClass(apiClass.getName() + name);
-            }
-            if (layer == implLayer) {
-                for (Project depProject : project.getDependencies()) {
-                    javaClass.uses(depProject.component(JvmLibrary.class).getApiClass());
-                }
-            }
-            for (JavaClass dep : dependencies) {
-                javaClass.uses(dep);
-            }
-            return javaClass;
-        });
     }
 }

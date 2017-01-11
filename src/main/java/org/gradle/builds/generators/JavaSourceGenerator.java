@@ -56,6 +56,7 @@ public class JavaSourceGenerator extends ProjectFileGenerator {
             printWriter.println("        return total;");
             printWriter.println("    }");
             printWriter.println();
+            printWriter.println("    // public method referenced by other classes");
             printWriter.println("    public static String getSomeValue() {");
             for (JavaClass dep : javaClass.getReferencedClasses()) {
                 printWriter.println("        " + dep.getName() + ".getSomeValue();");
@@ -87,6 +88,7 @@ public class JavaSourceGenerator extends ProjectFileGenerator {
             printWriter.println("public class " + javaClass.getSimpleName() + " {");
             printWriter.println("    @org.junit.Test");
             printWriter.println("    public void ok() {");
+            printWriter.println("        " + javaClass.role(UnitTest.class).getClassUnderTest().getName() + ".getSomeValue();");
             printWriter.println("    }");
             printWriter.println("}");
             printWriter.println();
