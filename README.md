@@ -60,8 +60,9 @@ Here's an example:
 - The Android application does not actually work. The Java and C++ applications can be installed and executed.
     - No annotation processors are used.
     - No Java library projects are included.
+    - There are no test apps.
 - There are no external dependencies.
-- There are no tests.
+- There are no tests for C++
 - Only a basic dependency graph is available, between projects and between source files.
     - Arranged in layers 
     - Only one layer of a project references classes from other projects
