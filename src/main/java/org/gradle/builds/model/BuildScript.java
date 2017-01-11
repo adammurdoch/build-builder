@@ -5,11 +5,23 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class BuildScript extends Scope {
+public class BuildScript extends ProjectScriptBlock {
     private final Set<ExternalDependencyDeclaration> buildScriptClasspath = new LinkedHashSet<>();
     private final Set<String> plugins = new LinkedHashSet<>();
     private final Set<SoftwareModelDeclaration> componentDeclarations = new LinkedHashSet<>();
     private final Map<String, Set<DependencyDeclaration>> dependencies = new LinkedHashMap<>();
+    private ProjectScriptBlock allProjects;
+
+    public ProjectScriptBlock getAllProjects() {
+        return allProjects;
+    }
+
+    public ProjectScriptBlock allProjects() {
+        if (allProjects == null) {
+            allProjects = new ProjectScriptBlock();
+        }
+        return allProjects;
+    }
 
     public Set<String> getPlugins() {
         return plugins;

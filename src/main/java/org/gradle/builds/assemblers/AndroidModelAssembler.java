@@ -5,6 +5,7 @@ import org.gradle.builds.model.*;
 public class AndroidModelAssembler extends JvmModelAssembler {
     @Override
     protected void rootProject(Project rootProject) {
+        super.rootProject(rootProject);
         BuildScript buildScript = rootProject.getBuildScript();
         buildScript.requireOnBuildScriptClasspath("com.android.tools.build:gradle:2.2.2");
     }

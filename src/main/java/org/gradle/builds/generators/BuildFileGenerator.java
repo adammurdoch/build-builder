@@ -37,12 +37,17 @@ public class BuildFileGenerator extends ProjectFileGenerator {
                     printWriter.println("apply plugin: '" + pluginId + "'");
                 }
             }
-            if (project.getParent() == null) {
+            if (buildScript.getAllProjects() != null) {
                 printWriter.println();
                 printWriter.println("allprojects {");
-                printWriter.println("    repositories {");
-                printWriter.println("        jcenter()");
-                printWriter.println("    }");
+                if (!buildScript.getAllProjects().getRepositories().isEmpty()) {
+                    printWriter.println("    repositories {");
+                    for (ScriptBlock repoBlock : buildScript.getAllProjects().getRepositories()) {
+                        printWriter.println("        " + repoBlock.getName() + "()");
+                    }
+                    printWriter.println("    }");
+                }
+                writeBlockContents(buildScript.getAllProjects(), "    ", printWriter);
                 printWriter.println("}");
             }
             if (!buildScript.getDependencies().isEmpty()) {
@@ -55,7 +60,7 @@ public class BuildFileGenerator extends ProjectFileGenerator {
                 }
                 printWriter.println("}");
             }
-            writeBlock(buildScript, "", printWriter);
+            writeBlockContents(buildScript, "", printWriter);
             if (!buildScript.getComponentDeclarations().isEmpty()) {
                 printWriter.println();
                 printWriter.println("model {");
@@ -77,14 +82,6 @@ public class BuildFileGenerator extends ProjectFileGenerator {
                 printWriter.println("    }");
                 printWriter.println("}");
             }
-            if (project.getParent() == null) {
-                printWriter.println();
-                printWriter.println("allprojects {");
-                printWriter.println("    tasks.withType(JavaCompile) {");
-                printWriter.println("        options.incremental = true");
-                printWriter.println("    }");
-                printWriter.println("}");
-            }
             printWriter.println();
         }
     }
@@ -97,9 +94,8 @@ public class BuildFileGenerator extends ProjectFileGenerator {
         return "'" + ((ExternalDependencyDeclaration) dep).getGav() + "'";
     }
 
-    private void writeBlock(Scope block, String indent, PrintWriter printWriter) {
+    private void writeBlockContents(Scope block, String indent, PrintWriter printWriter) {
         if (!block.getProperties().isEmpty()) {
-            printWriter.println();
             for (Map.Entry<String, Object> entry : block.getProperties().entrySet()) {
                 if (entry.getValue() instanceof Number) {
                     printWriter.println(indent + entry.getKey() + " = " + entry.getValue());
@@ -111,7 +107,7 @@ public class BuildFileGenerator extends ProjectFileGenerator {
         for (ScriptBlock childBlock : block.getBlocks()) {
             printWriter.println();
             printWriter.println(indent + childBlock.getName() + " {");
-            writeBlock(childBlock, indent + "    ", printWriter);
+            writeBlockContents(childBlock, indent + "    ", printWriter);
             printWriter.println(indent + "}");
         }
     }

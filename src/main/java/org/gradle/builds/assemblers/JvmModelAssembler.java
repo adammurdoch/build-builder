@@ -6,6 +6,13 @@ import java.util.LinkedHashSet;
 import java.util.function.Consumer;
 
 public abstract class JvmModelAssembler extends ModelAssembler {
+    @Override
+    protected void rootProject(Project rootProject) {
+        ProjectScriptBlock allProjects = rootProject.getBuildScript().allProjects();
+        allProjects.jcenter();
+        allProjects.block("tasks.withType(JavaCompile)").property("options.incremental", "true");
+    }
+
     protected void addTests(Project project, HasJavaSource application) {
         for (JavaClass javaClass : new LinkedHashSet<>(application.getSourceFiles())) {
             JavaClass testClass = application.addClass(javaClass.getName() + "Test");
