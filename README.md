@@ -22,7 +22,7 @@ The `--source-files` option can be used to specify the number of source files pe
 
 The root project will contain an application of the relevant type, and all other projects will contain a library of the relevant type. 
 
-Project dependency graph:
+#### Project dependency graph
 
 - The application depends on either directly or indirectly all library projects
 - Libraries are arranged in layers of 3 - 6 projects.
@@ -32,7 +32,7 @@ Here's an example:
 
 <img src="https://rawgit.com/adammurdoch/build-builder/master/src/doc/projects.svg">
            
-Dependencies between source files:
+#### Dependencies between source files
 
 - Each application has a main class (or function) and two or more implementation classes.
 - Each library has an API class and two or more implementation classes.
