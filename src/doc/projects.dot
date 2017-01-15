@@ -1,0 +1,9 @@
+digraph projects {
+    graph [rankdir="LR"]
+    node [shape=box,style="rounded,filled",fontname="sans-serif",color="8",fillcolor="3",colorscheme="blues8"]
+    edge [arrowhead=onormal,color="8",colorscheme="blues8"]
+    testApp -> lib1_1
+    testApp -> lib1_2
+    lib1_1 -> core1
+    lib1_2 -> core1
+}

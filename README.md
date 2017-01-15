@@ -28,13 +28,9 @@ Project dependency graph:
 - Libraries are arranged in layers of 3 - 6 projects.
 - The bottom-most libraries, with no dependencies, are called `core`.
 
-Here's an example:
+Here's an example: 
 
-```
-         +-> lib1_1 -+
-    app -|           |-> core1
-         +-> lib1_2 -+
-```
+<img src="src/doc/projects.svg">
            
 Dependencies between source files:
 
