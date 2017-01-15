@@ -4,7 +4,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class ProjectScriptBlock extends Scope {
-    private final Set<ScriptBlock> repositories = new LinkedHashSet<ScriptBlock>();
+    private final Set<ScriptBlock> repositories = new LinkedHashSet<>();
 
     public Set<ScriptBlock> getRepositories() {
         return repositories;

@@ -15,8 +15,10 @@ public class AndroidModelAssembler extends JvmModelAssembler {
         if (project.getRole() == Project.Role.Application) {
             AndroidApplication androidApplication = project.addComponent(new AndroidApplication());
             androidApplication.setPackageName(javaPackageFor(project));
-            JavaClass mainActivity = androidApplication.addClass(androidApplication.getPackageName() + "." + classNameFor(project));
-            addSourceFiles(project, androidApplication, mainActivity);
+
+            JavaClass appActivity = androidApplication.addClass(androidApplication.getPackageName() + "." + classNameFor(project));
+            androidApplication.activity(appActivity);
+            addSourceFiles(project, androidApplication, appActivity);
             addTests(project, androidApplication);
 
             BuildScript buildScript = project.getBuildScript();
@@ -35,8 +37,10 @@ public class AndroidModelAssembler extends JvmModelAssembler {
         } else if (project.getRole() == Project.Role.Library) {
             AndroidLibrary androidLibrary = project.addComponent(new AndroidLibrary());
             androidLibrary.setPackageName(javaPackageFor(project));
+
             JavaClass libraryActivity = androidLibrary.addClass(androidLibrary.getPackageName() + "." + classNameFor(project));
             androidLibrary.setApiClass(libraryActivity);
+            androidLibrary.activity(libraryActivity);
             addSourceFiles(project, androidLibrary, libraryActivity);
             addTests(project, androidLibrary);
 

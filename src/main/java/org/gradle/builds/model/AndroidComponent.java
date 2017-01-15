@@ -6,6 +6,7 @@ import java.util.Set;
 public class AndroidComponent extends HasJavaSource {
     private String packageName;
     private final Set<String> stringResources = new LinkedHashSet<>();
+    private final Set<JavaClass> activities = new LinkedHashSet<>();
 
     public String getPackageName() {
         return packageName;
@@ -21,5 +22,13 @@ public class AndroidComponent extends HasJavaSource {
 
     public void stringResource(String name) {
         stringResources.add(name);
+    }
+
+    public Set<JavaClass> getActivities() {
+        return activities;
+    }
+
+    public void activity(JavaClass javaClass) {
+        activities.add(javaClass);
     }
 }
