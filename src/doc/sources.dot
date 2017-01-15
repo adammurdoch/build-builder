@@ -1,0 +1,35 @@
+digraph sources {
+    graph [rankdir="LR"]
+    node [shape=box,style="rounded,filled",fontname="sans-serif",color="8",fillcolor="3",colorscheme="blues8"]
+    edge [arrowhead=vee,color="8",colorscheme="blues8"]
+    subgraph cluster_app {
+        color="3"
+        colorscheme="blues8"
+        App -> AppImpl1_1
+        App -> AppImpl1_2
+        AppImpl1_1 -> AppNoDeps1
+        AppImpl1_2 -> AppNoDeps1
+    }
+    AppImpl1_1 -> Lib1_1
+    AppImpl1_2 -> Lib1_1
+    subgraph cluster_lib1_1 {
+        color="3"
+        colorscheme="blues8"
+        Lib1_1
+        Lib1_1 -> Lib1_1Impl1_1
+        Lib1_1 -> Lib1_1Impl1_2
+        Lib1_1Impl1_1 -> Lib1_1NoDeps1
+        Lib1_1Impl1_2 -> Lib1_1NoDeps1
+    }
+        Lib1_1Impl1_1 -> Core1
+        Lib1_1Impl1_2 -> Core1
+    subgraph cluster_core1 {
+        color="3"
+        colorscheme="blues8"
+        Core1
+        Core1 -> Core1Impl1_1
+        Core1 -> Core1Impl1_2
+        Core1Impl1_1 -> Core1NoDeps1
+        Core1Impl1_2 -> Core1NoDeps1
+    }
+}

@@ -30,7 +30,7 @@ Project dependency graph:
 
 Here's an example: 
 
-<img src="src/doc/projects.svg">
+<img src="https://rawgit.com/adammurdoch/build-builder/master/src/doc/projects.svg">
            
 Dependencies between source files:
 
@@ -44,19 +44,14 @@ Dependencies between source files:
 
 Here's an example:
 
-```
-                         +-> AppNoDeps1                        
-         +-> AppImpl1_1 -|
-    App -|               |---> Lib1_1Api --> ...
-         +-> AppImpl1_2 -+ 
-```
+<img src="https://rawgit.com/adammurdoch/build-builder/master/src/doc/sources.svg">
 
 ### Current limitations
 
 - The Android application does not actually work. The Java and C++ applications can be installed and executed.
     - No annotation processors are used.
     - No Java library projects are included.
-    - There are no test apps.
+    - There are no instrumented tests.
 - There are no external dependencies.
 - There are no tests for C++
 - Only a basic dependency graph is available, between projects and between source files.
