@@ -30,7 +30,7 @@ Project dependency graph:
 
 Here's an example: 
 
-<img src="src/docs/projects.svg">
+<img src="src/doc/projects.svg">
            
 Dependencies between source files:
 
