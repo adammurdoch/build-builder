@@ -12,13 +12,17 @@ Generates one or more projects with source files. The source files have dependen
 
 Also generates a [gradle-profiler](https://www.github.com/gradle/gradle-profiler) scenario file for the build.
 
-### Command line options
+### Command line usage
 
-The `--type` option specified the type of build to create. Values are `java`, `android` or `cpp`
+`build-builder init [options]`
 
-The `--projects` option can be used to specify the number of projects.
+The `--dir` option specifies the directory to create the build init. Default is the current directory.
 
-The `--source-files` option can be used to specify the number of source files per project.
+The `--type` option specifies the type of build to create. Values are `java`, `android` or `cpp`. Default is `java`.
+
+The `--projects` option specifies the number of projects. Default is 1.
+
+The `--source-files` option specifies the number of source files per project. Default is 3.
 
 ### Build structure and dependency graph
 
