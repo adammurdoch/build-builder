@@ -10,6 +10,7 @@ repositories {
 
 dependencies {
     compile 'net.sf.jopt-simple:jopt-simple:5.0.2'
+    compile 'io.airlift:airline:0.7'
 
     testCompile 'org.codehaus.groovy:groovy:2.4.7'
     testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'

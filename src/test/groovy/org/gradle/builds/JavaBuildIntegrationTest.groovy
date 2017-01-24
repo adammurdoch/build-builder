@@ -3,7 +3,7 @@ package org.gradle.builds
 class JavaBuildIntegrationTest extends AbstractIntegrationTest {
     def "can generate single project build"() {
         when:
-        new Main().run("--root-dir", projectDir.absolutePath, "--type", "java")
+        new Main().run("init", "--dir", projectDir.absolutePath, "--type", "java")
 
         then:
         buildSucceeds(":installDist")
@@ -14,7 +14,7 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
 
     def "can generate single project build with specified number of source files"() {
         when:
-        new Main().run("--root-dir", projectDir.absolutePath, "--type", "java", "--source-files", sourceFiles)
+        new Main().run("init", "--dir", projectDir.absolutePath, "--type", "java", "--source-files", sourceFiles)
 
         then:
         buildSucceeds(":installDist")
@@ -28,7 +28,7 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
 
     def "can generate multi-project build"() {
         when:
-        new Main().run("--root-dir", projectDir.absolutePath, "--type", "java", "--projects", projects)
+        new Main().run("init", "--dir", projectDir.absolutePath, "--type", "java", "--projects", projects)
 
         then:
         buildSucceeds(":installDist")
@@ -42,7 +42,7 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
 
     def "can generate multi-project build with specified number of source files"() {
         when:
-        new Main().run("--root-dir", projectDir.absolutePath, "--type", "java", "--projects", "4", "--source-files", sourceFiles)
+        new Main().run("init", "--dir", projectDir.absolutePath, "--type", "java", "--projects", "4", "--source-files", sourceFiles)
 
         then:
         buildSucceeds(":installDist")

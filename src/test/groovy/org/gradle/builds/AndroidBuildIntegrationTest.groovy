@@ -3,7 +3,7 @@ package org.gradle.builds
 class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
     def "can generate single project build"() {
         when:
-        new Main().run("--root-dir", projectDir.absolutePath, "--type", "android")
+        new Main().run("init", "--dir", projectDir.absolutePath, "--type", "android")
 
         then:
         buildSucceeds(":assembleDebug")
@@ -14,7 +14,7 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
 
     def "can generate single project build with the specified number of source files"() {
         when:
-        new Main().run("--root-dir", projectDir.absolutePath, "--type", "android", "--source-files", sourceFiles)
+        new Main().run("init", "--dir", projectDir.absolutePath, "--type", "android", "--source-files", sourceFiles)
 
         then:
         buildSucceeds(":assembleDebug")
@@ -28,7 +28,7 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
 
     def "can generate multi-project build"() {
         when:
-        new Main().run("--root-dir", projectDir.absolutePath, "--type", "android", "--projects", projects)
+        new Main().run("init", "--dir", projectDir.absolutePath, "--type", "android", "--projects", projects)
 
         then:
         buildSucceeds(":assembleDebug")
@@ -42,7 +42,7 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
 
     def "can generate multi-project build with the specified number of source files"() {
         when:
-        new Main().run("--root-dir", projectDir.absolutePath, "--type", "android", "--projects", "4", "--source-files", sourceFiles)
+        new Main().run("init", "--dir", projectDir.absolutePath, "--type", "android", "--projects", "4", "--source-files", sourceFiles)
 
         then:
         buildSucceeds(":assembleDebug")

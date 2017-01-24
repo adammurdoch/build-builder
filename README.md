@@ -14,6 +14,8 @@ Also generates a [gradle-profiler](https://www.github.com/gradle/gradle-profiler
 
 ### Command line options
 
+The `--type` option specified the type of build to create. Values are `java`, `android` or `cpp`
+
 The `--projects` option can be used to specify the number of projects.
 
 The `--source-files` option can be used to specify the number of source files per project.

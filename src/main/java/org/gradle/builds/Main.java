@@ -1,16 +1,14 @@
 package org.gradle.builds;
 
-import joptsimple.ArgumentAcceptingOptionSpec;
-import joptsimple.OptionException;
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
+import io.airlift.airline.*;
 import org.gradle.builds.assemblers.*;
 import org.gradle.builds.generators.*;
 import org.gradle.builds.model.Build;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.concurrent.Callable;
 
 public class Main {
     public static void main(String[] args) {
@@ -27,79 +25,93 @@ public class Main {
         System.exit(0);
     }
 
-    public boolean run(String[] args) throws IOException {
-        OptionParser parser = new OptionParser();
-        ArgumentAcceptingOptionSpec<String> projectOption = parser.accepts("root-dir", "The directory to generate into").withRequiredArg();
-        ArgumentAcceptingOptionSpec<String> typeOption = parser.accepts("type", "The build type to generate (java, android, cpp)").withRequiredArg().defaultsTo("java");
-        ArgumentAcceptingOptionSpec<String> projectCountOption = parser.accepts("projects", "The number of projects to include in the build").withRequiredArg().defaultsTo("1");
-        ArgumentAcceptingOptionSpec<String> sourceFileCountOption = parser.accepts("source-files", "The number of source files to include in each project").withRequiredArg().defaultsTo("3");
+    public void run(String[] args) throws Exception {
+        Cli.CliBuilder<Callable<Void>> cliBuilder = new Cli.CliBuilder<>("build-builder");
+        cliBuilder.withCommand(InitBuild.class);
+        cliBuilder.withCommand(Help.class);
+        cliBuilder.withDefaultCommand(Help.class);
+        Cli<Callable<Void>> cli = cliBuilder.build();
 
-        OptionSet parsedOptions;
         try {
-            parsedOptions = parser.parse(args);
-        } catch (OptionException e) {
-            return fail(parser, e.getMessage());
+            cli.parse(args).call();
+        } catch (ParseException | CommandLineValidationException e) {
+            System.out.println(e.getMessage());
+            System.out.println();
+            Help.help(cli.getMetadata(), Collections.emptyList());
+            throw new SettingsNotAvailableException();
         }
-
-        if (!parsedOptions.has(projectOption)) {
-            return fail(parser, "No project directory specified.");
-        }
-
-        ModelAssembler modelAssembler;
-        switch (parsedOptions.valueOf(typeOption)) {
-            case "java":
-                modelAssembler = new JavaModelAssembler();
-                break;
-            case "android":
-                modelAssembler = new AndroidModelAssembler();
-                break;
-            case "cpp":
-                modelAssembler = new CppModelAssembler();
-                break;
-            default:
-                return fail(parser, "Unknown build type '" + parsedOptions.valueOf(typeOption) + "' specified");
-        }
-
-        int projects = Integer.valueOf(parsedOptions.valueOf(projectCountOption));
-        if (projects < 1) {
-            throw new IllegalArgumentException("Minimum of 1 project.");
-        }
-        int sourceFiles = Integer.valueOf(parsedOptions.valueOf(sourceFileCountOption));
-        if (sourceFiles < 1) {
-            throw new IllegalArgumentException("Minimum of 1 source files per project.");
-        }
-        Settings settings = new Settings(projects, sourceFiles);
-
-        Path projectDir = new File(parsedOptions.valueOf(projectOption)).toPath();
-        System.out.println("* Generating build in " + projectDir);
-        System.out.println("* Projects: " + projects);
-        System.out.println("* Source files per project: " + sourceFiles + " (total: " + (projects*sourceFiles) + ")");
-
-        Build build = new Build(projectDir);
-
-        // Create model
-        new StructureAssembler().populate(settings, build);
-        modelAssembler.populate(settings, build);
-
-        // Generate files
-        new SettingsFileGenerator().generate(build);
-        new BuildFileGenerator().generate(build);
-        new AndroidManifestGenerator().generate(build);
-        new AndroidStringResourcesGenerator().generate(build);
-        new JavaSourceGenerator().generate(build);
-        new CppSourceGenerator().generate(build);
-        new ScenarioFileGenerator().generate(build);
-
-        return true;
     }
 
-    private boolean fail(OptionParser parser, String message) throws IOException {
-        System.out.println(message);
-        System.out.println();
-        parser.printHelpOn(System.out);
-        throw new SettingsNotAvailableException();
+    private static class CommandLineValidationException extends RuntimeException {
+        public CommandLineValidationException(String message) {
+            super(message);
+        }
     }
 
-    private class SettingsNotAvailableException extends RuntimeException {
+    private static class SettingsNotAvailableException extends RuntimeException {
+    }
+
+    @Command(name = "init", description = "Generates a build with source files")
+    public static class InitBuild implements Callable<Void> {
+        @Option(name = "--dir", description = "The directory to generate into (default: current directory)")
+        String rootDir = ".";
+
+        @Option(name = "--type", description = "The type of build to generate (android, java, cpp) (default: java)")
+        String type = "java";
+
+        @Option(name = "--projects", description = "The number of projects to include in the build (default: 1)")
+        int projects = 1;
+
+        @Option(name = "--source-files", description = "The number of source files to include in each project (default: 3)")
+        int sourceFiles = 3;
+
+        @Override
+        public Void call() throws Exception {
+            ModelAssembler modelAssembler;
+            switch (type) {
+                case "java":
+                    modelAssembler = new JavaModelAssembler();
+                    break;
+                case "android":
+                    modelAssembler = new AndroidModelAssembler();
+                    break;
+                case "cpp":
+                    modelAssembler = new CppModelAssembler();
+                    break;
+                default:
+                    throw new CommandLineValidationException("Unknown build type '" + type + "' specified");
+            }
+
+            if (projects < 1) {
+                throw new IllegalArgumentException("Minimum of 1 project.");
+            }
+            if (sourceFiles < 1) {
+                throw new IllegalArgumentException("Minimum of 1 source files per project.");
+            }
+            Settings settings = new Settings(projects, sourceFiles);
+
+            Path projectDir = new File(rootDir).getCanonicalFile().toPath();
+            System.out.println("* Generating build in " + projectDir);
+            System.out.println("* Build type: " + type);
+            System.out.println("* Projects: " + projects);
+            System.out.println("* Source files per project: " + sourceFiles + " (total: " + (projects * sourceFiles) + ")");
+
+            Build build = new Build(projectDir);
+
+            // Create model
+            new StructureAssembler().populate(settings, build);
+            modelAssembler.populate(settings, build);
+
+            // Generate files
+            new SettingsFileGenerator().generate(build);
+            new BuildFileGenerator().generate(build);
+            new AndroidManifestGenerator().generate(build);
+            new AndroidStringResourcesGenerator().generate(build);
+            new JavaSourceGenerator().generate(build);
+            new CppSourceGenerator().generate(build);
+            new ScenarioFileGenerator().generate(build);
+
+            return null;
+        }
     }
 }
