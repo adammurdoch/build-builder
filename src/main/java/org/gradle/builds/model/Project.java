@@ -7,10 +7,6 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class Project {
-    public enum Role {
-        Application, Library, Empty;
-    }
-
     private final int id;
     private final Project parent;
     private final String name;
@@ -18,7 +14,6 @@ public class Project {
     private final BuildScript buildScript = new BuildScript();
     private final Set<Project> dependencies = new LinkedHashSet<>();
     private final Set<Component> components = new LinkedHashSet<>();
-    private Role role = Role.Empty;
     private Graph classGraph;
 
     public Project(int id, Project parent, String name, Path projectDir) {
@@ -58,14 +53,6 @@ public class Project {
 
     public Project getParent() {
         return parent;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
     }
 
     public BuildScript getBuildScript() {

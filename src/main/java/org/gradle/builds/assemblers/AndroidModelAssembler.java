@@ -4,6 +4,15 @@ import org.gradle.builds.model.*;
 
 public class AndroidModelAssembler extends JvmModelAssembler {
     @Override
+    public void apply(Class<? extends Component> component, Project project) {
+        if (component.equals(AndroidLibrary.class) || component.equals(Library.class)) {
+            project.addComponent(new AndroidLibrary());
+        } else if (component.equals(AndroidApplication.class) || component.equals(Application.class)) {
+            project.addComponent(new AndroidApplication());
+        }
+    }
+
+    @Override
     protected void rootProject(Project rootProject) {
         super.rootProject(rootProject);
         BuildScript buildScript = rootProject.getBuildScript();
@@ -12,8 +21,8 @@ public class AndroidModelAssembler extends JvmModelAssembler {
 
     @Override
     protected void populate(Settings settings, Project project) {
-        if (project.getRole() == Project.Role.Application) {
-            AndroidApplication androidApplication = project.addComponent(new AndroidApplication());
+        if (project.component(AndroidApplication.class) != null) {
+            AndroidApplication androidApplication = project.component(AndroidApplication.class);
             androidApplication.setPackageName(javaPackageFor(project));
 
             JavaClass appActivity = androidApplication.addClass(androidApplication.getPackageName() + "." + classNameFor(project));
@@ -34,8 +43,8 @@ public class AndroidModelAssembler extends JvmModelAssembler {
             configBlock.property("targetSdkVersion", 25);
             configBlock.property("versionCode", 1);
             configBlock.property("versionName", "1.0");
-        } else if (project.getRole() == Project.Role.Library) {
-            AndroidLibrary androidLibrary = project.addComponent(new AndroidLibrary());
+        } else if (project.component(AndroidLibrary.class) != null) {
+            AndroidLibrary androidLibrary = project.component(AndroidLibrary.class);
             androidLibrary.setPackageName(javaPackageFor(project));
 
             JavaClass libraryActivity = androidLibrary.addClass(androidLibrary.getPackageName() + "." + classNameFor(project));

@@ -4,9 +4,18 @@ import org.gradle.builds.model.*;
 
 public class JavaModelAssembler extends JvmModelAssembler {
     @Override
+    public void apply(Class<? extends Component> component, Project project) {
+        if (component.equals(JavaLibrary.class) || component.equals(Library.class)) {
+            project.addComponent(new JavaLibrary());
+        } else if (component.equals(JavaApplication.class) || component.equals(Application.class)) {
+            project.addComponent(new JavaApplication());
+        }
+    }
+
+    @Override
     protected void populate(Settings settings, Project project) {
-        if (project.getRole() == Project.Role.Library) {
-            JavaLibrary library = project.addComponent(new JavaLibrary());
+        if (project.component(JavaLibrary.class) != null) {
+            JavaLibrary library = project.component(JavaLibrary.class);
             JavaClass apiClass = library.addClass(javaPackageFor(project) + "." + classNameFor(project));
             library.setApiClass(apiClass);
             addSource(project, library, apiClass, javaClass -> {});
@@ -15,8 +24,8 @@ public class JavaModelAssembler extends JvmModelAssembler {
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("java");
             addDependencies(project, buildScript);
-        } else if (project.getRole() == Project.Role.Application) {
-            JavaApplication application = project.addComponent(new JavaApplication());
+        } else if (project.component(JavaApplication.class) != null) {
+            JavaApplication application = project.component(JavaApplication.class);
             JavaClass mainClass = application.addClass(javaPackageFor(project) + "." + classNameFor(project));
             mainClass.addRole(new AppEntryPoint());
             addSource(project, application, mainClass, javaClass -> {});

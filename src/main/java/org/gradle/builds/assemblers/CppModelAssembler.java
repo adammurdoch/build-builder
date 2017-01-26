@@ -7,9 +7,18 @@ import java.util.Set;
 
 public class CppModelAssembler extends ModelAssembler {
     @Override
+    public void apply(Class<? extends Component> component, Project project) {
+        if (component.equals(NativeLibrary.class) || component.equals(Library.class)) {
+            project.addComponent(new NativeLibrary());
+        } else if (component.equals(NativeApplication.class) || component.equals(Application.class)) {
+            project.addComponent(new NativeApplication());
+        }
+    }
+
+    @Override
     protected void populate(Settings settings, Project project) {
-        if (project.getRole() == Project.Role.Library) {
-            NativeLibrary lib = project.addComponent(new NativeLibrary());
+        if (project.component(NativeLibrary.class) != null) {
+            NativeLibrary lib = project.component(NativeLibrary.class);
 
             CppClass apiClass = new CppClass(classNameFor(project));
             lib.setApiClass(apiClass);
@@ -32,8 +41,8 @@ public class CppModelAssembler extends ModelAssembler {
             buildScript.requirePlugin("cpp-lang");
             SoftwareModelDeclaration componentDeclaration = buildScript.componentDeclaration("main", "NativeLibrarySpec");
             addDependencies(project, componentDeclaration);
-        } else if (project.getRole() == Project.Role.Application) {
-            NativeApplication app = project.addComponent(new NativeApplication());
+        } else if (project.component(NativeApplication.class) != null) {
+            NativeApplication app = project.component(NativeApplication.class);
 
             CppClass appClass = new CppClass(classNameFor(project));
 

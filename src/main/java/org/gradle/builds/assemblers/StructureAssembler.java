@@ -1,9 +1,17 @@
 package org.gradle.builds.assemblers;
 
+import org.gradle.builds.model.Application;
 import org.gradle.builds.model.Build;
+import org.gradle.builds.model.Library;
 import org.gradle.builds.model.Project;
 
 public class StructureAssembler {
+    private final ProjectDecorator decorator;
+
+    public StructureAssembler(ProjectDecorator decorator) {
+        this.decorator = decorator;
+    }
+
     public void populate(Settings settings, Build build) {
         defineProjects(settings, build);
         arrangeClasses(settings, build);
@@ -27,7 +35,7 @@ public class StructureAssembler {
             Project project;
             if (layer == 0) {
                 project = build.getRootProject();
-                project.setRole(Project.Role.Application);
+                decorator.apply(Application.class, project);
             } else {
                 String name;
                 if (lastLayer) {
@@ -36,7 +44,7 @@ public class StructureAssembler {
                     name = "lib" + layer + "_" + (item + 1);
                 }
                 project = build.addProject(name);
-                project.setRole(Project.Role.Library);
+                decorator.apply(Library.class, project);
             }
             for (Project dep : dependencies) {
                 project.dependsOn(dep);

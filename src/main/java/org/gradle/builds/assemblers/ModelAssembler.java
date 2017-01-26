@@ -1,18 +1,23 @@
 package org.gradle.builds.assemblers;
 
 import org.gradle.builds.model.Build;
+import org.gradle.builds.model.Component;
 import org.gradle.builds.model.Project;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public abstract class ModelAssembler {
+public abstract class ModelAssembler implements ProjectDecorator {
     public void populate(Settings settings, Build build) {
         rootProject(build.getRootProject());
         Set<Project> seen = new HashSet<>();
         for (Project project : build.getProjects()) {
             populate(settings, project, seen);
         }
+    }
+
+    @Override
+    public void apply(Class<? extends Component> component, Project project) {
     }
 
     private void populate(Settings settings, Project project, Set<Project> seen) {

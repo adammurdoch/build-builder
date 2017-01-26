@@ -1,13 +1,12 @@
 package org.gradle.builds.assemblers
 
 import org.gradle.builds.model.Build
-import org.gradle.builds.model.Project
 import spock.lang.Specification
 
 import java.nio.file.Paths
 
 class StructureAssemblerTest extends Specification {
-    def assembler = new StructureAssembler()
+    def assembler = new StructureAssembler(Stub(ProjectDecorator))
     def build = new Build(Paths.get("dir"))
 
     def "builds dependency graph with one project"() {

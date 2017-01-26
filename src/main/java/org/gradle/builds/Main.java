@@ -79,12 +79,12 @@ public class Main {
             Build build = new Build(rootDir);
 
             // Inspect model
-            new BuildInspector().inspect(build);
+            new BuildInspector(new AllTypesProjectDecorator()).inspect(build);
 
             System.out.println("* Projects: " + build.getProjects().size());
 
             for (Project project : build.getProjects()) {
-                System.out.println("  * path: " + project.getPath() + " dir: " + project.getProjectDir());
+                System.out.println("  * path: " + project.getPath() + " dir: " + rootDir.relativize(project.getProjectDir()));
             }
 
             return null;
@@ -116,7 +116,7 @@ public class Main {
             Build build = new Build(rootDir);
 
             // Create model
-            new StructureAssembler().populate(settings, build);
+            new StructureAssembler(modelAssembler).populate(settings, build);
             modelAssembler.populate(settings, build);
 
             // Generate files
