@@ -8,11 +8,16 @@ Supported build types:
 - Android
 - C++
 
-Generates one or more projects with source files. The source files have dependencies between each other, as described below.
+Generates one or more projects with source files. Can also be used to add source files to an existing skeleton build. 
+The source files have dependencies between each other, as described below.
 
-Also generates a [gradle-profiler](https://www.github.com/gradle/gradle-profiler) scenario file for the build.
+Generates JUnit tests for Java and Android projects.
+
+Generates a [gradle-profiler](https://www.github.com/gradle/gradle-profiler) scenario file for the build.
 
 ### Command line usage
+
+#### Create a build
 
 `build-builder init [options]`
 
@@ -21,6 +26,14 @@ The `--dir` option specifies the directory to create the build init. Default is 
 The `--type` option specifies the type of build to create. Values are `java`, `android` or `cpp`. Default is `java`.
 
 The `--projects` option specifies the number of projects. Default is 1.
+
+The `--source-files` option specifies the number of source files per project. Default is 3.
+
+#### Add source files to an existing build
+
+`build-builder add-source [options]`
+
+The `--dir` option specifies the directory containing the build to add source files to. Default is the current directory.
 
 The `--source-files` option specifies the number of source files per project. Default is 3.
 
@@ -54,6 +67,7 @@ Here's an example:
 
 ### Current limitations
 
+- Adding source does not consider project dependencies.
 - The Android application does not actually work. The Java and C++ applications can be installed and executed.
     - No annotation processors are used.
     - No Java library projects are included.
