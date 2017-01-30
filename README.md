@@ -53,8 +53,8 @@ Here's an example:
            
 #### Dependencies between source files
 
-- Each application has a main class. The remaining classes, if any, are implementation classes.
-- Each library has an API class, used by other projects. The remaining classes, if any, are implementation classes and are not used by any other project.
+- Each application has a main class. The remaining classes in the project, if any, are implementation classes.
+- Each library has an API class, used by other projects. The remaining classes in the project, if any, are implementation classes and are not used directly by any other project. They are used indirectly.
 - The classes for a project are arranged in layers of 3 - 6 classes.
 - The main class/API class uses the first layer of implementation classes.
 - The implementation classes in the second last layer use the API class for each library that the project depends on.
