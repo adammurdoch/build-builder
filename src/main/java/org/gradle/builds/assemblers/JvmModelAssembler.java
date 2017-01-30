@@ -5,7 +5,7 @@ import org.gradle.builds.model.*;
 import java.util.LinkedHashSet;
 import java.util.function.Consumer;
 
-public abstract class JvmModelAssembler extends ModelAssembler {
+public abstract class JvmModelAssembler extends AbstractModelAssembler {
     @Override
     protected void rootProject(Project rootProject) {
         ProjectScriptBlock allProjects = rootProject.getBuildScript().allProjects();

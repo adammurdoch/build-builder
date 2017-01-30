@@ -5,7 +5,7 @@ import org.gradle.builds.model.*;
 import java.util.HashSet;
 import java.util.Set;
 
-public class CppModelAssembler extends ModelAssembler {
+public class CppModelAssembler extends AbstractModelAssembler {
     @Override
     public void apply(Class<? extends Component> component, Project project) {
         if (component.equals(NativeLibrary.class) || component.equals(Library.class)) {

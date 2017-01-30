@@ -11,7 +11,7 @@ class StructureAssemblerTest extends Specification {
 
     def "builds dependency graph with one project"() {
         when:
-        assembler.populate(projects(1), build)
+        assembler.arrangeProjects(projects(1), build)
 
         then:
         build.projects.size() == 1
@@ -21,7 +21,7 @@ class StructureAssemblerTest extends Specification {
 
     def "builds dependency graph with two projects"() {
         when:
-        assembler.populate(projects(2), build)
+        assembler.arrangeProjects(projects(2), build)
 
         then:
         build.projects.size() == 2
@@ -33,7 +33,7 @@ class StructureAssemblerTest extends Specification {
 
     def "builds dependency graph with three projects"() {
         when:
-        assembler.populate(projects(3), build)
+        assembler.arrangeProjects(projects(3), build)
 
         then:
         build.projects.size() == 3
@@ -47,7 +47,7 @@ class StructureAssemblerTest extends Specification {
 
     def "builds dependency graph with four projects"() {
         when:
-        assembler.populate(projects(4), build)
+        assembler.arrangeProjects(projects(4), build)
 
         then:
         build.projects.size() == 4
@@ -62,7 +62,7 @@ class StructureAssemblerTest extends Specification {
 
     def "builds dependency graph with five projects"() {
         when:
-        assembler.populate(projects(5), build)
+        assembler.arrangeProjects(projects(5), build)
 
         then:
         build.projects.size() == 5

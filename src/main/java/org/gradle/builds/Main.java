@@ -5,7 +5,6 @@ import org.gradle.builds.assemblers.*;
 import org.gradle.builds.generators.*;
 import org.gradle.builds.inspectors.BuildInspector;
 import org.gradle.builds.model.Build;
-import org.gradle.builds.model.Project;
 
 import java.io.File;
 import java.io.IOException;
@@ -79,13 +78,18 @@ public class Main {
             Build build = new Build(rootDir);
 
             // Inspect model
-            new BuildInspector(new AllTypesProjectDecorator()).inspect(build);
+            ModelAssembler modelAssembler = new AllTypesProjectDecorator();
+            Settings settings = new Settings(build.getProjects().size(), sourceFiles);
+            new BuildInspector(modelAssembler).inspect(build);
 
             System.out.println("* Projects: " + build.getProjects().size());
 
-            for (Project project : build.getProjects()) {
-                System.out.println("  * path: " + project.getPath() + " dir: " + rootDir.relativize(project.getProjectDir()));
-            }
+            new StructureAssembler(modelAssembler).arrangeClasses(settings, build);
+            modelAssembler.populate(settings, build);
+
+            new AndroidStringResourcesGenerator().generate(build);
+            new JavaSourceGenerator().generate(build);
+            new CppSourceGenerator().generate(build);
 
             return null;
         }
@@ -116,7 +120,9 @@ public class Main {
             Build build = new Build(rootDir);
 
             // Create model
-            new StructureAssembler(modelAssembler).populate(settings, build);
+            StructureAssembler structureAssembler = new StructureAssembler(modelAssembler);
+            structureAssembler.arrangeProjects(settings, build);
+            structureAssembler.arrangeClasses(settings, build);
             modelAssembler.populate(settings, build);
 
             // Generate files

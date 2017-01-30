@@ -12,12 +12,7 @@ public class StructureAssembler {
         this.decorator = decorator;
     }
 
-    public void populate(Settings settings, Build build) {
-        defineProjects(settings, build);
-        arrangeClasses(settings, build);
-    }
-
-    private void arrangeClasses(Settings settings, Build build) {
+    public void arrangeClasses(Settings settings, Build build) {
         Graph classGraph = new Graph();
         new GraphAssembler().arrange(settings.getSourceFileCount(), classGraph);
         System.out.println("* Arranging source files in " + classGraph.getLayers().size() + " layers per project.");
@@ -26,7 +21,7 @@ public class StructureAssembler {
         }
     }
 
-    private void defineProjects(Settings settings, Build build) {
+    public void arrangeProjects(Settings settings, Build build) {
         Graph projectGraph = new Graph();
         new GraphAssembler().arrange(settings.getProjectCount(), projectGraph);
         System.out.println("* Arranging projects in " + projectGraph.getLayers().size() + " layers.");

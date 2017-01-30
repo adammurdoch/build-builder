@@ -64,7 +64,7 @@ class AddSourceIntegrationTest extends AbstractIntegrationTest {
         new Main().run("add-source", "--dir", projectDir.absolutePath, "--source-files", "2")
 
         then:
-        noExceptionThrown()
+        buildSucceeds("build")
     }
 
     private void writeAndroidManifest(File manifest, String packageName) {
