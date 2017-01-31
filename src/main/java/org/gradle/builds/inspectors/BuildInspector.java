@@ -4,9 +4,12 @@ import org.gradle.builds.assemblers.ProjectDecorator;
 import org.gradle.builds.model.*;
 import org.gradle.tooling.GradleConnector;
 import org.gradle.tooling.ProjectConnection;
+import org.w3c.dom.Document;
 
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -56,9 +59,11 @@ public class BuildInspector {
             switch (type) {
                 case "android-application":
                     decorator.apply(AndroidApplication.class, project);
+                    inspectManifest(project);
                     break;
                 case "android-library":
                     decorator.apply(AndroidLibrary.class, project);
+                    inspectManifest(project);
                     break;
                 case "java-library":
                     decorator.apply(JavaLibrary.class, project);
@@ -75,5 +80,18 @@ public class BuildInspector {
 
         Files.delete(initScript);
         Files.delete(dataFile);
+    }
+
+    private void inspectManifest(Project project) {
+        Path manifest = project.getProjectDir().resolve("src/main/AndroidManifest.xml");
+        try {
+            try (InputStream inputStream = Files.newInputStream(manifest)) {
+                Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputStream);
+                String packageName = document.getDocumentElement().getAttribute("package");
+                project.component(AndroidComponent.class).setPackageName(packageName);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Could not parse Android manifest " + manifest, e);
+        }
     }
 }

@@ -24,6 +24,7 @@ class AddSourceIntegrationTest extends AbstractIntegrationTest {
             project(':javaApp') {
                 apply plugin: 'java'
                 apply plugin: 'application'
+                mainClassName = 'org.gradle.example.app.Main'
             }
             project(':javaLib') {
                 apply plugin: 'java'
@@ -41,16 +42,30 @@ class AddSourceIntegrationTest extends AbstractIntegrationTest {
                 apply plugin: 'com.android.library'
             }
             allprojects {
+                repositories {
+                    jcenter()
+                }
+                plugins.withId('java') {
+                    dependencies {
+                        testCompile 'junit:junit:4.12'
+                    }
+                }
                 plugins.withId('com.android.application') {
                     android {
                         buildToolsVersion = '25.0.0'
                         compileSdkVersion = 25
+                    }
+                    dependencies {
+                        testCompile 'junit:junit:4.12'
                     }
                 }
                 plugins.withId('com.android.library') {
                     android {
                         buildToolsVersion = '25.0.0'
                         compileSdkVersion = 25
+                    }
+                    dependencies {
+                        testCompile 'junit:junit:4.12'
                     }
                 }
             }

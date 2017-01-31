@@ -23,7 +23,9 @@ public class AndroidModelAssembler extends JvmModelAssembler {
     protected void populate(Settings settings, Project project) {
         if (project.component(AndroidApplication.class) != null) {
             AndroidApplication androidApplication = project.component(AndroidApplication.class);
-            androidApplication.setPackageName(javaPackageFor(project));
+            if (androidApplication.getPackageName() == null) {
+                androidApplication.setPackageName(javaPackageFor(project));
+            }
 
             JavaClass appActivity = androidApplication.addClass(androidApplication.getPackageName() + "." + classNameFor(project));
             androidApplication.activity(appActivity);
@@ -45,7 +47,9 @@ public class AndroidModelAssembler extends JvmModelAssembler {
             configBlock.property("versionName", "1.0");
         } else if (project.component(AndroidLibrary.class) != null) {
             AndroidLibrary androidLibrary = project.component(AndroidLibrary.class);
-            androidLibrary.setPackageName(javaPackageFor(project));
+            if (androidLibrary.getPackageName() == null) {
+                androidLibrary.setPackageName(javaPackageFor(project));
+            }
 
             JavaClass libraryActivity = androidLibrary.addClass(androidLibrary.getPackageName() + "." + classNameFor(project));
             androidLibrary.setApiClass(libraryActivity);
