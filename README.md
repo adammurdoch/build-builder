@@ -68,11 +68,13 @@ Here's an example:
 ### Current limitations
 
 - Adding source to an existing build does not consider project dependencies.
+- Adding source to a native build does nothing.
 - The Android application does not actually work. The Java and C++ applications can be installed and executed.
     - No Java library projects are included.
     - There are no instrumented tests.
 - No annotation processors are used.
-- There are no external dependencies.
+- External dependencies are the same for all projects and not used by the source.
+- There are no external dependencies for C++.
 - There are no tests for C++
 - Only a basic dependency graph is available, between projects and between source files.
     - Arranged in layers 

@@ -106,6 +106,9 @@ public class Main {
         @Option(name = "--projects", description = "The number of projects to include in the build (default: 1)")
         int projects = 1;
 
+        @Option(name = "--experimental", description = "Use the experimental Android plugin (default: false")
+        boolean experimentalAndroid = false;
+
         @Override
         public Void call() throws Exception {
             ModelAssembler modelAssembler = createModelAssembler();
@@ -156,7 +159,7 @@ public class Main {
                 case "java":
                     return new JavaModelAssembler();
                 case "android":
-                    return new AndroidModelAssembler();
+                    return new AndroidModelAssembler(experimentalAndroid);
                 case "cpp":
                     return new CppModelAssembler();
                 default:

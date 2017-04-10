@@ -22,6 +22,9 @@ public class BuildFileGenerator extends ProjectFileGenerator {
                 printWriter.println();
                 printWriter.println("buildscript {");
                 printWriter.println("    repositories {");
+                if (buildScript.isUseMavenLocalForBuildScriptClasspath()) {
+                    printWriter.println("        mavenLocal()");
+                }
                 printWriter.println("        jcenter()");
                 printWriter.println("    }");
                 printWriter.println("    dependencies {");

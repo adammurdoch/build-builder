@@ -3,6 +3,12 @@ package org.gradle.builds.assemblers;
 import org.gradle.builds.model.*;
 
 public class AndroidModelAssembler extends JvmModelAssembler {
+    private final boolean experimentalAndroid;
+
+    public AndroidModelAssembler(boolean experimentalAndroid) {
+        this.experimentalAndroid = experimentalAndroid;
+    }
+
     @Override
     public void apply(Class<? extends Component> component, Project project) {
         if (component.equals(AndroidLibrary.class) || component.equals(Library.class)) {
@@ -16,7 +22,12 @@ public class AndroidModelAssembler extends JvmModelAssembler {
     protected void rootProject(Project rootProject) {
         super.rootProject(rootProject);
         BuildScript buildScript = rootProject.getBuildScript();
-        buildScript.requireOnBuildScriptClasspath("com.android.tools.build:gradle:2.2.2");
+        if (experimentalAndroid) {
+            buildScript.useMavenLocalForBuildScriptClasspath();
+            buildScript.requireOnBuildScriptClasspath("com.android.tools.build:gradle:2.5.0-dev");
+        } else {
+            buildScript.requireOnBuildScriptClasspath("com.android.tools.build:gradle:2.3.1");
+        }
     }
 
     @Override
@@ -76,6 +87,8 @@ public class AndroidModelAssembler extends JvmModelAssembler {
         for (Project dep : project.getDependencies()) {
             buildScript.dependsOnProject("compile", dep.getPath());
         }
+        buildScript.dependsOnExternal("compile", "com.android.support:support-core-utils:25.1.0");
+        buildScript.dependsOnExternal("compile", "org.slf4j:slf4j-api:1.7.25");
         buildScript.dependsOnExternal("testCompile", "junit:junit:4.12");
     }
 

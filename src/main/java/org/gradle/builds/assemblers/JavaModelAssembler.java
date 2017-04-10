@@ -43,6 +43,7 @@ public class JavaModelAssembler extends JvmModelAssembler {
         for (Project dep : project.getDependencies()) {
             buildScript.dependsOnProject("compile", dep.getPath());
         }
+        buildScript.dependsOnExternal("compile", "org.slf4j:slf4j-api:1.7.25");
         buildScript.dependsOnExternal("testCompile", "junit:junit:4.12");
     }
 }

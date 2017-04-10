@@ -6,7 +6,7 @@ import org.gradle.builds.model.Project;
 
 public class AllTypesProjectDecorator implements ProjectDecorator, ModelAssembler {
     private final JavaModelAssembler javaModelAssembler = new JavaModelAssembler();
-    private final AndroidModelAssembler androidModelAssembler = new AndroidModelAssembler();
+    private final AndroidModelAssembler androidModelAssembler = new AndroidModelAssembler(false);
     private final CppModelAssembler cppModelAssembler = new CppModelAssembler();
 
     @Override

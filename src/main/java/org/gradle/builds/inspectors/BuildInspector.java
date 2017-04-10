@@ -34,13 +34,21 @@ public class BuildInspector {
             printWriter.println("        else if (p.plugins.hasPlugin('com.android.library')) { t = 'android-library' }");
             printWriter.println("        else if (p.plugins.hasPlugin('application')) { t = 'java-application' }");
             printWriter.println("        else if (p.plugins.hasPlugin('java')) { t = 'java-library' }");
+            printWriter.println("        else {");
+            printWriter.println("          def comps = p.modelRegistry.find(\"components\", ComponentSpecContainer)");
+            printWriter.println("          if (comps != null && comps.withType(NativeExecutableSpec).size() > 0) {");
+            printWriter.println("              t = 'cpp-application'");
+            printWriter.println("          } else if (comps != null && comps.withType(NativeLibrarySpec).size() > 0) {");
+            printWriter.println("              t = 'cpp-library'");
+            printWriter.println("          }");
+            printWriter.println("        }");
             printWriter.println("        f << p.path + ',' + t + ',' + p.projectDir + '\\n'");
             printWriter.println("    }");
             printWriter.println("}");
         }
         ProjectConnection connection = GradleConnector.newConnector().forProjectDirectory(build.getRootDir().toFile()).connect();
         try {
-            connection.newBuild().withArguments("-I", initScript.toString()).run();
+            connection.newBuild().setStandardOutput(System.out).setStandardError(System.out).withArguments("-I", initScript.toString()).run();
         } finally {
             connection.close();
         }
@@ -70,6 +78,12 @@ public class BuildInspector {
                     break;
                 case "java-application":
                     decorator.apply(JavaApplication.class, project);
+                    break;
+                case "cpp-library":
+                    decorator.apply(NativeLibrary.class, project);
+                    break;
+                case "cpp-application":
+                    decorator.apply(NativeApplication.class, project);
                     break;
                 case "empty":
                     break;
