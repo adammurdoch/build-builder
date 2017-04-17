@@ -18,6 +18,7 @@ public class AndroidModelAssembler extends JvmModelAssembler {
         if (component.equals(AndroidLibrary.class) || component.equals(Library.class)) {
             if (project.isMayUseOtherLanguage() && includeJavaLibraries) {
                 javaModelAssembler.apply(component, project);
+                project.component(JavaLibrary.class).setTargetJavaVersion("1.7");
             } else {
                 project.addComponent(new AndroidLibrary());
             }

@@ -24,6 +24,7 @@ public class JavaModelAssembler extends JvmModelAssembler {
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("java");
             addDependencies(project, buildScript);
+            addJavaVersion(library, buildScript);
         } else if (project.component(JavaApplication.class) != null) {
             JavaApplication application = project.component(JavaApplication.class);
             JavaClass mainClass = application.addClass(javaPackageFor(project) + "." + classNameFor(project));
@@ -36,6 +37,12 @@ public class JavaModelAssembler extends JvmModelAssembler {
             buildScript.requirePlugin("application");
             addDependencies(project, buildScript);
             buildScript.property("mainClassName", mainClass.getName());
+        }
+    }
+
+    private void addJavaVersion(JavaLibrary library, BuildScript buildScript) {
+        if (library.getTargetJavaVersion() != null) {
+            buildScript.property("sourceCompatibility", library.getTargetJavaVersion());
         }
     }
 
