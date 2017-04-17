@@ -39,6 +39,9 @@ public class StructureAssembler {
                     name = "lib" + layer + "_" + (item + 1);
                 }
                 project = build.addProject(name);
+                if (lastLayer && item == 0) {
+                    project.setMayUseOtherLanguage(true);
+                }
                 decorator.apply(Library.class, project);
             }
             for (Project dep : dependencies) {

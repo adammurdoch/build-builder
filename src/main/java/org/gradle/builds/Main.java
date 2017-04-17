@@ -29,7 +29,9 @@ public class Main {
 
     public void run(String[] args) throws Exception {
         Cli.CliBuilder<Callable<Void>> cliBuilder = new Cli.CliBuilder<>("build-builder");
-        cliBuilder.withCommand(InitBuild.class);
+        cliBuilder.withCommand(InitJavaBuild.class);
+        cliBuilder.withCommand(InitCppBuild.class);
+        cliBuilder.withCommand(InitAndroidBuild.class);
         cliBuilder.withCommand(AddSource.class);
         cliBuilder.withCommand(Help.class);
         cliBuilder.withDefaultCommand(Help.class);
@@ -95,19 +97,12 @@ public class Main {
         }
     }
 
-    @Command(name = "init", description = "Generates a build with source files")
-    public static class InitBuild extends SourceGenerationCommand {
+    public static abstract class InitBuild extends SourceGenerationCommand {
         @Option(name = "--dir", description = "The directory to generate into (default: current directory)")
         String rootDir = ".";
 
-        @Option(name = "--type", description = "The type of build to generate (android, java, cpp) (default: java)")
-        String type = "java";
-
         @Option(name = "--projects", description = "The number of projects to include in the build (default: 1)")
         int projects = 1;
-
-        @Option(name = "--experimental", description = "Use the experimental Android plugin (default: false")
-        boolean experimentalAndroid = false;
 
         @Override
         public Void call() throws Exception {
@@ -116,7 +111,7 @@ public class Main {
             Path rootDir = getRootDir();
 
             System.out.println("* Generating build in " + rootDir);
-            System.out.println("* Build type: " + type);
+            System.out.println("* Build type: " + getType());
             System.out.println("* Projects: " + projects);
             System.out.println("* Source files per project: " + sourceFiles + " (total: " + (projects * sourceFiles) + ")");
 
@@ -154,17 +149,50 @@ public class Main {
             return new Settings(projects, sourceFiles);
         }
 
-        private ModelAssembler createModelAssembler() {
-            switch (type) {
-                case "java":
-                    return new JavaModelAssembler();
-                case "android":
-                    return new AndroidModelAssembler(experimentalAndroid);
-                case "cpp":
-                    return new CppModelAssembler();
-                default:
-                    throw new CommandLineValidationException("Unknown build type '" + type + "' specified");
-            }
+        protected abstract String getType();
+
+        protected abstract ModelAssembler createModelAssembler();
+    }
+
+    @Command(name = "java", description = "Generates a Java build with source files")
+    public static class InitJavaBuild extends InitBuild {
+        @Override
+        protected String getType() {
+            return "Java";
+        }
+
+        protected ModelAssembler createModelAssembler() {
+            return new JavaModelAssembler();
+        }
+    }
+
+    @Command(name = "cpp", description = "Generates a C++ build with source files")
+    public static class InitCppBuild extends InitBuild {
+        @Override
+        protected String getType() {
+            return "C++";
+        }
+
+        protected ModelAssembler createModelAssembler() {
+            return new CppModelAssembler();
+        }
+    }
+
+    @Command(name = "android", description = "Generates an Android build with source files")
+    public static class InitAndroidBuild extends InitBuild {
+        @Option(name = "--experimental", description = "Use the experimental Android plugin (default: false")
+        boolean experimentalAndroid = false;
+
+        @Option(name = "--java", description = "Include some Java libraries (default: false")
+        boolean includeJavaLibraries = false;
+
+        @Override
+        protected String getType() {
+            return "Android";
+        }
+
+        protected ModelAssembler createModelAssembler() {
+            return new AndroidModelAssembler(experimentalAndroid, includeJavaLibraries);
         }
     }
 }

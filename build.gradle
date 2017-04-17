@@ -9,13 +9,22 @@ repositories {
     maven { url 'https://repo.gradle.org/gradle/repo' }
 }
 
+configurations.all {
+    resolutionStrategy.eachDependency { details ->
+        if (details.requested.group == 'org.codehaus.groovy' && details.requested.name == 'groovy-all') {
+            useTarget('org.codehaus.groovy:groovy:2.4.10')
+        }
+    }
+}
+
 dependencies {
     compile 'io.airlift:airline:0.7'
     compile 'org.gradle:gradle-tooling-api:3.3'
 
     runtime 'org.slf4j:slf4j-simple:1.7.10'
 
-    testCompile 'org.codehaus.groovy:groovy:2.4.7'
+    testCompile gradleTestKit()
+    testCompile 'org.codehaus.groovy:groovy:2.4.10'
     testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
 }
 

@@ -4,15 +4,23 @@ import org.gradle.builds.model.*;
 
 public class AndroidModelAssembler extends JvmModelAssembler {
     private final boolean experimentalAndroid;
+    private final boolean includeJavaLibraries;
+    private final JavaModelAssembler javaModelAssembler;
 
-    public AndroidModelAssembler(boolean experimentalAndroid) {
+    public AndroidModelAssembler(boolean experimentalAndroid, boolean includeJavaLibraries) {
         this.experimentalAndroid = experimentalAndroid;
+        this.includeJavaLibraries = includeJavaLibraries;
+        javaModelAssembler = new JavaModelAssembler();
     }
 
     @Override
     public void apply(Class<? extends Component> component, Project project) {
         if (component.equals(AndroidLibrary.class) || component.equals(Library.class)) {
-            project.addComponent(new AndroidLibrary());
+            if (project.isMayUseOtherLanguage() && includeJavaLibraries) {
+                javaModelAssembler.apply(component, project);
+            } else {
+                project.addComponent(new AndroidLibrary());
+            }
         } else if (component.equals(AndroidApplication.class) || component.equals(Application.class)) {
             project.addComponent(new AndroidApplication());
         }
@@ -32,6 +40,11 @@ public class AndroidModelAssembler extends JvmModelAssembler {
 
     @Override
     protected void populate(Settings settings, Project project) {
+        if (project.isMayUseOtherLanguage() && includeJavaLibraries) {
+            javaModelAssembler.populate(settings, project);
+            return;
+        }
+
         if (project.component(AndroidApplication.class) != null) {
             AndroidApplication androidApplication = project.component(AndroidApplication.class);
             if (androidApplication.getPackageName() == null) {

@@ -3,9 +3,11 @@ package org.gradle.builds
 class CppBuildIntegrationTest extends AbstractIntegrationTest {
     def "can generate single project build"() {
         when:
-        new Main().run("init", "--dir", projectDir.absolutePath, "--type", "cpp")
+        new Main().run("cpp", "--dir", projectDir.absolutePath)
 
         then:
+        isCppProject(":")
+
         buildSucceeds(":installMain")
         exeSucceeds(file("build/install/main/testApp"))
 
@@ -14,9 +16,11 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
 
     def "can generate single project build with specified number of source files"() {
         when:
-        new Main().run("init", "--dir", projectDir.absolutePath, "--type", "cpp", "--source-files", sourceFiles)
+        new Main().run("cpp", "--dir", projectDir.absolutePath, "--source-files", sourceFiles)
 
         then:
+        isCppProject(":")
+
         buildSucceeds(":installMain")
         exeSucceeds(file("build/install/main/testApp"))
 
@@ -28,9 +32,12 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
 
     def "can generate multi-project build"() {
         when:
-        new Main().run("init", "--dir", projectDir.absolutePath, "--type", "cpp", "--projects", projects)
+        new Main().run("cpp", "--dir", projectDir.absolutePath, "--projects", projects)
 
         then:
+        isCppProject(":")
+        isCppProject(":core1")
+
         buildSucceeds(":installMain")
         exeSucceeds(file("build/install/main/testApp"))
 
@@ -42,9 +49,14 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
 
     def "can generate multi-project build with specified number of source files"() {
         when:
-        new Main().run("init", "--dir", projectDir.absolutePath, "--type", "cpp", "--projects", "4", "--source-files", sourceFiles)
+        new Main().run("cpp", "--dir", projectDir.absolutePath, "--projects", "4", "--source-files", sourceFiles)
 
         then:
+        isCppProject(":")
+        isCppProject(":lib1_1")
+        isCppProject(":lib1_2")
+        isCppProject(":core1")
+
         buildSucceeds(":installMain")
         exeSucceeds(file("build/install/main/testApp"))
 

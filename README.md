@@ -19,15 +19,15 @@ Generates a [gradle-profiler](https://www.github.com/gradle/gradle-profiler) sce
 
 #### Create a build
 
-`build-builder init [options]`
+`build-builder java|cpp|android [options]`
 
 The `--dir` option specifies the directory to create the build init. Default is the current directory.
-
-The `--type` option specifies the type of build to create. Values are `java`, `android` or `cpp`. Default is `java`.
 
 The `--projects` option specifies the number of projects. Default is 1.
 
 The `--source-files` option specifies the number of source files per project. Default is 3.
+
+The `--java` option includes some Java libraries in the build. Default is false. 
 
 #### Add source files to an existing build
 
@@ -70,7 +70,7 @@ Here's an example:
 - Adding source to an existing build does not consider project dependencies.
 - Adding source to a native build does nothing.
 - The Android application does not actually work. The Java and C++ applications can be installed and executed.
-    - No Java library projects are included.
+    - Can include only a single Java project.
     - There are no instrumented tests.
 - No annotation processors are used.
 - External dependencies are the same for all projects and not used by the source.
