@@ -8,7 +8,7 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class SettingsFileGenerator {
+public class SettingsFileGenerator implements BuildGenerator {
     public void generate(Build build) throws IOException {
         Path settingsFile = build.getRootDir().resolve("settings.gradle");
         Files.createDirectories(settingsFile.getParent());

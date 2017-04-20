@@ -5,10 +5,12 @@ import org.gradle.builds.assemblers.*;
 import org.gradle.builds.generators.*;
 import org.gradle.builds.inspectors.BuildInspector;
 import org.gradle.builds.model.Build;
+import org.gradle.builds.model.Model;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.Callable;
 
@@ -106,8 +108,6 @@ public class Main {
 
         @Override
         public Void call() throws Exception {
-            ModelAssembler modelAssembler = createModelAssembler();
-            Settings settings = createSettings();
             Path rootDir = getRootDir();
 
             System.out.println("* Generating build in " + rootDir);
@@ -115,24 +115,39 @@ public class Main {
             System.out.println("* Projects: " + projects);
             System.out.println("* Source files per project: " + sourceFiles + " (total: " + (projects * sourceFiles) + ")");
 
+            ModelAssembler modelAssembler = createModelAssembler();
+            Settings settings = createSettings();
+
             Build build = new Build(rootDir);
+            Model model = new Model(build);
 
             // Create model
+            createModelStructureAssembler().attachBuilds(model);
             StructureAssembler structureAssembler = new StructureAssembler(modelAssembler);
             structureAssembler.arrangeProjects(settings, build);
             structureAssembler.arrangeClasses(settings, build);
             modelAssembler.populate(settings, build);
 
             // Generate files
-            new SettingsFileGenerator().generate(build);
-            new BuildFileGenerator().generate(build);
-            new AndroidManifestGenerator().generate(build);
-            new AndroidStringResourcesGenerator().generate(build);
-            new JavaSourceGenerator().generate(build);
-            new CppSourceGenerator().generate(build);
-            new ScenarioFileGenerator().generate(build);
+            new ModelGenerator(createBuildGenerator()).generate(model);
 
             return null;
+        }
+
+        private BuildGenerator createBuildGenerator() {
+            return new CompositeBuildGenerator(Arrays.asList(
+                    new SettingsFileGenerator(),
+                    new BuildFileGenerator(),
+                    new AndroidManifestGenerator(),
+                    new AndroidStringResourcesGenerator(),
+                    new JavaSourceGenerator(),
+                    new CppSourceGenerator(),
+                    new ScenarioFileGenerator()
+            ));
+        }
+
+        protected ModelStructureAssembler createModelStructureAssembler() {
+            return new SingleBuildModelStructureAssembler();
         }
 
         private Path getRootDir() throws IOException {
@@ -156,6 +171,9 @@ public class Main {
 
     @Command(name = "java", description = "Generates a Java build with source files")
     public static class InitJavaBuild extends InitBuild {
+        @Option(name = "--http-repo", description = "Generate an HTTP repository (default: false)")
+        boolean httpRepo = false;
+
         @Override
         protected String getType() {
             return "Java";
@@ -163,6 +181,11 @@ public class Main {
 
         protected ModelAssembler createModelAssembler() {
             return new JavaModelAssembler();
+        }
+
+        @Override
+        protected ModelStructureAssembler createModelStructureAssembler() {
+            return httpRepo ? new HttpRepoModelStructureAssembler() : super.createModelStructureAssembler();
         }
     }
 

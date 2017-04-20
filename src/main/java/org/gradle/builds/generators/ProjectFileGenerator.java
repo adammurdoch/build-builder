@@ -5,7 +5,7 @@ import org.gradle.builds.model.Project;
 
 import java.io.IOException;
 
-public abstract class ProjectFileGenerator {
+public abstract class ProjectFileGenerator implements BuildGenerator {
     public void generate(Build build) throws IOException {
         for (Project project : build.getProjects()) {
             generate(project);
