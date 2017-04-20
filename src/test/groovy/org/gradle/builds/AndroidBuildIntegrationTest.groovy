@@ -6,6 +6,7 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
         new Main().run("android", "--dir", projectDir.absolutePath)
 
         then:
+        build.isBuild()
         isAndroidProject(":")
 
         buildSucceeds(":assembleDebug")
@@ -19,6 +20,7 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
         new Main().run("android", "--dir", projectDir.absolutePath, "--source-files", sourceFiles)
 
         then:
+        build.isBuild()
         isAndroidProject(":")
 
         buildSucceeds(":assembleDebug")
@@ -35,6 +37,7 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
         new Main().run("android", "--dir", projectDir.absolutePath, "--projects", projects)
 
         then:
+        build.isBuild()
         isAndroidProject(":")
         isAndroidProject(":core1")
 
@@ -52,8 +55,9 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
         new Main().run("android", "--dir", projectDir.absolutePath, "--projects", "4", "--java")
 
         then:
+        build.isBuild()
         isAndroidProject(":")
-        isJavaProject(":core1")
+        build.project(":core1").isJavaLibrary()
         isAndroidProject(":lib1_1")
         isAndroidProject(":lib1_2")
 
@@ -68,6 +72,7 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
         new Main().run("android", "--dir", projectDir.absolutePath, "--projects", "4", "--source-files", sourceFiles)
 
         then:
+        build.isBuild()
         isAndroidProject(":")
         isAndroidProject(":lib1_1")
         isAndroidProject(":lib1_2")

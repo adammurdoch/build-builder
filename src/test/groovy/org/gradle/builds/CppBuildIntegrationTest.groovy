@@ -6,6 +6,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         new Main().run("cpp", "--dir", projectDir.absolutePath)
 
         then:
+        build.isBuild()
         isCppProject(":")
 
         buildSucceeds(":installMain")
@@ -19,6 +20,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         new Main().run("cpp", "--dir", projectDir.absolutePath, "--source-files", sourceFiles)
 
         then:
+        build.isBuild()
         isCppProject(":")
 
         buildSucceeds(":installMain")
@@ -35,6 +37,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         new Main().run("cpp", "--dir", projectDir.absolutePath, "--projects", projects)
 
         then:
+        build.isBuild()
         isCppProject(":")
         isCppProject(":core1")
 
@@ -52,6 +55,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         new Main().run("cpp", "--dir", projectDir.absolutePath, "--projects", "4", "--source-files", sourceFiles)
 
         then:
+        build.isBuild()
         isCppProject(":")
         isCppProject(":lib1_1")
         isCppProject(":lib1_2")
