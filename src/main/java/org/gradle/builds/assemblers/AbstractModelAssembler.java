@@ -9,11 +9,11 @@ import java.util.Set;
 
 public abstract class AbstractModelAssembler implements ModelAssembler {
     @Override
-    public void populate(Settings settings, Build build) {
+    public void populate(Build build) {
         rootProject(build.getRootProject());
         Set<Project> seen = new HashSet<>();
         for (Project project : build.getProjects()) {
-            populate(settings, project, seen);
+            populate(build.getSettings(), project, seen);
         }
     }
 

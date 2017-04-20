@@ -10,10 +10,10 @@ public class AllTypesProjectDecorator implements ProjectDecorator, ModelAssemble
     private final CppModelAssembler cppModelAssembler = new CppModelAssembler();
 
     @Override
-    public void populate(Settings settings, Build build) {
-        javaModelAssembler.populate(settings, build);
-        androidModelAssembler.populate(settings, build);
-        cppModelAssembler.populate(settings, build);
+    public void populate(Build build) {
+        javaModelAssembler.populate(build);
+        androidModelAssembler.populate(build);
+        cppModelAssembler.populate(build);
     }
 
     @Override

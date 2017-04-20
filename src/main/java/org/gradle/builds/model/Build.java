@@ -1,5 +1,7 @@
 package org.gradle.builds.model;
 
+import org.gradle.builds.assemblers.Settings;
+
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -11,10 +13,12 @@ public class Build {
     private final Path rootDir;
     private final Project rootProject;
     private final Map<String, Project> projects = new LinkedHashMap<>();
+    private Settings settings;
+    private Class<? extends Component> rootProjectType = Application.class;
 
-    public Build(Path rootDir) {
+    public Build(Path rootDir, String rootProjectName) {
         this.rootDir = rootDir;
-        rootProject = new Project(1, null, "testApp", rootDir);
+        rootProject = new Project(null, rootProjectName, rootDir);
         projects.put(rootProject.getPath(), rootProject);
     }
 
@@ -64,11 +68,27 @@ public class Build {
     }
 
     private Project addProject(String name, Project parent, Path projectDir) {
-        Project project = new Project(projects.size() + 2, parent, name, projectDir);
+        Project project = new Project(parent, name, projectDir);
         if (projects.containsKey(project.getPath())) {
             throw new IllegalArgumentException("Project " + project.getPath() + " already exists.");
         }
         projects.put(project.getPath(), project);
         return project;
+    }
+
+    public Class<? extends Component> getRootProjectType() {
+        return rootProjectType;
+    }
+
+    public void setRootProjectType(Class<? extends Component> rootProjectType) {
+        this.rootProjectType = rootProjectType;
+    }
+
+    public void setSettings(Settings settings) {
+        this.settings = settings;
+    }
+
+    public Settings getSettings() {
+        return settings;
     }
 }

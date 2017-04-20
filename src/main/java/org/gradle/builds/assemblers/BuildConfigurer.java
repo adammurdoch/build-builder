@@ -6,5 +6,5 @@ public interface BuildConfigurer {
     /**
      * Populates the model for the given build. The projects, and their dependencies and components have already been configured.
      */
-    void populate(Settings settings, Build build);
+    void populate(Build build);
 }

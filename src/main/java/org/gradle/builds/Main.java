@@ -79,17 +79,18 @@ public class Main {
             System.out.println("* Adding source to build in " + rootDir);
             System.out.println("* Source files per project: " + sourceFiles);
 
-            Build build = new Build(rootDir);
+            Build build = new Build(rootDir, "testApp");
 
             // Inspect model
             ModelAssembler modelAssembler = new AllTypesProjectDecorator();
             Settings settings = new Settings(build.getProjects().size(), sourceFiles);
+            build.setSettings(settings);
             new BuildInspector(modelAssembler).inspect(build);
 
             System.out.println("* Projects: " + build.getProjects().size());
 
-            new StructureAssembler(modelAssembler).arrangeClasses(settings, build);
-            modelAssembler.populate(settings, build);
+            new StructureAssembler(modelAssembler).arrangeClasses(build);
+            modelAssembler.populate(build);
 
             new AndroidStringResourcesGenerator().generate(build);
             new JavaSourceGenerator().generate(build);
@@ -118,15 +119,16 @@ public class Main {
             ModelAssembler modelAssembler = createModelAssembler();
             Settings settings = createSettings();
 
-            Build build = new Build(rootDir);
-            Model model = new Model(build);
+            Model model = new Model(new Build(rootDir, "testApp"));
 
             // Create model
-            createModelStructureAssembler().attachBuilds(model);
+            createModelStructureAssembler().attachBuilds(settings, model);
             StructureAssembler structureAssembler = new StructureAssembler(modelAssembler);
-            structureAssembler.arrangeProjects(settings, build);
-            structureAssembler.arrangeClasses(settings, build);
-            modelAssembler.populate(settings, build);
+            for (Build build : model.getBuilds()) {
+                structureAssembler.arrangeProjects(build);
+                structureAssembler.arrangeClasses(build);
+                modelAssembler.populate(build);
+            }
 
             // Generate files
             new ModelGenerator(createBuildGenerator()).generate(model);
@@ -185,7 +187,8 @@ public class Main {
 
         @Override
         protected ModelStructureAssembler createModelStructureAssembler() {
-            return httpRepo ? new HttpRepoModelStructureAssembler() : super.createModelStructureAssembler();
+            ModelStructureAssembler mainBuildAssembler = super.createModelStructureAssembler();
+            return httpRepo ? new HttpRepoModelStructureAssembler(mainBuildAssembler) : mainBuildAssembler;
         }
     }
 

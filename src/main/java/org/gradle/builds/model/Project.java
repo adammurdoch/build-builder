@@ -7,7 +7,6 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class Project {
-    private final int id;
     private final Project parent;
     private final String name;
     private final Path projectDir;
@@ -17,8 +16,7 @@ public class Project {
     private Graph classGraph;
     private boolean mayUseOtherLanguage;
 
-    public Project(int id, Project parent, String name, Path projectDir) {
-        this.id = id;
+    public Project(Project parent, String name, Path projectDir) {
         this.parent = parent;
         this.name = name;
         this.projectDir = projectDir;
@@ -27,10 +25,6 @@ public class Project {
     @Override
     public String toString() {
         return getPath();
-    }
-
-    public int getId() {
-        return id;
     }
 
     public String getName() {

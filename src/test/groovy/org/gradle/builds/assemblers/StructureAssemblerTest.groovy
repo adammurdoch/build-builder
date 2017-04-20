@@ -7,11 +7,12 @@ import java.nio.file.Paths
 
 class StructureAssemblerTest extends Specification {
     def assembler = new StructureAssembler(Stub(ProjectDecorator))
-    def build = new Build(Paths.get("dir"))
+    def build = new Build(Paths.get("dir"), "testApp")
 
     def "builds dependency graph with one project"() {
         when:
-        assembler.arrangeProjects(projects(1), build)
+        build.settings = projects(1)
+        assembler.arrangeProjects(build)
 
         then:
         build.projects.size() == 1
@@ -21,7 +22,8 @@ class StructureAssemblerTest extends Specification {
 
     def "builds dependency graph with two projects"() {
         when:
-        assembler.arrangeProjects(projects(2), build)
+        build.settings = projects(2)
+        assembler.arrangeProjects(build)
 
         then:
         build.projects.size() == 2
@@ -33,7 +35,8 @@ class StructureAssemblerTest extends Specification {
 
     def "builds dependency graph with three projects"() {
         when:
-        assembler.arrangeProjects(projects(3), build)
+        build.settings = projects(3)
+        assembler.arrangeProjects(build)
 
         then:
         build.projects.size() == 3
@@ -47,7 +50,8 @@ class StructureAssemblerTest extends Specification {
 
     def "builds dependency graph with four projects"() {
         when:
-        assembler.arrangeProjects(projects(4), build)
+        build.settings = projects(4)
+        assembler.arrangeProjects(build)
 
         then:
         build.projects.size() == 4
@@ -62,7 +66,8 @@ class StructureAssemblerTest extends Specification {
 
     def "builds dependency graph with five projects"() {
         when:
-        assembler.arrangeProjects(projects(5), build)
+        build.settings = projects(5)
+        assembler.arrangeProjects(build)
 
         then:
         build.projects.size() == 5
