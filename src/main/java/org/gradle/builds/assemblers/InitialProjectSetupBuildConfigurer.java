@@ -29,27 +29,26 @@ public class InitialProjectSetupBuildConfigurer implements ModelAssembler {
 
         if (build.getHttpRepository() != null) {
             for (Project project : build.getProjects()) {
-                project.setPublishAs("org.gradle.example", "ext_" + project.getName());
+                project.publishTo(build.getHttpRepository());
             }
         }
 
+        // Add incoming dependencies
         for (Build other : build.getDependsOn()) {
             build.getRootProject().getBuildScript().allProjects().maven(other.getHttpRepository());
             for (Project project : build.getProjects()) {
-                for (ExternalJvmLibrary library : other.getPublishedLibraries()) {
-                    project.getBuildScript().dependsOn("compile", library.getGav());
-                }
+                project.dependsOn(other.getPublishedLibraries());
             }
         }
 
         modelAssembler.populate(build);
 
+        // Collect published libraries
         if (build.getHttpRepository() != null) {
             for (Project project : build.getProjects()) {
-                JvmLibrary jvmLibrary = project.component(JvmLibrary.class);
+                PublishedJvmLibrary jvmLibrary = project.component(PublishedJvmLibrary.class);
                 if (jvmLibrary != null) {
-                    build.publishLibrary(new ExternalJvmLibrary(
-                            new ExternalDependencyDeclaration(project.getPublishGroup() + ":" + project.getPublishModule() + ":1.2")));
+                    build.publishLibrary(jvmLibrary);
                 }
             }
         }

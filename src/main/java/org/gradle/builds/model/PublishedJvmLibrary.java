@@ -1,9 +1,9 @@
 package org.gradle.builds.model;
 
-public class ExternalJvmLibrary {
+public class PublishedJvmLibrary implements Component {
     private final ExternalDependencyDeclaration gav;
 
-    public ExternalJvmLibrary(ExternalDependencyDeclaration gav) {
+    public PublishedJvmLibrary(ExternalDependencyDeclaration gav) {
         this.gav = gav;
     }
 

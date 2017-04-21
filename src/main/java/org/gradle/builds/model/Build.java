@@ -13,7 +13,7 @@ public class Build {
     private Settings settings;
     private Class<? extends Component> rootProjectType = Application.class;
     private final List<Build> dependsOn = new ArrayList<>();
-    private final List<ExternalJvmLibrary> publishedLibraries = new ArrayList<>();
+    private final List<PublishedJvmLibrary> publishedLibraries = new ArrayList<>();
     private HttpRepository httpRepository;
 
     public Build(Path rootDir, String rootProjectName) {
@@ -92,11 +92,11 @@ public class Build {
         return settings;
     }
 
-    public List<ExternalJvmLibrary> getPublishedLibraries() {
+    public List<PublishedJvmLibrary> getPublishedLibraries() {
         return publishedLibraries;
     }
 
-    public void publishLibrary(ExternalJvmLibrary library) {
+    public void publishLibrary(PublishedJvmLibrary library) {
         publishedLibraries.add(library);
     }
 

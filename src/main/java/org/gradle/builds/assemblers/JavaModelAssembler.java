@@ -43,16 +43,20 @@ public class JavaModelAssembler extends JvmModelAssembler {
     }
 
     private void addPublishing(Project project, BuildScript buildScript) {
-        if (project.getPublishGroup() != null) {
+        if (project.getPublishRepository() != null) {
+            String group = "org.gradle.example";
+            String module = "ext_" + project.getName();
+            String version = "1.2";
+            project.addComponent(new PublishedJvmLibrary(new ExternalDependencyDeclaration(group, module, version)));
             buildScript.requirePlugin("maven-publish");
-            buildScript.property("group", project.getPublishGroup());
+            buildScript.property("group", group);
             ScriptBlock publishing = buildScript.block("publishing");
-            publishing.block("repositories").block("maven").property("url", new Scope.Code("rootProject.file('build/repo')"));
+            publishing.block("repositories").block("maven").property("url", new Scope.Code("new URI('" + project.getPublishRepository().getRootDir().toUri() + "')"));
             ScriptBlock publication = publishing.block("publications").block("maven(MavenPublication)");
             publication.statement("from components.java");
-            publication.property("groupId", project.getPublishGroup());
-            publication.property("artifactId", project.getPublishModule());
-            publication.property("version", "1.2");
+            publication.property("groupId", group);
+            publication.property("artifactId", module);
+            publication.property("version", version);
         }
     }
 
@@ -65,6 +69,9 @@ public class JavaModelAssembler extends JvmModelAssembler {
     private void addDependencies(Project project, BuildScript buildScript) {
         for (Project dep : project.getDependencies()) {
             buildScript.dependsOnProject("compile", dep.getPath());
+        }
+        for (PublishedJvmLibrary library : project.getExternalDependencies()) {
+            buildScript.dependsOn("compile", library.getGav());
         }
         buildScript.dependsOnExternal("compile", "org.slf4j:slf4j-api:1.7.25");
         buildScript.dependsOnExternal("testCompile", "junit:junit:4.12");

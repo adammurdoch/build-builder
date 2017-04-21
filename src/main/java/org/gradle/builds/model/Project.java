@@ -3,7 +3,9 @@ package org.gradle.builds.model;
 import org.gradle.builds.assemblers.Graph;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 public class Project {
@@ -13,10 +15,10 @@ public class Project {
     private final BuildScript buildScript = new BuildScript();
     private final Set<Project> dependencies = new LinkedHashSet<>();
     private final Set<Component> components = new LinkedHashSet<>();
+    private final List<PublishedJvmLibrary> externalDependencies = new ArrayList<>();
     private Graph classGraph;
     private boolean mayUseOtherLanguage;
-    private String publishGroup;
-    private String publishModule;
+    private HttpRepository publishRepository;
 
     public Project(Project parent, String name, Path projectDir) {
         this.parent = parent;
@@ -94,16 +96,19 @@ public class Project {
         return mayUseOtherLanguage;
     }
 
-    public String getPublishGroup() {
-        return publishGroup;
+    public HttpRepository getPublishRepository() {
+        return publishRepository;
     }
 
-    public String getPublishModule() {
-        return publishModule;
+    public void publishTo(HttpRepository httpRepository) {
+        this.publishRepository = httpRepository;
     }
 
-    public void setPublishAs(String group, String module) {
-        publishGroup = group;
-        publishModule = module;
+    public List<PublishedJvmLibrary> getExternalDependencies() {
+        return externalDependencies;
+    }
+
+    public void dependsOn(List<PublishedJvmLibrary> libraries) {
+        this.externalDependencies.addAll(libraries);
     }
 }

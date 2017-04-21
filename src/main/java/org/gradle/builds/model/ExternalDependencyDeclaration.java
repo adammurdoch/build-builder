@@ -7,6 +7,10 @@ public class ExternalDependencyDeclaration extends DependencyDeclaration {
         this.gav = gav;
     }
 
+    public ExternalDependencyDeclaration(String group, String module, String version) {
+        this.gav = group + ':' + module + ':' + version;
+    }
+
     public String getGav() {
         return gav;
     }
