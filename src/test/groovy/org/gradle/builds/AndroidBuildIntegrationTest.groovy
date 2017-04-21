@@ -7,12 +7,12 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
 
         then:
         build.isBuild()
-        isAndroidProject(":")
+        build.project(":").isAndroidApplication()
 
-        buildSucceeds(":assembleDebug")
+        build.buildSucceeds(":assembleDebug")
         file("build/outputs/apk/testApp-debug.apk").exists()
 
-        buildSucceeds("build")
+        build.buildSucceeds("build")
     }
 
     def "can generate single project build with the specified number of source files"() {
@@ -21,12 +21,12 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
 
         then:
         build.isBuild()
-        isAndroidProject(":")
+        build.project(":").isAndroidApplication()
 
-        buildSucceeds(":assembleDebug")
+        build.buildSucceeds(":assembleDebug")
         file("build/outputs/apk/testApp-debug.apk").exists()
 
-        buildSucceeds("build")
+        build.buildSucceeds("build")
 
         where:
         sourceFiles << ["1", "2", "5"]
@@ -38,13 +38,13 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
 
         then:
         build.isBuild()
-        isAndroidProject(":")
-        isAndroidProject(":core1")
+        build.project(":").isAndroidApplication()
+        build.project(":core1").isAndroidLibrary()
 
-        buildSucceeds(":assembleDebug")
+        build.buildSucceeds(":assembleDebug")
         file("build/outputs/apk/testApp-debug.apk").exists()
 
-        buildSucceeds("build")
+        build.buildSucceeds("build")
 
         where:
         projects << ["2", "5"]
@@ -56,15 +56,15 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
 
         then:
         build.isBuild()
-        isAndroidProject(":")
+        build.project(":").isAndroidApplication()
         build.project(":core1").isJavaLibrary()
-        isAndroidProject(":lib1_1")
-        isAndroidProject(":lib1_2")
+        build.project(":lib1_1").isAndroidLibrary()
+        build.project(":lib1_2").isAndroidLibrary()
 
-        buildSucceeds(":assembleDebug")
+        build.buildSucceeds(":assembleDebug")
         file("build/outputs/apk/testApp-debug.apk").exists()
 
-        buildSucceeds("build")
+        build.buildSucceeds("build")
     }
 
     def "can generate multi-project build with the specified number of source files"() {
@@ -73,15 +73,15 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
 
         then:
         build.isBuild()
-        isAndroidProject(":")
-        isAndroidProject(":lib1_1")
-        isAndroidProject(":lib1_2")
-        isAndroidProject(":core1")
+        build.project(":").isAndroidApplication()
+        build.project(":core1").isAndroidLibrary()
+        build.project(":lib1_1").isAndroidLibrary()
+        build.project(":lib1_2").isAndroidLibrary()
 
-        buildSucceeds(":assembleDebug")
+        build.buildSucceeds(":assembleDebug")
         file("build/outputs/apk/testApp-debug.apk").exists()
 
-        buildSucceeds("build")
+        build.buildSucceeds("build")
 
         where:
         sourceFiles << ["1", "2", "5"]

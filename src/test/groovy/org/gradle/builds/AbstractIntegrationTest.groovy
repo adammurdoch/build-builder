@@ -25,42 +25,6 @@ abstract class AbstractIntegrationTest extends Specification {
         return new BuildLayout(rootDir)
     }
 
-    // TODO - add more checks
-    void isAndroidProject(String path) {
-        def layout = build.project(path)
-        def packagePath
-        if (path == ':') {
-            packagePath = ''
-        } else {
-            packagePath = path.replace(':', '/')
-        }
-
-        layout.isProject()
-
-        assert new File(layout.projectDir, "src/main/AndroidManifest.xml").file
-        def srcDir = new File(layout.projectDir, "src/main/java/org/gradle/example/${packagePath}")
-        assert srcDir.directory
-        assert srcDir.list().findAll { it.endsWith(".java") }
-    }
-
-    // TODO - add more checks
-    void isCppProject(String path) {
-        def layout = build.project(path)
-
-        layout.isProject()
-
-        def srcDir = new File(layout.projectDir, "src/main/cpp")
-        assert srcDir.directory
-        assert srcDir.list().findAll { it.endsWith(".cpp") }
-        def headerDir = new File(layout.projectDir, "src/main/headers")
-        assert headerDir.directory
-        assert headerDir.list().findAll { it.endsWith(".h") }
-    }
-
-    void buildSucceeds(String... tasks) {
-        build.buildSucceeds(tasks)
-    }
-
     void exeSucceeds(File path) {
         runCommand([path.absolutePath])
     }
@@ -133,7 +97,7 @@ abstract class AbstractIntegrationTest extends Specification {
         }
 
         // TODO - add more checks
-        void isJavaProject() {
+        void hasJavaSource() {
             def packagePath
             if (path == ':') {
                 packagePath = ''
@@ -141,12 +105,20 @@ abstract class AbstractIntegrationTest extends Specification {
                 packagePath = path.replace(':', '/')
             }
 
-            isProject()
-            assert buildFile.text.contains("apply plugin: 'java'")
-
             def srcDir = new File(projectDir, "src/main/java/org/gradle/example/${packagePath}")
             assert srcDir.directory
             assert srcDir.list().findAll { it.endsWith(".java") }
+
+            def testSrcDir = new File(projectDir, "src/test/java/org/gradle/example/${packagePath}")
+            assert testSrcDir.directory
+            assert testSrcDir.list().findAll { it.endsWith(".java") }
+        }
+
+        // TODO - add more checks
+        void isJavaProject() {
+            isProject()
+            assert buildFile.text.contains("apply plugin: 'java'")
+            hasJavaSource()
         }
 
         // TODO - add more checks
@@ -159,6 +131,39 @@ abstract class AbstractIntegrationTest extends Specification {
         void isJavaApplication() {
             isJavaProject()
             assert buildFile.text.contains("apply plugin: 'application'")
+        }
+
+        // TODO - add more checks
+        void isAndroidProject() {
+            isProject()
+            assert new File(projectDir, "src/main/AndroidManifest.xml").file
+            hasJavaSource()
+        }
+
+        // TODO - add more checks
+        void isAndroidLibrary() {
+            isAndroidProject()
+            assert buildFile.text.contains("apply plugin: 'com.android.library'")
+            assert !buildFile.text.contains("apply plugin: 'com.android.application'")
+        }
+
+        // TODO - add more checks
+        void isAndroidApplication() {
+            isAndroidProject()
+            assert !buildFile.text.contains("apply plugin: 'com.android.library'")
+            assert buildFile.text.contains("apply plugin: 'com.android.application'")
+        }
+
+        // TODO - add more checks
+        void isCppProject() {
+            isProject()
+
+            def srcDir = new File(projectDir, "src/main/cpp")
+            assert srcDir.directory
+            assert srcDir.list().findAll { it.endsWith(".cpp") }
+            def headerDir = new File(projectDir, "src/main/headers")
+            assert headerDir.directory
+            assert headerDir.list().findAll { it.endsWith(".h") }
         }
 
         private File getBuildFile() {

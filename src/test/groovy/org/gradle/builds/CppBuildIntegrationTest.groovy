@@ -7,12 +7,12 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
 
         then:
         build.isBuild()
-        isCppProject(":")
+        build.project(":").isCppProject()
 
-        buildSucceeds(":installMain")
+        build.buildSucceeds(":installMain")
         exeSucceeds(file("build/install/main/testApp"))
 
-        buildSucceeds("build")
+        build.buildSucceeds("build")
     }
 
     def "can generate single project build with specified number of source files"() {
@@ -21,12 +21,12 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
 
         then:
         build.isBuild()
-        isCppProject(":")
+        build.project(":").isCppProject()
 
-        buildSucceeds(":installMain")
+        build.buildSucceeds(":installMain")
         exeSucceeds(file("build/install/main/testApp"))
 
-        buildSucceeds("build")
+        build.buildSucceeds("build")
 
         where:
         sourceFiles << ["1", "2", "5"]
@@ -38,13 +38,13 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
 
         then:
         build.isBuild()
-        isCppProject(":")
-        isCppProject(":core1")
+        build.project(":").isCppProject()
+        build.project(":core1").isCppProject()
 
-        buildSucceeds(":installMain")
+        build.buildSucceeds(":installMain")
         exeSucceeds(file("build/install/main/testApp"))
 
-        buildSucceeds("build")
+        build.buildSucceeds("build")
 
         where:
         projects << ["2", "3", "4", "5"]
@@ -56,15 +56,15 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
 
         then:
         build.isBuild()
-        isCppProject(":")
-        isCppProject(":lib1_1")
-        isCppProject(":lib1_2")
-        isCppProject(":core1")
+        build.project(":").isCppProject()
+        build.project(":lib1_1").isCppProject()
+        build.project(":lib1_2").isCppProject()
+        build.project(":core1").isCppProject()
 
-        buildSucceeds(":installMain")
+        build.buildSucceeds(":installMain")
         exeSucceeds(file("build/install/main/testApp"))
 
-        buildSucceeds("build")
+        build.buildSucceeds("build")
 
         where:
         sourceFiles << ["1", "2", "5"]

@@ -94,7 +94,7 @@ class AddSourceIntegrationTest extends AbstractIntegrationTest {
         new Main().run("add-source", "--dir", projectDir.absolutePath, "--source-files", "2")
 
         then:
-        buildSucceeds("build")
+        build.buildSucceeds("build")
     }
 
     def "inspects and adds source to a skeleton build with a mixture of native project types"() {
@@ -149,7 +149,7 @@ class AddSourceIntegrationTest extends AbstractIntegrationTest {
         new Main().run("add-source", "--dir", projectDir.absolutePath, "--source-files", "2")
 
         then:
-        buildSucceeds("build")
+        build.buildSucceeds("build")
     }
 
     private void writeAndroidManifest(File manifest, String packageName) {

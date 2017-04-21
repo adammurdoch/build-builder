@@ -9,10 +9,10 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         build.isBuild()
         build.project(":").isJavaApplication()
 
-        buildSucceeds(":installDist")
+        build.buildSucceeds(":installDist")
         exeSucceeds(file("build/install/testApp/bin/testApp"))
 
-        buildSucceeds("build")
+        build.buildSucceeds("build")
     }
 
     def "can generate single project build with specified number of source files"() {
@@ -23,10 +23,10 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         build.isBuild()
         build.project(":").isJavaApplication()
 
-        buildSucceeds(":installDist")
+        build.buildSucceeds(":installDist")
         exeSucceeds(file("build/install/testApp/bin/testApp"))
 
-        buildSucceeds("build")
+        build.buildSucceeds("build")
 
         where:
         sourceFiles << ["1", "2", "5"]
@@ -41,10 +41,10 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":").isJavaApplication()
         build.project(":core1").isJavaLibrary()
 
-        buildSucceeds(":installDist")
+        build.buildSucceeds(":installDist")
         exeSucceeds(file("build/install/testApp/bin/testApp"))
 
-        buildSucceeds("build")
+        build.buildSucceeds("build")
 
         where:
         projects << ["2", "3", "4", "5"]
@@ -61,10 +61,10 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":lib1_2").isJavaLibrary()
         build.project(":core1").isJavaLibrary()
 
-        buildSucceeds(":installDist")
+        build.buildSucceeds(":installDist")
         exeSucceeds(file("build/install/testApp/bin/testApp"))
 
-        buildSucceeds("build")
+        build.buildSucceeds("build")
 
         where:
         sourceFiles << ["1", "2", "5"]
@@ -87,9 +87,9 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
 
         repoBuild.buildSucceeds("assemble")
 
-        buildSucceeds(":installDist")
+        build.buildSucceeds(":installDist")
         exeSucceeds(file("build/install/testApp/bin/testApp"))
 
-        buildSucceeds("build")
+        build.buildSucceeds("build")
     }
 }
