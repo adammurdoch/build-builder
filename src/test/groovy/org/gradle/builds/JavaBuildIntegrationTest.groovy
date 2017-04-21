@@ -85,7 +85,7 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         repoBuild.project(':lib1_2').isJavaLibrary()
         repoBuild.project(':core1').isJavaLibrary()
 
-        repoBuild.buildSucceeds("publish")
+        repoBuild.buildSucceeds("installDist")
         new File(repoBuild.rootDir, "build/repo/org/gradle/example/ext_core1/1.2/ext_core1-1.2.jar").file
         new File(repoBuild.rootDir, "build/repo/org/gradle/example/ext_core1/1.2/ext_core1-1.2.pom").file
 

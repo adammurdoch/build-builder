@@ -9,16 +9,16 @@ import java.util.Set;
 
 public abstract class AbstractModelAssembler implements ModelAssembler {
     @Override
+    public void apply(Class<? extends Component> component, Project project) {
+    }
+
+    @Override
     public void populate(Build build) {
         rootProject(build.getRootProject());
         Set<Project> seen = new HashSet<>();
         for (Project project : build.getProjects()) {
             populate(build.getSettings(), project, seen);
         }
-    }
-
-    @Override
-    public void apply(Class<? extends Component> component, Project project) {
     }
 
     private void populate(Settings settings, Project project, Set<Project> seen) {

@@ -134,15 +134,15 @@ public class Main {
         }
 
         private BuildGenerator createBuildGenerator() {
-            return new CompositeBuildGenerator(Arrays.asList(
+            return new CompositeBuildGenerator(
                     new SettingsFileGenerator(),
                     new BuildFileGenerator(),
                     new AndroidManifestGenerator(),
                     new AndroidStringResourcesGenerator(),
                     new JavaSourceGenerator(),
                     new CppSourceGenerator(),
-                    new ScenarioFileGenerator()
-            ));
+                    new HttpServerMainGenerator(),
+                    new ScenarioFileGenerator());
         }
 
         protected ModelStructureAssembler createModelStructureAssembler() {
@@ -179,7 +179,9 @@ public class Main {
         }
 
         protected ModelAssembler createModelAssembler() {
-            return new JavaModelAssembler();
+            return new CompositeModelAssembler(
+                    new HttpServerModelAssembler(),
+                    new JavaModelAssembler());
         }
 
         @Override
