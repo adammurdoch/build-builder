@@ -23,7 +23,7 @@ public class JavaModelAssembler extends JvmModelAssembler {
 
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("java");
-            addPublishing(project, buildScript);
+            addPublishing(project, apiClass, buildScript);
             addDependencies(project, buildScript);
             addJavaVersion(library, buildScript);
         } else if (project.component(JavaApplication.class) != null) {
@@ -36,18 +36,17 @@ public class JavaModelAssembler extends JvmModelAssembler {
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("java");
             buildScript.requirePlugin("application");
-            addPublishing(project, buildScript);
             addDependencies(project, buildScript);
             buildScript.property("mainClassName", mainClass.getName());
         }
     }
 
-    private void addPublishing(Project project, BuildScript buildScript) {
+    private void addPublishing(Project project, JavaClass apiClass, BuildScript buildScript) {
         if (project.getPublishRepository() != null) {
             String group = "org.gradle.example";
-            String module = "ext_" + project.getName();
+            String module = project.getName();
             String version = "1.2";
-            project.addComponent(new PublishedJvmLibrary(new ExternalDependencyDeclaration(group, module, version)));
+            project.addComponent(new PublishedJvmLibrary(new ExternalDependencyDeclaration(group, module, version), apiClass));
             buildScript.requirePlugin("maven-publish");
             buildScript.property("group", group);
             ScriptBlock publishing = buildScript.block("publishing");

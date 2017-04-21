@@ -10,7 +10,7 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":").isJavaApplication()
 
         build.buildSucceeds(":installDist")
-        exeSucceeds(build.app("build/install/testApp/bin/testApp"))
+        build.app("build/install/testApp/bin/testApp").succeeds()
 
         build.buildSucceeds("build")
     }
@@ -24,7 +24,7 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":").isJavaApplication()
 
         build.buildSucceeds(":installDist")
-        exeSucceeds(build.app("build/install/testApp/bin/testApp"))
+        build.app("build/install/testApp/bin/testApp").succeeds()
 
         build.buildSucceeds("build")
 
@@ -42,7 +42,7 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":core1").isJavaLibrary()
 
         build.buildSucceeds(":installDist")
-        exeSucceeds(build.app("build/install/testApp/bin/testApp"))
+        build.app("build/install/testApp/bin/testApp").succeeds()
 
         build.buildSucceeds("build")
 
@@ -62,7 +62,7 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":core1").isJavaLibrary()
 
         build.buildSucceeds(":installDist")
-        exeSucceeds(build.app("build/install/testApp/bin/testApp"))
+        build.app("build/install/testApp/bin/testApp").succeeds()
 
         build.buildSucceeds("build")
 
@@ -84,22 +84,24 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         def repoBuild = build(file('repo'))
         repoBuild.isBuild()
         repoBuild.project(':').isEmptyProject()
-        repoBuild.project(':lib1_1').isJavaLibrary()
-        repoBuild.project(':lib1_2').isJavaLibrary()
-        repoBuild.project(':core1').isJavaLibrary()
+        repoBuild.project(':repo_lib1_1').isJavaLibrary()
+        repoBuild.project(':repo_lib1_2').isJavaLibrary()
+        repoBuild.project(':repo_core1').isJavaLibrary()
 
         repoBuild.buildSucceeds("installDist")
-        new File(repoBuild.rootDir, "build/repo/org/gradle/example/ext_core1/1.2/ext_core1-1.2.jar").file
-        new File(repoBuild.rootDir, "build/repo/org/gradle/example/ext_core1/1.2/ext_core1-1.2.pom").file
-        def server = repoBuild.start(repoBuild.app("build/install/repo/bin/repo"))
+        new File(repoBuild.rootDir, "build/repo/org/gradle/example/repo_core1/1.2/repo_core1-1.2.jar").file
+        new File(repoBuild.rootDir, "build/repo/org/gradle/example/repo_core1/1.2/repo_core1-1.2.pom").file
+
+        def server = repoBuild.app("build/install/repo/bin/repo").start()
         waitFor(new URI("http://localhost:5005"))
 
         build.buildSucceeds(":installDist")
+
         build.file("build/install/testApp/lib/testApp.jar").file
-        build.file("build/install/testApp/lib/ext_core1-1.2.jar").file
-        build.file("build/install/testApp/lib/ext_lib1_1-1.2.jar").file
-        build.file("build/install/testApp/lib/ext_lib1_2-1.2.jar").file
-        exeSucceeds(build.app("build/install/testApp/bin/testApp"))
+        build.file("build/install/testApp/lib/repo_core1-1.2.jar").file
+        build.file("build/install/testApp/lib/repo_lib1_1-1.2.jar").file
+        build.file("build/install/testApp/lib/repo_lib1_2-1.2.jar").file
+        build.app("build/install/testApp/bin/testApp").succeeds()
 
         build.buildSucceeds("build")
 

@@ -73,8 +73,13 @@ Here's an example:
     - Can include only a single Java project.
     - There are no instrumented tests.
 - No annotation processors are used.
-- External HTTP repo has fixed size and structure
+- External HTTP repo
+    - Has fixed size and structure
+    - Only available for Java builds
+    - Dependencies used by 'impl' class only.
 - External dependencies are the same for all projects and not used by the source.
+    - slf4j
+    - support-core-utils (Android builds)
 - There are no external dependencies for C++.
 - There are no tests for C++
 - Only a basic dependency graph is available, between projects and between source files and external libraries

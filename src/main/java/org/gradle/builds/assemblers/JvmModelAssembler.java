@@ -39,6 +39,9 @@ public abstract class JvmModelAssembler extends AbstractModelAssembler {
                 for (Project depProject : project.getDependencies()) {
                     javaClass.uses(depProject.component(JvmLibrary.class).getApiClass());
                 }
+                for (PublishedJvmLibrary library : project.getExternalDependencies()) {
+                    javaClass.uses(library.getApiClass());
+                }
                 implClass.accept(javaClass);
             }
             for (JavaClass dep : dependencies) {

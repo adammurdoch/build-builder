@@ -1,6 +1,7 @@
 package org.gradle.builds
 
 import junit.framework.AssertionFailedError
+import org.gradle.builds.model.Build
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
@@ -40,10 +41,6 @@ abstract class AbstractIntegrationTest extends Specification {
         return new BuildLayout(rootDir)
     }
 
-    void exeSucceeds(InstalledApp app) {
-        build.start(app).waitFor()
-    }
-
     void waitFor(URI uri) {
         def url = uri.toURL()
         while (true) {
@@ -59,22 +56,35 @@ abstract class AbstractIntegrationTest extends Specification {
     }
 
     static class InstalledApp {
+        final BuildLayout owner
         final File binFile
 
-        InstalledApp(File binFile) {
+        InstalledApp(BuildLayout owner, File binFile) {
+            this.owner = owner
             this.binFile = binFile
+        }
+
+        CommandHandle start() {
+            return owner.start(this)
+        }
+
+        void succeeds() {
+            owner.start(this).waitFor()
         }
     }
 
     static class CommandHandle {
         final Process process
+        final Thread forwarder
 
-        CommandHandle(Process process) {
+        CommandHandle(Process process, Thread forwarder) {
             this.process = process
+            this.forwarder = forwarder
         }
 
         void waitFor() {
             process.waitFor()
+            forwarder.join()
             if (process.exitValue() != 0) {
                 throw new AssertionFailedError("Build failed")
             }
@@ -83,6 +93,7 @@ abstract class AbstractIntegrationTest extends Specification {
         void kill() {
             process.destroy()
             process.waitFor()
+            forwarder.join()
         }
     }
 
@@ -113,7 +124,7 @@ abstract class AbstractIntegrationTest extends Specification {
         }
 
         InstalledApp app(String path) {
-            return new InstalledApp(file(path))
+            return new InstalledApp(this, file(path))
         }
 
         CommandHandle start(InstalledApp app) {
@@ -124,9 +135,23 @@ abstract class AbstractIntegrationTest extends Specification {
             def builder = new ProcessBuilder(commandLine)
             builder.directory(rootDir)
             builder.environment().put("JAVA_HOME", System.getProperty("java.home"))
-            builder.inheritIO()
+            builder.redirectErrorStream(true)
             def process = builder.start()
-            return new CommandHandle(process)
+            def forwarder = new Thread() {
+                @Override
+                void run() {
+                    def buffer = new byte[1024]
+                    while(true) {
+                        int nread = process.inputStream.read(buffer)
+                        if (nread < 0) {
+                            break;
+                        }
+                        System.out.write(buffer, 0, nread)
+                    }
+                }
+            }
+            forwarder.start()
+            return new CommandHandle(process, forwarder)
         }
 
         void buildSucceeds(String... tasks) {

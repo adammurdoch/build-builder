@@ -20,6 +20,7 @@ public class HttpRepoModelStructureAssembler implements ModelStructureAssembler 
         repoBuild.setRootProjectType(null);
         repoBuild.publishTo(new HttpRepository(repoBuild.getRootDir().resolve("build/repo"), 5005));
         repoBuild.getRootProject().addComponent(new HttpServerImplementation(repoBuild.getHttpRepository()));
+        repoBuild.setProjectNamePrefix("repo_");
         model.setRepoBuild(repoBuild);
 
         model.getBuild().dependsOn(repoBuild);

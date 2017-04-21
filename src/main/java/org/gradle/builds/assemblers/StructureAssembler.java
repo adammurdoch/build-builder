@@ -27,9 +27,9 @@ public class StructureAssembler {
             } else {
                 String name;
                 if (lastLayer) {
-                    name = "core" + (item + 1);
+                    name = build.getProjectNamePrefix() + "core" + (item + 1);
                 } else {
-                    name = "lib" + layer + "_" + (item + 1);
+                    name = build.getProjectNamePrefix() + "lib" + layer + "_" + (item + 1);
                 }
                 project = build.addProject(name);
                 if (lastLayer && item == 0) {

@@ -15,6 +15,7 @@ public class Build {
     private final List<Build> dependsOn = new ArrayList<>();
     private final List<PublishedJvmLibrary> publishedLibraries = new ArrayList<>();
     private HttpRepository httpRepository;
+    private String projectNamePrefix = "";
 
     public Build(Path rootDir, String rootProjectName) {
         this.rootDir = rootDir;
@@ -114,5 +115,13 @@ public class Build {
 
     public void dependsOn(Build build) {
         this.dependsOn.add(build);
+    }
+
+    public void setProjectNamePrefix(String projectNamePrefix) {
+        this.projectNamePrefix = projectNamePrefix;
+    }
+
+    public String getProjectNamePrefix() {
+        return projectNamePrefix;
     }
 }
