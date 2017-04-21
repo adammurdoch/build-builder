@@ -46,7 +46,7 @@ public class BuildFileGenerator extends ProjectFileGenerator {
                 if (!buildScript.getAllProjects().getRepositories().isEmpty()) {
                     printWriter.println("    repositories {");
                     for (ScriptBlock repoBlock : buildScript.getAllProjects().getRepositories()) {
-                        printWriter.println("        " + repoBlock.getName() + "()");
+                        writeBlock(repoBlock, "        ", printWriter);
                     }
                     printWriter.println("    }");
                 }
@@ -97,6 +97,12 @@ public class BuildFileGenerator extends ProjectFileGenerator {
         return "'" + ((ExternalDependencyDeclaration) dep).getGav() + "'";
     }
 
+    private void writeBlock(ScriptBlock block, String indent, PrintWriter printWriter) {
+        printWriter.println(indent + block.getName() + " {");
+        doWriteBlockContents(block, indent + "    ", printWriter, false);
+        printWriter.println(indent + "}");
+    }
+
     private void writeBlockContents(Scope block, String indent, PrintWriter printWriter) {
         doWriteBlockContents(block, indent, printWriter, true);
     }
@@ -118,9 +124,7 @@ public class BuildFileGenerator extends ProjectFileGenerator {
                 printWriter.println();
             }
             leadingBlankLine = true;
-            printWriter.println(indent + childBlock.getName() + " {");
-            doWriteBlockContents(childBlock, indent + "    ", printWriter, false);
-            printWriter.println(indent + "}");
+            writeBlock(childBlock, indent, printWriter);
         }
     }
 }

@@ -3,10 +3,7 @@ package org.gradle.builds.model;
 import org.gradle.builds.assemblers.Settings;
 
 import java.nio.file.Path;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Build {
@@ -14,8 +11,9 @@ public class Build {
     private final Project rootProject;
     private final Map<String, Project> projects = new LinkedHashMap<>();
     private Settings settings;
-    private boolean publish;
     private Class<? extends Component> rootProjectType = Application.class;
+    private final List<Build> dependsOn = new ArrayList<>();
+    private HttpRepo httpRepo;
 
     public Build(Path rootDir, String rootProjectName) {
         this.rootDir = rootDir;
@@ -93,11 +91,19 @@ public class Build {
         return settings;
     }
 
-    public boolean isPublish() {
-        return publish;
+    public HttpRepo getHttpRepo() {
+        return httpRepo;
     }
 
-    public void setPublish(boolean publish) {
-        this.publish = publish;
+    public void publishTo(HttpRepo httpRepo) {
+        this.httpRepo = httpRepo;
+    }
+
+    public List<Build> getDependsOn() {
+        return dependsOn;
+    }
+
+    public void dependsOn(Build build) {
+        this.dependsOn.add(build);
     }
 }

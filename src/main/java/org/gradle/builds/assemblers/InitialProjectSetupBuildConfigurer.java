@@ -29,11 +29,15 @@ public class InitialProjectSetupBuildConfigurer implements ModelAssembler {
         for (Project project : build.getSubprojects()) {
             modelAssembler.apply(Library.class, project);
         }
-        if (build.isPublish()) {
+        if (build.getHttpRepo() != null) {
             for (Project project : build.getProjects()) {
                 project.setPublishAs("org.gradle.example", "ext_" + project.getName());
             }
         }
+        for (Build other : build.getDependsOn()) {
+            build.getRootProject().getBuildScript().allProjects().maven(other.getHttpRepo());
+        }
+
         modelAssembler.populate(build);
     }
 }

@@ -8,9 +8,6 @@ import org.gradle.builds.model.Project;
 public class HttpServerModelAssembler extends AbstractModelAssembler {
     @Override
     public void apply(Class<? extends Component> component, Project project) {
-        if (component.equals(HttpServer.class)) {
-            project.addComponent(new HttpServer());
-        }
     }
 
     @Override
@@ -23,9 +20,6 @@ public class HttpServerModelAssembler extends AbstractModelAssembler {
             buildScript.statement("def publishTasks = { subprojects.collect { p -> p.tasks.getByName('publish') } }");
             buildScript.statement("installDist.dependsOn publishTasks");
             buildScript.statement("run.dependsOn publishTasks");
-
-            component.setRootDir(project.getProjectDir().resolve("build/repo"));
-            component.setPort(5005);
         }
     }
 }

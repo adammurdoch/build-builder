@@ -1,6 +1,7 @@
 package org.gradle.builds.assemblers;
 
 import org.gradle.builds.model.Build;
+import org.gradle.builds.model.HttpRepo;
 import org.gradle.builds.model.HttpServer;
 import org.gradle.builds.model.Model;
 
@@ -16,8 +17,11 @@ public class HttpRepoModelStructureAssembler implements ModelStructureAssembler 
         assembler.attachBuilds(settings, model);
         Build repoBuild = new Build(model.getBuild().getRootDir().resolve("repo"), "repo");
         repoBuild.setSettings(new Settings(4, 1));
-        repoBuild.setRootProjectType(HttpServer.class);
-        repoBuild.setPublish(true);
+        repoBuild.setRootProjectType(null);
+        repoBuild.publishTo(new HttpRepo(repoBuild.getRootDir().resolve("build/repo"), 5005));
+        repoBuild.getRootProject().addComponent(new HttpServer(repoBuild.getHttpRepo()));
         model.setRepoBuild(repoBuild);
+
+        model.getBuild().dependsOn(repoBuild);
     }
 }
