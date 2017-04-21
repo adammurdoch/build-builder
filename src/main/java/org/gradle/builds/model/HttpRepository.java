@@ -4,11 +4,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 
-public class HttpRepo {
+public class HttpRepository {
     private final Path rootDir;
     private final int httpPort;
 
-    public HttpRepo(Path rootDir, int httpPort) {
+    public HttpRepository(Path rootDir, int httpPort) {
         this.rootDir = rootDir;
         this.httpPort = httpPort;
     }

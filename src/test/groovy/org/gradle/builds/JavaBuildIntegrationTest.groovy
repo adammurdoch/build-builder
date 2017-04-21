@@ -88,10 +88,14 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         repoBuild.buildSucceeds("installDist")
         new File(repoBuild.rootDir, "build/repo/org/gradle/example/ext_core1/1.2/ext_core1-1.2.jar").file
         new File(repoBuild.rootDir, "build/repo/org/gradle/example/ext_core1/1.2/ext_core1-1.2.pom").file
+        def server = repoBuild.start(new File(repoBuild.rootDir, "build/install/repo/bin/repo"))
 
         build.buildSucceeds(":installDist")
         exeSucceeds(file("build/install/testApp/bin/testApp"))
 
         build.buildSucceeds("build")
+
+        cleanup:
+        server?.kill()
     }
 }

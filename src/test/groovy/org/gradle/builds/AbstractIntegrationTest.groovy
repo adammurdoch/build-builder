@@ -26,19 +26,34 @@ abstract class AbstractIntegrationTest extends Specification {
     }
 
     void exeSucceeds(File path) {
-        runCommand([path.absolutePath])
+        build.start(path).waitFor()
     }
 
-    private void runCommand(List<String> commandLine) {
-        def builder = new ProcessBuilder(commandLine)
-        builder.directory(projectDir)
-        builder.environment().put("JAVA_HOME", System.getProperty("java.home"))
-        builder.environment().put("ANDROID_HOME", System.getProperty("user.home") + "/Library/Android/sdk")
-        builder.inheritIO()
-        def process = builder.start()
-        process.waitFor()
-        if (process.exitValue() != 0) {
-            throw new AssertionFailedError("Build failed")
+    static class InstalledApp {
+        final File binFile
+
+        InstalledApp(File binFile) {
+            this.binFile = binFile
+        }
+    }
+
+    static class CommandHandle {
+        final Process process
+
+        CommandHandle(Process process) {
+            this.process = process
+        }
+
+        void waitFor() {
+            process.waitFor()
+            if (process.exitValue() != 0) {
+                throw new AssertionFailedError("Build failed")
+            }
+        }
+
+        void kill() {
+            process.destroy()
+            process.waitFor()
         }
     }
 
@@ -62,6 +77,20 @@ abstract class AbstractIntegrationTest extends Specification {
             } else {
                 return new ProjectLayout(path, new File(rootDir, path.replace(':', '/')))
             }
+        }
+
+        CommandHandle start(File exe) {
+            return start([exe.absolutePath])
+        }
+
+        CommandHandle start(List<String> commandLine) {
+            def builder = new ProcessBuilder(commandLine)
+            builder.directory(rootDir)
+            builder.environment().put("JAVA_HOME", System.getProperty("java.home"))
+            builder.environment().put("ANDROID_HOME", System.getProperty("user.home") + "/Library/Android/sdk")
+            builder.inheritIO()
+            def process = builder.start()
+            return new CommandHandle(process)
         }
 
         void buildSucceeds(String... tasks) {

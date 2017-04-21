@@ -67,12 +67,15 @@ public class BuildScript extends ProjectScriptBlock {
     }
 
     public void dependsOnProject(String configuration, String projectPath) {
-        Set<DependencyDeclaration> deps = getDepsForConfiguration(configuration);
-        deps.add(new ProjectDependencyDeclaration(projectPath));
+        dependsOn(configuration, new ProjectDependencyDeclaration(projectPath));
     }
 
     public void dependsOnExternal(String configuration, String gav) {
+        dependsOn(configuration, new ExternalDependencyDeclaration(gav));
+    }
+
+    public void dependsOn(String configuration, DependencyDeclaration dep) {
         Set<DependencyDeclaration> deps = getDepsForConfiguration(configuration);
-        deps.add(new ExternalDependencyDeclaration(gav));
+        deps.add(dep);
     }
 }

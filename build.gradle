@@ -21,7 +21,7 @@ dependencies {
     compile 'io.airlift:airline:0.7'
     compile 'org.gradle:gradle-tooling-api:3.3'
 
-    runtime 'org.slf4j:slf4j-simple:1.7.10'
+    runtime 'org.slf4j:slf4j-simple:1.7.25'
 
     testCompile gradleTestKit()
     testCompile 'org.codehaus.groovy:groovy:2.4.10'

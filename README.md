@@ -27,7 +27,7 @@ The `--projects` option specifies the number of projects. Default is 1.
 
 The `--source-files` option specifies the number of source files per project. Default is 3.
 
-The `--java` option includes some Java libraries in the build. Default is false. 
+The `--java` option includes some Java libraries in an Android build. Default is false. 
 
 #### Add source files to an existing build
 
@@ -74,9 +74,10 @@ Here's an example:
     - There are no instrumented tests.
 - No annotation processors are used.
 - External dependencies are the same for all projects and not used by the source.
+- External HTTP repo is fixed size.
 - There are no external dependencies for C++.
 - There are no tests for C++
-- Only a basic dependency graph is available, between projects and between source files.
+- Only a basic dependency graph is available, between projects and between source files and external libraries
     - Arranged in layers 
     - Only one layer of a project references classes from other projects
 - Generated classes are small.

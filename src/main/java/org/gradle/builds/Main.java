@@ -10,7 +10,6 @@ import org.gradle.builds.model.Model;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.Callable;
 
@@ -116,16 +115,15 @@ public class Main {
             System.out.println("* Projects: " + projects);
             System.out.println("* Source files per project: " + sourceFiles + " (total: " + (projects * sourceFiles) + ")");
 
-            ModelAssembler modelAssembler = new InitialProjectSetupBuildConfigurer(createModelAssembler());
             Settings settings = createSettings();
 
             Model model = new Model(new Build(rootDir, "testApp"));
 
             // Create model
             createModelStructureAssembler().attachBuilds(settings, model);
-            for (Build build : model.getBuilds()) {
-                modelAssembler.populate(build);
-            }
+
+            ModelAssembler modelAssembler = new InitialProjectSetupBuildConfigurer(createModelAssembler());
+            new ModelConfigurer(modelAssembler).populate(model);
 
             // Generate files
             new ModelGenerator(createBuildGenerator()).generate(model);

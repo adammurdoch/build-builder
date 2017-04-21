@@ -1,17 +1,17 @@
 package org.gradle.builds.generators;
 
-import org.gradle.builds.model.HttpServer;
+import org.gradle.builds.model.HttpServerImplementation;
 import org.gradle.builds.model.Project;
 
 import java.io.PrintWriter;
 
-public class HttpServerMainGenerator extends ComponentSpecificProjectFileGenerator<HttpServer> {
+public class HttpServerMainGenerator extends ComponentSpecificProjectFileGenerator<HttpServerImplementation> {
     public HttpServerMainGenerator() {
-        super(HttpServer.class, "src/main/java/org/gradle/example/http/Main.java");
+        super(HttpServerImplementation.class, "src/main/java/org/gradle/example/http/RepoMain.java");
     }
 
     @Override
-    protected void generate(Project project, HttpServer component, PrintWriter printWriter) {
+    protected void generate(Project project, HttpServerImplementation component, PrintWriter printWriter) {
         printWriter.println("package org.gradle.example.http;");
         printWriter.println();
         printWriter.println("import com.sun.net.httpserver.HttpServer;");
@@ -20,10 +20,11 @@ public class HttpServerMainGenerator extends ComponentSpecificProjectFileGenerat
         printWriter.println("import java.net.InetSocketAddress;");
         printWriter.println("import java.io.IOException;");
         printWriter.println("import java.io.File;");
+        printWriter.println("import java.nio.file.Files;");
         printWriter.println("import java.net.URI;");
         printWriter.println("import java.util.concurrent.atomic.AtomicLong;");
         printWriter.println();
-        printWriter.println("public class Main {");
+        printWriter.println("public class RepoMain {");
         printWriter.println("    public static void main(String[] args) throws Exception {");
         printWriter.println("        File rootDir = new File(new URI(\"" + component.getRootDir().toUri() + "\"));");
         printWriter.println("        System.out.println(\"Root dir: \" + rootDir);");
@@ -41,9 +42,13 @@ public class HttpServerMainGenerator extends ComponentSpecificProjectFileGenerat
         printWriter.println("                if (!f.isFile()) {");
         printWriter.println("                    System.out.println(String.format(\"[%d] not found.\", n));");
         printWriter.println("                    exchange.sendResponseHeaders(404, -1);");
-        printWriter.println("                } else {");
+        printWriter.println("                } else if (!getRequest) {");
         printWriter.println("                    System.out.println(String.format(\"[%d] found.\", n));");
-        printWriter.println("                    exchange.sendResponseHeaders(200, getRequest ? 0 : -1);");
+        printWriter.println("                    exchange.sendResponseHeaders(200, -1);");
+        printWriter.println("                } else {");
+        printWriter.println("                    System.out.println(String.format(\"[%d] sending.\", n));");
+        printWriter.println("                    exchange.sendResponseHeaders(200, f.length());");
+        printWriter.println("                    Files.copy(f.toPath(), exchange.getResponseBody());");
         printWriter.println("                }");
         printWriter.println("                exchange.close();");
         printWriter.println("            }");
