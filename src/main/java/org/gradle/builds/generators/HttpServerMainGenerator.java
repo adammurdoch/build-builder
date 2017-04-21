@@ -23,6 +23,7 @@ public class HttpServerMainGenerator extends ComponentSpecificProjectFileGenerat
         printWriter.println("import java.nio.file.Files;");
         printWriter.println("import java.net.URI;");
         printWriter.println("import java.util.concurrent.atomic.AtomicLong;");
+        printWriter.println("import java.util.concurrent.Executors;");
         printWriter.println();
         printWriter.println("public class RepoMain {");
         printWriter.println("    public static void main(String[] args) throws Exception {");
@@ -30,6 +31,7 @@ public class HttpServerMainGenerator extends ComponentSpecificProjectFileGenerat
         printWriter.println("        System.out.println(\"Root dir: \" + rootDir);");
         printWriter.println("        System.out.println(\"URL: http://localhost:" + component.getPort() + "\");");
         printWriter.println("        HttpServer server = HttpServer.create(new InetSocketAddress(" + component.getPort() + "), 20);");
+        printWriter.println("        server.setExecutor(Executors.newCachedThreadPool());");
         printWriter.println("        AtomicLong counter = new AtomicLong();");
         printWriter.println("        server.createContext(\"/\", new HttpHandler() {");
         printWriter.println("            public void handle(HttpExchange exchange) throws IOException {");
@@ -48,6 +50,7 @@ public class HttpServerMainGenerator extends ComponentSpecificProjectFileGenerat
         printWriter.println("                } else {");
         printWriter.println("                    System.out.println(String.format(\"[%d] sending.\", n));");
         printWriter.println("                    exchange.sendResponseHeaders(200, f.length());");
+        printWriter.println("                    // try { Thread.sleep(1000); } catch (InterruptedException e) { }");
         printWriter.println("                    Files.copy(f.toPath(), exchange.getResponseBody());");
         printWriter.println("                }");
         printWriter.println("                exchange.close();");
