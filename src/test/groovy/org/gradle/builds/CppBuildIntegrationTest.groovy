@@ -10,7 +10,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":").isCppProject()
 
         build.buildSucceeds(":installMain")
-        exeSucceeds(file("build/install/main/testApp"))
+        exeSucceeds(build.app("build/install/main/testApp"))
 
         build.buildSucceeds("build")
     }
@@ -24,7 +24,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":").isCppProject()
 
         build.buildSucceeds(":installMain")
-        exeSucceeds(file("build/install/main/testApp"))
+        exeSucceeds(build.app("build/install/main/testApp"))
 
         build.buildSucceeds("build")
 
@@ -42,7 +42,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":core1").isCppProject()
 
         build.buildSucceeds(":installMain")
-        exeSucceeds(file("build/install/main/testApp"))
+        exeSucceeds(build.app("build/install/main/testApp"))
 
         build.buildSucceeds("build")
 
@@ -62,7 +62,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":core1").isCppProject()
 
         build.buildSucceeds(":installMain")
-        exeSucceeds(file("build/install/main/testApp"))
+        exeSucceeds(build.app("build/install/main/testApp"))
 
         build.buildSucceeds("build")
 

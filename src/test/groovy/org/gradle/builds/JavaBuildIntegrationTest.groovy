@@ -10,7 +10,7 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":").isJavaApplication()
 
         build.buildSucceeds(":installDist")
-        exeSucceeds(file("build/install/testApp/bin/testApp"))
+        exeSucceeds(build.app("build/install/testApp/bin/testApp"))
 
         build.buildSucceeds("build")
     }
@@ -24,7 +24,7 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":").isJavaApplication()
 
         build.buildSucceeds(":installDist")
-        exeSucceeds(file("build/install/testApp/bin/testApp"))
+        exeSucceeds(build.app("build/install/testApp/bin/testApp"))
 
         build.buildSucceeds("build")
 
@@ -42,7 +42,7 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":core1").isJavaLibrary()
 
         build.buildSucceeds(":installDist")
-        exeSucceeds(file("build/install/testApp/bin/testApp"))
+        exeSucceeds(build.app("build/install/testApp/bin/testApp"))
 
         build.buildSucceeds("build")
 
@@ -62,7 +62,7 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":core1").isJavaLibrary()
 
         build.buildSucceeds(":installDist")
-        exeSucceeds(file("build/install/testApp/bin/testApp"))
+        exeSucceeds(build.app("build/install/testApp/bin/testApp"))
 
         build.buildSucceeds("build")
 
@@ -71,6 +71,9 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
     }
 
     def "can generate single project build with http repo"() {
+        given:
+        useIsolatedUserHome()
+
         when:
         new Main().run("java", "--http-repo", "--dir", projectDir.absolutePath)
 
@@ -88,10 +91,15 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         repoBuild.buildSucceeds("installDist")
         new File(repoBuild.rootDir, "build/repo/org/gradle/example/ext_core1/1.2/ext_core1-1.2.jar").file
         new File(repoBuild.rootDir, "build/repo/org/gradle/example/ext_core1/1.2/ext_core1-1.2.pom").file
-        def server = repoBuild.start(new File(repoBuild.rootDir, "build/install/repo/bin/repo"))
+        def server = repoBuild.start(repoBuild.app("build/install/repo/bin/repo"))
+        waitFor(new URI("http://localhost:5005"))
 
         build.buildSucceeds(":installDist")
-        exeSucceeds(file("build/install/testApp/bin/testApp"))
+        build.file("build/install/testApp/lib/testApp.jar").file
+        build.file("build/install/testApp/lib/ext_core1-1.2.jar").file
+        build.file("build/install/testApp/lib/ext_lib1_1-1.2.jar").file
+        build.file("build/install/testApp/lib/ext_lib1_2-1.2.jar").file
+        exeSucceeds(build.app("build/install/testApp/bin/testApp"))
 
         build.buildSucceeds("build")
 

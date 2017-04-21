@@ -8,13 +8,28 @@ import spock.lang.Specification
 
 abstract class AbstractIntegrationTest extends Specification {
     @Rule
-    TemporaryFolder tmpDir = new TemporaryFolder()
+    TemporaryFolder tmpDir = new TemporaryFolder(getRootTempDir())
+    static File rootTmpDir
     File projectDir
+    File userHomeDir
     BuildLayout build
+
+    static File getRootTempDir() {
+        if (rootTmpDir == null) {
+            def file = new File("build/tmp/tests").canonicalFile
+            file.mkdirs()
+            rootTmpDir = file
+        }
+        return rootTmpDir
+    }
 
     def setup() {
         projectDir = tmpDir.newFolder("generated-root-dir")
         build = new BuildLayout(projectDir)
+    }
+
+    void useIsolatedUserHome() {
+        userHomeDir = tmpDir.newFolder("user-home")
     }
 
     File file(String path) {
@@ -25,8 +40,22 @@ abstract class AbstractIntegrationTest extends Specification {
         return new BuildLayout(rootDir)
     }
 
-    void exeSucceeds(File path) {
-        build.start(path).waitFor()
+    void exeSucceeds(InstalledApp app) {
+        build.start(app).waitFor()
+    }
+
+    void waitFor(URI uri) {
+        def url = uri.toURL()
+        while (true) {
+            try {
+                HttpURLConnection urlConnection = url.openConnection()
+                urlConnection.responseCode
+                break;
+            } catch (ConnectException e) {
+                // Ignore
+                Thread.sleep(100)
+            }
+        }
     }
 
     static class InstalledApp {
@@ -57,17 +86,21 @@ abstract class AbstractIntegrationTest extends Specification {
         }
     }
 
-    static class BuildLayout {
+    class BuildLayout {
         final File rootDir
 
         BuildLayout(File rootDir) {
             this.rootDir = rootDir
         }
 
+        File file(String path) {
+            return new File(rootDir, path)
+        }
+
         // TODO - add more checks
         void isBuild() {
             assert rootDir.directory
-            assert new File(rootDir, "settings.gradle").file
+            assert file("settings.gradle").file
             project(':').isProject()
         }
 
@@ -79,15 +112,18 @@ abstract class AbstractIntegrationTest extends Specification {
             }
         }
 
-        CommandHandle start(File exe) {
-            return start([exe.absolutePath])
+        InstalledApp app(String path) {
+            return new InstalledApp(file(path))
+        }
+
+        CommandHandle start(InstalledApp app) {
+            return start([app.binFile.absolutePath])
         }
 
         CommandHandle start(List<String> commandLine) {
             def builder = new ProcessBuilder(commandLine)
             builder.directory(rootDir)
             builder.environment().put("JAVA_HOME", System.getProperty("java.home"))
-            builder.environment().put("ANDROID_HOME", System.getProperty("user.home") + "/Library/Android/sdk")
             builder.inheritIO()
             def process = builder.start()
             return new CommandHandle(process)
@@ -96,12 +132,12 @@ abstract class AbstractIntegrationTest extends Specification {
         void buildSucceeds(String... tasks) {
             def gradleRunner = GradleRunner.create()
             gradleRunner.withGradleVersion("3.5")
+            gradleRunner.withTestKitDir(userHomeDir ?: new File(rootTempDir, "testkit"))
             gradleRunner.withProjectDir(rootDir)
             gradleRunner.withArguments(["-S"] + (tasks as List))
             gradleRunner.forwardOutput()
             gradleRunner.build()
         }
-
     }
 
     static class ProjectLayout {
@@ -113,10 +149,14 @@ abstract class AbstractIntegrationTest extends Specification {
             this.projectDir = projectDir
         }
 
+        File file(String path) {
+            return new File(projectDir, path)
+        }
+
         // TODO - add more checks
         void isProject() {
             assert projectDir.directory
-            assert getBuildFile().file
+            assert buildFile.file
         }
 
         // TODO - add more checks
@@ -134,11 +174,11 @@ abstract class AbstractIntegrationTest extends Specification {
                 packagePath = path.replace(':', '/')
             }
 
-            def srcDir = new File(projectDir, "src/main/java/org/gradle/example/${packagePath}")
+            def srcDir = file("src/main/java/org/gradle/example/${packagePath}")
             assert srcDir.directory
             assert srcDir.list().findAll { it.endsWith(".java") }
 
-            def testSrcDir = new File(projectDir, "src/test/java/org/gradle/example/${packagePath}")
+            def testSrcDir = file("src/test/java/org/gradle/example/${packagePath}")
             assert testSrcDir.directory
             assert testSrcDir.list().findAll { it.endsWith(".java") }
         }
@@ -165,7 +205,7 @@ abstract class AbstractIntegrationTest extends Specification {
         // TODO - add more checks
         void isAndroidProject() {
             isProject()
-            assert new File(projectDir, "src/main/AndroidManifest.xml").file
+            assert file("src/main/AndroidManifest.xml").file
             hasJavaSource()
         }
 
@@ -187,16 +227,16 @@ abstract class AbstractIntegrationTest extends Specification {
         void isCppProject() {
             isProject()
 
-            def srcDir = new File(projectDir, "src/main/cpp")
+            def srcDir = file("src/main/cpp")
             assert srcDir.directory
             assert srcDir.list().findAll { it.endsWith(".cpp") }
-            def headerDir = new File(projectDir, "src/main/headers")
+            def headerDir = file("src/main/headers")
             assert headerDir.directory
             assert headerDir.list().findAll { it.endsWith(".h") }
         }
 
         private File getBuildFile() {
-            new File(projectDir, "build.gradle")
+            return file("build.gradle")
         }
     }
 }
