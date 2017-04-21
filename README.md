@@ -67,14 +67,14 @@ Here's an example:
 
 ### Current limitations
 
-- Adding source to an existing build does not consider project dependencies.
-- Adding source to a native build does nothing.
+#### Generating builds
+
 - The Android application does not actually work. The Java and C++ applications can be installed and executed.
     - Can include only a single Java project.
     - There are no instrumented tests.
 - No annotation processors are used.
+- External HTTP repo has fixed size and structure
 - External dependencies are the same for all projects and not used by the source.
-- External HTTP repo is fixed size.
 - There are no external dependencies for C++.
 - There are no tests for C++
 - Only a basic dependency graph is available, between projects and between source files and external libraries
@@ -82,3 +82,8 @@ Here's an example:
     - Only one layer of a project references classes from other projects
 - Generated classes are small.
 - There are no transitive API classes. 
+
+#### Adding source to an existing build
+
+- Adding source to an existing build does not consider project dependencies.
+- Adding source to a native build does nothing.
