@@ -89,7 +89,7 @@ public class Main {
 
             System.out.println("* Projects: " + build.getProjects().size());
 
-            new StructureAssembler(modelAssembler).arrangeClasses(build);
+            new StructureAssembler().arrangeClasses(build);
             modelAssembler.populate(build);
 
             new AndroidStringResourcesGenerator().generate(build);
@@ -116,17 +116,14 @@ public class Main {
             System.out.println("* Projects: " + projects);
             System.out.println("* Source files per project: " + sourceFiles + " (total: " + (projects * sourceFiles) + ")");
 
-            ModelAssembler modelAssembler = createModelAssembler();
+            ModelAssembler modelAssembler = new InitialProjectSetupBuildConfigurer(createModelAssembler());
             Settings settings = createSettings();
 
             Model model = new Model(new Build(rootDir, "testApp"));
 
             // Create model
             createModelStructureAssembler().attachBuilds(settings, model);
-            StructureAssembler structureAssembler = new StructureAssembler(modelAssembler);
             for (Build build : model.getBuilds()) {
-                structureAssembler.arrangeProjects(build);
-                structureAssembler.arrangeClasses(build);
                 modelAssembler.populate(build);
             }
 

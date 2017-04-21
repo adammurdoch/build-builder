@@ -30,3 +30,7 @@ dependencies {
 
 sourceCompatibility = 1.8
 mainClassName = "org.gradle.builds.Main"
+
+test {
+    maxParallelForks = 2
+}

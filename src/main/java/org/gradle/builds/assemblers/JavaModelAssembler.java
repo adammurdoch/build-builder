@@ -23,6 +23,7 @@ public class JavaModelAssembler extends JvmModelAssembler {
 
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("java");
+            addPublishing(project, buildScript);
             addDependencies(project, buildScript);
             addJavaVersion(library, buildScript);
         } else if (project.component(JavaApplication.class) != null) {
@@ -35,8 +36,23 @@ public class JavaModelAssembler extends JvmModelAssembler {
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("java");
             buildScript.requirePlugin("application");
+            addPublishing(project, buildScript);
             addDependencies(project, buildScript);
             buildScript.property("mainClassName", mainClass.getName());
+        }
+    }
+
+    private void addPublishing(Project project, BuildScript buildScript) {
+        if (project.getPublishGroup() != null) {
+            buildScript.requirePlugin("maven-publish");
+            buildScript.property("group", project.getPublishGroup());
+            ScriptBlock publishing = buildScript.block("publishing");
+            publishing.block("repositories").block("maven").property("url", new Scope.Code("rootProject.file('build/repo')"));
+            ScriptBlock publication = publishing.block("publications").block("maven(MavenPublication)");
+            publication.statement("from components.java");
+            publication.property("groupId", project.getPublishGroup());
+            publication.property("artifactId", project.getPublishModule());
+            publication.property("version", "1.2");
         }
     }
 

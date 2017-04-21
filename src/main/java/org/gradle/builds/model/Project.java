@@ -15,6 +15,8 @@ public class Project {
     private final Set<Component> components = new LinkedHashSet<>();
     private Graph classGraph;
     private boolean mayUseOtherLanguage;
+    private String publishGroup;
+    private String publishModule;
 
     public Project(Project parent, String name, Path projectDir) {
         this.parent = parent;
@@ -90,5 +92,18 @@ public class Project {
 
     public boolean isMayUseOtherLanguage() {
         return mayUseOtherLanguage;
+    }
+
+    public String getPublishGroup() {
+        return publishGroup;
+    }
+
+    public String getPublishModule() {
+        return publishModule;
+    }
+
+    public void setPublishAs(String group, String module) {
+        publishGroup = group;
+        publishModule = module;
     }
 }

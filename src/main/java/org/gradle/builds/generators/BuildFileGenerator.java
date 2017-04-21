@@ -98,19 +98,28 @@ public class BuildFileGenerator extends ProjectFileGenerator {
     }
 
     private void writeBlockContents(Scope block, String indent, PrintWriter printWriter) {
-        if (!block.getProperties().isEmpty()) {
-            for (Map.Entry<String, Object> entry : block.getProperties().entrySet()) {
-                if (entry.getValue() instanceof Number) {
-                    printWriter.println(indent + entry.getKey() + " = " + entry.getValue());
-                } else {
-                    printWriter.println(indent + entry.getKey() + " = '" + entry.getValue() + "'");
-                }
+        doWriteBlockContents(block, indent, printWriter, true);
+    }
+
+    private void doWriteBlockContents(Scope block, String indent, PrintWriter printWriter, boolean leadingBlankLine) {
+        if (!block.getStatements().isEmpty()) {
+            if (leadingBlankLine) {
+                printWriter.println();
             }
+            for (Scope.Expression expression : block.getStatements()) {
+                printWriter.print(indent);
+                expression.appendTo(printWriter);
+                printWriter.println();
+            }
+            leadingBlankLine = true;
         }
         for (ScriptBlock childBlock : block.getBlocks()) {
-            printWriter.println();
+            if (leadingBlankLine) {
+                printWriter.println();
+            }
+            leadingBlankLine = true;
             printWriter.println(indent + childBlock.getName() + " {");
-            writeBlockContents(childBlock, indent + "    ", printWriter);
+            doWriteBlockContents(childBlock, indent + "    ", printWriter, false);
             printWriter.println(indent + "}");
         }
     }

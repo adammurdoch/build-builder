@@ -6,7 +6,7 @@ import spock.lang.Specification
 import java.nio.file.Paths
 
 class StructureAssemblerTest extends Specification {
-    def assembler = new StructureAssembler(Stub(ProjectDecorator))
+    def assembler = new StructureAssembler()
     def build = new Build(Paths.get("dir"), "testApp")
 
     def "builds dependency graph with one project"() {

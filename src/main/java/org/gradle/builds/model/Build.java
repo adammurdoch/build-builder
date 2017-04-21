@@ -14,6 +14,7 @@ public class Build {
     private final Project rootProject;
     private final Map<String, Project> projects = new LinkedHashMap<>();
     private Settings settings;
+    private boolean publish;
     private Class<? extends Component> rootProjectType = Application.class;
 
     public Build(Path rootDir, String rootProjectName) {
@@ -90,5 +91,13 @@ public class Build {
 
     public Settings getSettings() {
         return settings;
+    }
+
+    public boolean isPublish() {
+        return publish;
+    }
+
+    public void setPublish(boolean publish) {
+        this.publish = publish;
     }
 }

@@ -1,17 +1,9 @@
 package org.gradle.builds.assemblers;
 
-import org.gradle.builds.model.Application;
 import org.gradle.builds.model.Build;
-import org.gradle.builds.model.Library;
 import org.gradle.builds.model.Project;
 
 public class StructureAssembler {
-    private final ProjectDecorator decorator;
-
-    public StructureAssembler(ProjectDecorator decorator) {
-        this.decorator = decorator;
-    }
-
     public void arrangeClasses(Build build) {
         Graph classGraph = new Graph();
         Settings settings = build.getSettings();
@@ -32,9 +24,6 @@ public class StructureAssembler {
             Project project;
             if (layer == 0) {
                 project = build.getRootProject();
-                if (build.getRootProjectType() != null) {
-                    decorator.apply(build.getRootProjectType(), project);
-                }
             } else {
                 String name;
                 if (lastLayer) {
@@ -46,7 +35,6 @@ public class StructureAssembler {
                 if (lastLayer && item == 0) {
                     project.setMayUseOtherLanguage(true);
                 }
-                decorator.apply(Library.class, project);
             }
             for (Project dep : dependencies) {
                 project.dependsOn(dep);
