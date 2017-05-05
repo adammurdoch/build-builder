@@ -4,9 +4,9 @@ Generates various builds that can be used for profiling and benchmarking Gradle.
 
 Supported build types:
 
-- Java
-- Android
-- C++
+- Java application
+- Android application
+- C++ application
 
 Generates one or more projects with source files. Can also be used to add source files to an existing skeleton build. 
 The source files have dependencies between each other, as described below.
@@ -73,7 +73,8 @@ Here's an example:
 
 #### Generating builds
 
-- The Android application does not actually work. The Java and C++ applications can be installed and executed.
+- Android application 
+    - Doesn't do anything, but can be installed and started.
     - Can include only a single Java project.
     - There are no instrumented tests.
 - No annotation processors are used.
