@@ -78,9 +78,10 @@ Here's an example:
     - There are no instrumented tests.
 - No annotation processors are used.
 - External HTTP repo
-    - Has fixed size and structure
-    - Only available for Java builds
+    - Has fixed size and structure.
+    - Not available for C++.
     - Dependencies used by 'impl' class only.
+    - Broken when used with `android --java`
 - External dependencies are the same for all projects and not used by the source.
     - slf4j
     - support-core-utils (Android builds)

@@ -116,6 +116,9 @@ public class AndroidModelAssembler extends JvmModelAssembler {
         for (Project dep : project.getDependencies()) {
             buildScript.dependsOnProject("compile", dep.getPath());
         }
+        for (PublishedJvmLibrary library : project.getExternalDependencies()) {
+            buildScript.dependsOn("compile", library.getGav());
+        }
         buildScript.dependsOnExternal("compile", "com.android.support:support-core-utils:25.1.0");
         buildScript.dependsOnExternal("compile", "org.slf4j:slf4j-api:1.7.25");
         buildScript.dependsOnExternal("testCompile", "junit:junit:4.12");
