@@ -4,6 +4,7 @@ import org.gradle.builds.model.AndroidComponent;
 import org.gradle.builds.model.Project;
 
 import java.io.PrintWriter;
+import java.util.Map;
 
 public class AndroidStringResourcesGenerator extends ComponentSpecificProjectFileGenerator<AndroidComponent> {
     public AndroidStringResourcesGenerator() {
@@ -14,8 +15,8 @@ public class AndroidStringResourcesGenerator extends ComponentSpecificProjectFil
     protected void generate(Project project, AndroidComponent component, PrintWriter printWriter) {
         printWriter.println("<!-- GENERATED SOURCE FILE -->");
         printWriter.println("<resources>");
-        for (String resourceName : component.getStringResources()) {
-            printWriter.println("    <string name='" + resourceName + "'>some value</string>");
+        for (Map.Entry<String, String> entry : component.getStringResources().entrySet()) {
+            printWriter.println("    <string name='" + entry.getKey() + "'>" + entry.getValue() + "</string>");
         }
         printWriter.println("</resources>");
         printWriter.println();

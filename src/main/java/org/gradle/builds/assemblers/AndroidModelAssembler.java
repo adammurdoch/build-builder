@@ -60,6 +60,7 @@ public class AndroidModelAssembler extends JvmModelAssembler {
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("com.android.application");
             addDependencies(project, buildScript);
+            addApplicationResources(androidApplication);
 
             ScriptBlock androidBlock = buildScript.block("android");
             androidBlock.property("buildToolsVersion", "25.0.0");
@@ -98,6 +99,12 @@ public class AndroidModelAssembler extends JvmModelAssembler {
         }
     }
 
+    private void addApplicationResources(AndroidApplication application) {
+        String labelResource = "app_label";
+        application.stringResource(labelResource, "Test App");
+        application.setLabelResource(labelResource);
+    }
+
     private void addPublishing(Project project, JavaClass libraryActivity, BuildScript buildScript) {
         if (project.getPublishRepository() != null) {
             String group = "org.gradle.example";
@@ -125,8 +132,8 @@ public class AndroidModelAssembler extends JvmModelAssembler {
     }
 
     private void addSourceFiles(Project project, AndroidComponent androidComponent, JavaClass activity) {
-        String stringResourceName = project.getName().toLowerCase();
-        androidComponent.stringResource(stringResourceName);
+        String stringResourceName = project.getName().toLowerCase() + "_string";
+        androidComponent.stringResource(stringResourceName, "some-value");
 
         addSource(project, androidComponent, activity, javaClass -> {
             javaClass.addFieldReference(androidComponent.getPackageName() + ".R.string." + stringResourceName);

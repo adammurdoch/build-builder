@@ -1,5 +1,6 @@
 package org.gradle.builds.generators;
 
+import org.gradle.builds.model.AndroidApplication;
 import org.gradle.builds.model.AndroidComponent;
 import org.gradle.builds.model.JavaClass;
 import org.gradle.builds.model.Project;
@@ -16,9 +17,22 @@ public class AndroidManifestGenerator extends ComponentSpecificProjectFileGenera
         printWriter.println("<!-- GENERATED SOURCE FILE -->");
         printWriter.println("<manifest xmlns:android='http://schemas.android.com/apk/res/android'");
         printWriter.println("        package='" + component.getPackageName() + "'>");
-        printWriter.println("  <application>");
+        printWriter.println("  <application");
+        if (component.getLabelResource() != null) {
+            printWriter.println("    android:label='@string/" + component.getLabelResource() + "'");
+        }
+        if (component instanceof AndroidApplication) {
+            printWriter.println("    android:icon='@mipmap/ic_launcher'");
+        }
+        printWriter.println("  >");
         for (JavaClass javaClass : component.getActivities()) {
             printWriter.println("    <activity android:name='" + javaClass.getName() + "'>");
+            if (component instanceof AndroidApplication) {
+                printWriter.println("      <intent-filter>");
+                printWriter.println("        <action android:name='android.intent.action.MAIN'/>");
+                printWriter.println("        <category android:name='android.intent.category.LAUNCHER'/>");
+                printWriter.println("      </intent-filter>");
+            }
             printWriter.println("    </activity>");
         }
         printWriter.println("  </application>");

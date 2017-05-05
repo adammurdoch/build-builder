@@ -1,11 +1,14 @@
 package org.gradle.builds.model;
 
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class AndroidComponent extends HasJavaSource {
     private String packageName;
-    private final Set<String> stringResources = new LinkedHashSet<>();
+    private String labelResource;
+    private final Map<String, String> stringResources = new LinkedHashMap<>();
     private final Set<JavaClass> activities = new LinkedHashSet<>();
 
     public String getPackageName() {
@@ -16,12 +19,20 @@ public class AndroidComponent extends HasJavaSource {
         this.packageName = packageName;
     }
 
-    public Set<String> getStringResources() {
+    public String getLabelResource() {
+        return labelResource;
+    }
+
+    public void setLabelResource(String labelResource) {
+        this.labelResource = labelResource;
+    }
+
+    public Map<String, String> getStringResources() {
         return stringResources;
     }
 
-    public void stringResource(String name) {
-        stringResources.add(name);
+    public void stringResource(String name, String value) {
+        stringResources.put(name, value);
     }
 
     public Set<JavaClass> getActivities() {
