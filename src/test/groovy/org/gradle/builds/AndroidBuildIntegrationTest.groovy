@@ -8,6 +8,7 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
         build.project(":").isAndroidApplication()
+        build.project(":").file("src/main/java/org/gradle/example").list() as Set == ["AppMainActivity.java", "AppImpl1_1.java", "AppNoDeps1.java"] as Set
 
         build.buildSucceeds(":assembleDebug")
         file("build/outputs/apk/testApp-debug.apk").exists()
@@ -39,7 +40,9 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
         build.project(":").isAndroidApplication()
+        build.project(":").file("src/main/java/org/gradle/example").list() as Set == ["AppMainActivity.java", "AppImpl1_1.java", "AppNoDeps1.java"] as Set
         build.project(":core1").isAndroidLibrary()
+        build.project(":core1").file("src/main/java/org/gradle/example/core1").list() as Set == ["Core1Activity.java", "Core1Impl1_1.java", "Core1NoDeps1.java"] as Set
 
         build.buildSucceeds(":assembleDebug")
         file("build/outputs/apk/testApp-debug.apk").exists()

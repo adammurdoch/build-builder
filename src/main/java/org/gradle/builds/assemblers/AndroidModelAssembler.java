@@ -52,7 +52,8 @@ public class AndroidModelAssembler extends JvmModelAssembler {
                 androidApplication.setPackageName(javaPackageFor(project));
             }
 
-            JavaClass appActivity = androidApplication.addClass(androidApplication.getPackageName() + "." + classNameFor(project));
+            JavaClass appActivity = androidApplication.addClass(androidApplication.getPackageName() + "." + classNameFor(project) + "MainActivity");
+            appActivity.addRole(new AndroidActivity());
             androidApplication.activity(appActivity);
             addSourceFiles(project, androidApplication, appActivity);
             addTests(project, androidApplication);
@@ -77,7 +78,8 @@ public class AndroidModelAssembler extends JvmModelAssembler {
                 androidLibrary.setPackageName(javaPackageFor(project));
             }
 
-            JavaClass libraryActivity = androidLibrary.addClass(androidLibrary.getPackageName() + "." + classNameFor(project));
+            JavaClass libraryActivity = androidLibrary.addClass(androidLibrary.getPackageName() + "." + classNameFor(project) + "Activity");
+            libraryActivity.addRole(new AndroidActivity());
             androidLibrary.setApiClass(libraryActivity);
             androidLibrary.activity(libraryActivity);
             addSourceFiles(project, androidLibrary, libraryActivity);

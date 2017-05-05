@@ -33,7 +33,11 @@ public class JavaSourceGenerator extends ProjectFileGenerator {
             printWriter.println("// GENERATED SOURCE FILE");
             printWriter.println("package " + javaClass.getPackage() + ";");
             printWriter.println();
-            printWriter.println("public class " + javaClass.getSimpleName() + " {");
+            if (javaClass.role(AndroidActivity.class) != null) {
+                printWriter.println("public class " + javaClass.getSimpleName() + " extends android.app.Activity {");
+            } else {
+                printWriter.println("public class " + javaClass.getSimpleName() + " {");
+            }
             printWriter.println("    // constant with unique value, referenced by other classes");
             printWriter.println("    public static final int INT_CONST = " + (counter++) + ";");
             printWriter.println("    // constant with unique value, not referenced by any other classes");

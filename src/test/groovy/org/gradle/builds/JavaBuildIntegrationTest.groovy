@@ -8,6 +8,7 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
         build.project(":").isJavaApplication()
+        build.project(":").file("src/main/java/org/gradle/example").list() as Set == ["App.java", "AppImpl1_1.java", "AppNoDeps1.java"] as Set
 
         build.buildSucceeds(":installDist")
         build.app("build/install/testApp/bin/testApp").succeeds()
@@ -39,7 +40,9 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
         build.project(":").isJavaApplication()
+        build.project(":").file("src/main/java/org/gradle/example").list() as Set == ["App.java", "AppImpl1_1.java", "AppNoDeps1.java"] as Set
         build.project(":core1").isJavaLibrary()
+        build.project(":core1").file("src/main/java/org/gradle/example/core1").list() as Set == ["Core1.java", "Core1Impl1_1.java", "Core1NoDeps1.java"] as Set
 
         build.buildSucceeds(":installDist")
         build.app("build/install/testApp/bin/testApp").succeeds()
