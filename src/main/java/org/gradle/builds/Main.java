@@ -122,25 +122,33 @@ public class Main {
             // Create model
             createModelStructureAssembler().attachBuilds(settings, model);
 
-            ModelAssembler modelAssembler = new InitialProjectSetupBuildConfigurer(createModelAssembler());
-            new ModelConfigurer(modelAssembler).populate(model);
+            createModelConfigurer().populate(model);
 
             // Generate files
-            new ModelGenerator(createBuildGenerator()).generate(model);
+            createModelGenerator().generate(model);
 
             return null;
         }
 
-        private BuildGenerator createBuildGenerator() {
-            return new CompositeBuildGenerator(
-                    new SettingsFileGenerator(),
-                    new BuildFileGenerator(),
-                    new AndroidManifestGenerator(),
-                    new AndroidStringResourcesGenerator(),
-                    new JavaSourceGenerator(),
-                    new CppSourceGenerator(),
-                    new HttpServerMainGenerator(),
-                    new ScenarioFileGenerator());
+        private ModelConfigurer createModelConfigurer() {
+            return new ModelConfigurer(
+                    new InitialProjectSetupBuildConfigurer(
+                            new CompositeModelAssembler(
+                                    new HttpServerModelAssembler(),
+                                    createModelAssembler())));
+        }
+
+        private ModelGenerator createModelGenerator() {
+            return new ModelGenerator(
+                    new CompositeBuildGenerator(
+                            new SettingsFileGenerator(),
+                            new BuildFileGenerator(),
+                            new AndroidManifestGenerator(),
+                            new AndroidStringResourcesGenerator(),
+                            new JavaSourceGenerator(),
+                            new CppSourceGenerator(),
+                            new HttpServerMainGenerator(),
+                            new ScenarioFileGenerator()));
         }
 
         protected ModelStructureAssembler createModelStructureAssembler() {
@@ -166,26 +174,26 @@ public class Main {
         protected abstract ModelAssembler createModelAssembler();
     }
 
-    @Command(name = "java", description = "Generates a Java build with source files")
-    public static class InitJavaBuild extends InitBuild {
+    public static abstract class InitJvmBuild extends InitBuild {
         @Option(name = "--http-repo", description = "Generate an HTTP repository (default: false)")
         boolean httpRepo = false;
 
+        @Override
+        protected ModelStructureAssembler createModelStructureAssembler() {
+            ModelStructureAssembler mainBuildAssembler = super.createModelStructureAssembler();
+            return httpRepo ? new HttpRepoModelStructureAssembler(mainBuildAssembler) : mainBuildAssembler;
+        }
+    }
+
+    @Command(name = "java", description = "Generates a Java build with source files")
+    public static class InitJavaBuild extends InitJvmBuild {
         @Override
         protected String getType() {
             return "Java";
         }
 
         protected ModelAssembler createModelAssembler() {
-            return new CompositeModelAssembler(
-                    new HttpServerModelAssembler(),
-                    new JavaModelAssembler());
-        }
-
-        @Override
-        protected ModelStructureAssembler createModelStructureAssembler() {
-            ModelStructureAssembler mainBuildAssembler = super.createModelStructureAssembler();
-            return httpRepo ? new HttpRepoModelStructureAssembler(mainBuildAssembler) : mainBuildAssembler;
+            return new JavaModelAssembler();
         }
     }
 
@@ -202,7 +210,7 @@ public class Main {
     }
 
     @Command(name = "android", description = "Generates an Android build with source files")
-    public static class InitAndroidBuild extends InitBuild {
+    public static class InitAndroidBuild extends InitJvmBuild {
         @Option(name = "--experimental", description = "Use the experimental Android plugin (default: false")
         boolean experimentalAndroid = false;
 

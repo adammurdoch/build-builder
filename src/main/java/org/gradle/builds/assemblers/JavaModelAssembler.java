@@ -47,15 +47,11 @@ public class JavaModelAssembler extends JvmModelAssembler {
             String module = project.getName();
             String version = "1.2";
             project.addComponent(new PublishedJvmLibrary(new ExternalDependencyDeclaration(group, module, version), apiClass));
-            buildScript.requirePlugin("maven-publish");
+            buildScript.requirePlugin("maven");
             buildScript.property("group", group);
-            ScriptBlock publishing = buildScript.block("publishing");
-            publishing.block("repositories").block("maven").property("url", new Scope.Code("new URI('" + project.getPublishRepository().getRootDir().toUri() + "')"));
-            ScriptBlock publication = publishing.block("publications").block("maven(MavenPublication)");
-            publication.statement("from components.java");
-            publication.property("groupId", group);
-            publication.property("artifactId", module);
-            publication.property("version", version);
+            buildScript.property("version", version);
+            ScriptBlock deployerBlock = buildScript.block("uploadArchives").block("repositories").block("mavenDeployer");
+            deployerBlock.statement("repository(url: new URI('" + project.getPublishRepository().getRootDir().toUri() + "'))");
         }
     }
 

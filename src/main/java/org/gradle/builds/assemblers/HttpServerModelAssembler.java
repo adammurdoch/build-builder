@@ -17,7 +17,7 @@ public class HttpServerModelAssembler extends AbstractModelAssembler {
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("application");
             buildScript.property("mainClassName", "org.gradle.example.http.RepoMain");
-            buildScript.statement("def publishTasks = { subprojects.collect { p -> p.tasks.getByName('publish') } }");
+            buildScript.statement("def publishTasks = { subprojects.collect { p -> p.tasks.getByName('uploadArchives') } }");
             buildScript.statement("installDist.dependsOn publishTasks");
             buildScript.statement("run.dependsOn publishTasks");
         }

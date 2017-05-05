@@ -13,6 +13,8 @@ The source files have dependencies between each other, as described below.
 
 Generates JUnit tests for Java and Android projects.
 
+Can optionally generate a local HTTP repository and server.
+
 Generates a [gradle-profiler](https://www.github.com/gradle/gradle-profiler) scenario file for the build.
 
 ### Command line usage
@@ -28,6 +30,8 @@ The `--projects` option specifies the number of projects. Default is 1.
 The `--source-files` option specifies the number of source files per project. Default is 3.
 
 The `--java` option includes some Java libraries in an Android build. Default is false. 
+
+The `--http-repo` option generates an additional build that produces an HTTP repository that provides external libraries. This repository and its classes are referenced by the generated build. Use `gradle -p repo run` to build and start the HTTP server and libraries.
 
 #### Add source files to an existing build
 
