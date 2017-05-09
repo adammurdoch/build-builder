@@ -7,6 +7,7 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
 
         then:
         build.isBuild()
+
         build.project(":").isAndroidApplication()
         def srcDir = build.project(":").file("src/main/java/org/gradle/example")
         srcDir.list() as Set == ["AppMainActivity.java", "AppImpl1_1.java", "AppNoDeps1.java"] as Set
@@ -29,6 +30,7 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
 
         then:
         build.isBuild()
+
         build.project(":").isAndroidApplication()
 
         build.buildSucceeds(":assembleDebug")
@@ -40,14 +42,41 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
         sourceFiles << ["1", "2", "5"]
     }
 
+    def "can generate 2 project build"() {
+        when:
+        new Main().run("android", "--dir", projectDir.absolutePath, "--projects", "2")
+
+        then:
+        build.isBuild()
+
+        build.project(":").isAndroidApplication()
+        def srcDir = build.project(":").file("src/main/java/org/gradle/example")
+        srcDir.list() as Set == ["AppMainActivity.java", "AppImpl1_1.java", "AppNoDeps1.java"] as Set
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.core1.Core1Activity.getSomeValue()")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.core1.Core1Activity.INT_CONST")
+
+        build.project(":core1").isAndroidLibrary()
+        build.project(":core1").file("src/main/java/org/gradle/example/core1").list() as Set == ["Core1Activity.java", "Core1Impl1_1.java", "Core1NoDeps1.java"] as Set
+
+        build.buildSucceeds(":assembleDebug")
+        file("build/outputs/apk/testApp-debug.apk").exists()
+
+        build.buildSucceeds("build")
+    }
+
     def "can generate multi-project build"() {
         when:
         new Main().run("android", "--dir", projectDir.absolutePath, "--projects", projects)
 
         then:
         build.isBuild()
+
         build.project(":").isAndroidApplication()
         build.project(":").file("src/main/java/org/gradle/example").list() as Set == ["AppMainActivity.java", "AppImpl1_1.java", "AppNoDeps1.java"] as Set
+
+        build.project(":lib1_1").isAndroidLibrary()
+        build.project(":lib1_1").file("src/main/java/org/gradle/example/lib1_1").list() as Set == ["Lib1_1Activity.java", "Lib1_1Impl1_1.java", "Lib1_1NoDeps1.java"] as Set
+
         build.project(":core1").isAndroidLibrary()
         build.project(":core1").file("src/main/java/org/gradle/example/core1").list() as Set == ["Core1Activity.java", "Core1Impl1_1.java", "Core1NoDeps1.java"] as Set
 
@@ -57,7 +86,7 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
         build.buildSucceeds("build")
 
         where:
-        projects << ["2", "5"]
+        projects << ["3", "5"]
     }
 
     def "can generate multi-project build containing some java libraries"() {
@@ -66,6 +95,7 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
 
         then:
         build.isBuild()
+
         build.project(":").isAndroidApplication()
         build.project(":core1").isJavaLibrary()
         build.project(":lib1_1").isAndroidLibrary()
@@ -83,6 +113,7 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
 
         then:
         build.isBuild()
+
         build.project(":").isAndroidApplication()
         build.project(":core1").isAndroidLibrary()
         build.project(":lib1_1").isAndroidLibrary()
@@ -106,7 +137,11 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
 
         then:
         build.isBuild()
+
         build.project(":").isAndroidApplication()
+        def srcDir = build.project(":").file("src/main/java/org/gradle/example")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo_core1.Repo_core1Activity.getSomeValue()")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo_core1.Repo_core1Activity.INT_CONST")
 
         def repoBuild = build(file('repo'))
         repoBuild.isBuild()

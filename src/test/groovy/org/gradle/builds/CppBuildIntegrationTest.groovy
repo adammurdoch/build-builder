@@ -9,7 +9,10 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         build.isBuild()
         build.project(":").isCppProject()
         build.project(":").file("src/main/headers").list() as Set == ["app.h"] as Set
-        build.project(":").file("src/main/cpp").list() as Set == ["app.cpp", "app_impl1_1.cpp", "app_nodeps1.cpp"] as Set
+        def srcDir = build.project(":").file("src/main/cpp")
+        srcDir.list() as Set == ["app.cpp", "app_impl1_1.cpp", "app_nodeps1.cpp"] as Set
+        new File(srcDir, "app.cpp").text.contains("AppImpl1_1")
+        new File(srcDir, "app_impl1_1.cpp").text.contains("AppNoDeps1")
 
         build.buildSucceeds(":installMain")
         build.app("build/install/main/testApp").succeeds()
@@ -34,6 +37,28 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         sourceFiles << ["1", "2", "5"]
     }
 
+    def "can generate 2 project build"() {
+        when:
+        new Main().run("cpp", "--dir", projectDir.absolutePath, "--projects", "2")
+
+        then:
+        build.isBuild()
+        build.project(":").isCppProject()
+        build.project(":").file("src/main/headers").list() as Set == ["app.h"] as Set
+        def srcDir = build.project(":").file("src/main/cpp")
+        srcDir.list() as Set == ["app.cpp", "app_impl1_1.cpp", "app_nodeps1.cpp"] as Set
+        new File(srcDir, "app_impl1_1.cpp").text.contains("Core1")
+
+        build.project(":core1").isCppProject()
+        build.project(":core1").file("src/main/headers").list() as Set == ["core1.h", "core1_impl.h"] as Set
+        build.project(":core1").file("src/main/cpp").list() as Set == ["core1.cpp", "core1_impl1_1.cpp", "core1_nodeps1.cpp"] as Set
+
+        build.buildSucceeds(":installMain")
+        build.app("build/install/main/testApp").succeeds()
+
+        build.buildSucceeds("build")
+    }
+
     def "can generate multi-project build"() {
         when:
         new Main().run("cpp", "--dir", projectDir.absolutePath, "--projects", projects)
@@ -43,6 +68,11 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":").isCppProject()
         build.project(":").file("src/main/headers").list() as Set == ["app.h"] as Set
         build.project(":").file("src/main/cpp").list() as Set == ["app.cpp", "app_impl1_1.cpp", "app_nodeps1.cpp"] as Set
+
+        build.project(":lib1_1").isCppProject()
+        build.project(":lib1_1").file("src/main/headers").list() as Set == ["lib1_1.h", "lib1_1_impl.h"] as Set
+        build.project(":lib1_1").file("src/main/cpp").list() as Set == ["lib1_1.cpp", "lib1_1_impl1_1.cpp", "lib1_1_nodeps1.cpp"] as Set
+
         build.project(":core1").isCppProject()
         build.project(":core1").file("src/main/headers").list() as Set == ["core1.h", "core1_impl.h"] as Set
         build.project(":core1").file("src/main/cpp").list() as Set == ["core1.cpp", "core1_impl1_1.cpp", "core1_nodeps1.cpp"] as Set
@@ -53,7 +83,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         build.buildSucceeds("build")
 
         where:
-        projects << ["2", "3", "4", "5"]
+        projects << ["3", "4", "5"]
     }
 
     def "can generate multi-project build with specified number of source files"() {
