@@ -37,6 +37,12 @@ public class JavaClass {
         uses(javaClass.getApi());
     }
 
+    public void uses(Iterable<JavaClassApi> javaClasses) {
+        for (JavaClassApi javaClass : javaClasses) {
+            uses(javaClass);
+        }
+    }
+
     public void uses(JavaClassApi javaClass) {
         references.add(javaClass);
     }

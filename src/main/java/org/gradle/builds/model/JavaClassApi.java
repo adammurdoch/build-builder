@@ -1,5 +1,6 @@
 package org.gradle.builds.model;
 
+import java.util.Collections;
 import java.util.Set;
 
 public class JavaClassApi {
@@ -11,6 +12,14 @@ public class JavaClassApi {
         this.name = name;
         this.methods = methods;
         this.fields = fields;
+    }
+
+    public static JavaClassApi method(String className, String method) {
+        return new JavaClassApi(className, Collections.singleton(method), Collections.emptySet());
+    }
+
+    public static JavaClassApi field(String className, String field) {
+        return new JavaClassApi(className, Collections.emptySet(), Collections.singleton(field));
     }
 
     public String getName() {

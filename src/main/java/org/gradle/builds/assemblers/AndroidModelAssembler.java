@@ -2,7 +2,10 @@ package org.gradle.builds.assemblers;
 
 import org.gradle.builds.model.*;
 
+import java.util.Arrays;
+
 public class AndroidModelAssembler extends JvmModelAssembler {
+    private static final PublishedJvmLibrary supportUtils = new PublishedJvmLibrary(new ExternalDependencyDeclaration("com.android.support:support-core-utils:25.1.0"), JavaClassApi.field("android.support.v4.app.NavUtils", "PARENT_ACTIVITY"));
     private final boolean experimentalAndroid;
     private final boolean includeJavaLibraries;
     private final JavaModelAssembler javaModelAssembler;
@@ -52,11 +55,13 @@ public class AndroidModelAssembler extends JvmModelAssembler {
                 androidApplication.setPackageName(javaPackageFor(project));
             }
             project.dependsOn(slfj4);
+            project.dependsOn(supportUtils);
+            JavaClassApi rClass = JavaClassApi.field(androidApplication.getPackageName() + ".R.string", project.getName().toLowerCase() + "_string");
 
             JavaClass appActivity = androidApplication.addClass(androidApplication.getPackageName() + "." + classNameFor(project) + "MainActivity");
             appActivity.addRole(new AndroidActivity());
             androidApplication.activity(appActivity);
-            addSourceFiles(project, androidApplication, appActivity);
+            addSourceFiles(project, androidApplication, appActivity, rClass);
             addTests(project, androidApplication);
 
             BuildScript buildScript = project.getBuildScript();
@@ -79,17 +84,19 @@ public class AndroidModelAssembler extends JvmModelAssembler {
                 androidLibrary.setPackageName(javaPackageFor(project));
             }
             project.dependsOn(slfj4);
+            JavaClassApi rClass = JavaClassApi.field(androidLibrary.getPackageName() + ".R.string", project.getName().toLowerCase() + "_string");
 
             JavaClass libraryActivity = androidLibrary.addClass(androidLibrary.getPackageName() + "." + classNameFor(project) + "Activity");
             libraryActivity.addRole(new AndroidActivity());
             androidLibrary.setApiClass(libraryActivity);
+            androidLibrary.setRClass(rClass);
             androidLibrary.activity(libraryActivity);
-            addSourceFiles(project, androidLibrary, libraryActivity);
+            addSourceFiles(project, androidLibrary, libraryActivity, rClass);
             addTests(project, androidLibrary);
 
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("com.android.library");
-            addPublishing(project, libraryActivity, buildScript);
+            addPublishing(project, libraryActivity, rClass, buildScript);
             addDependencies(project, buildScript);
 
             ScriptBlock androidBlock = buildScript.block("android");
@@ -109,12 +116,12 @@ public class AndroidModelAssembler extends JvmModelAssembler {
         application.setLabelResource(labelResource);
     }
 
-    private void addPublishing(Project project, JavaClass libraryActivity, BuildScript buildScript) {
+    private void addPublishing(Project project, JavaClass libraryActivity, JavaClassApi rClass, BuildScript buildScript) {
         if (project.getPublishRepository() != null) {
             String group = "org.gradle.example";
             String module = project.getName();
             String version = "1.2";
-            project.addComponent(new PublishedJvmLibrary(new ExternalDependencyDeclaration(group, module, version), libraryActivity.getApi()));
+            project.addComponent(new PublishedJvmLibrary(new ExternalDependencyDeclaration(group, module, version), Arrays.asList(libraryActivity.getApi(), rClass)));
             buildScript.requirePlugin("maven");
             buildScript.property("group", group);
             buildScript.property("version", version);
@@ -130,16 +137,15 @@ public class AndroidModelAssembler extends JvmModelAssembler {
         for (PublishedJvmLibrary library : project.getExternalDependencies()) {
             buildScript.dependsOn("compile", library.getGav());
         }
-        buildScript.dependsOnExternal("compile", "com.android.support:support-core-utils:25.1.0");
         buildScript.dependsOnExternal("testCompile", "junit:junit:4.12");
     }
 
-    private void addSourceFiles(Project project, AndroidComponent androidComponent, JavaClass activity) {
+    private void addSourceFiles(Project project, AndroidComponent androidComponent, JavaClass activity, JavaClassApi rClass) {
         String stringResourceName = project.getName().toLowerCase() + "_string";
         androidComponent.stringResource(stringResourceName, "some-value");
 
         addSource(project, androidComponent, activity, javaClass -> {
-            javaClass.addFieldReference(androidComponent.getPackageName() + ".R.string." + stringResourceName);
+            javaClass.uses(rClass);
         });
     }
 }
