@@ -9,16 +9,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
-public class AndroidImageGenerator extends ProjectFileGenerator {
+public class AndroidImageGenerator extends ProjectComponentSpecificGenerator<AndroidApplication> {
+    public AndroidImageGenerator() {
+        super(AndroidApplication.class);
+    }
+
     @Override
-    protected void generate(Project project) throws IOException {
-        AndroidApplication application = project.component(AndroidApplication.class);
-        if (application != null) {
-            Path outFile = project.getProjectDir().resolve("src/main/res/mipmap-hdpi/ic_launcher.png");
-            Files.createDirectories(outFile.getParent());
-            try (InputStream imageContent = getClass().getClassLoader().getResourceAsStream("ic_launcher.png")) {
-                Files.copy(imageContent, outFile, StandardCopyOption.REPLACE_EXISTING);
-            }
+    protected void generate(Project project, AndroidApplication component) throws IOException {
+        Path outFile = project.getProjectDir().resolve("src/main/res/mipmap-hdpi/ic_launcher.png");
+        Files.createDirectories(outFile.getParent());
+        try (InputStream imageContent = getClass().getClassLoader().getResourceAsStream("ic_launcher.png")) {
+            Files.copy(imageContent, outFile, StandardCopyOption.REPLACE_EXISTING);
         }
     }
 }

@@ -203,6 +203,10 @@ abstract class AbstractIntegrationTest extends Specification {
             assert srcDir.directory
             assert srcDir.list().findAll { it.endsWith(".java") }
 
+            def resourceDir = file("src/main/resources")
+            assert resourceDir.directory
+            assert resourceDir.list().findAll { it.endsWith(".properties") }
+
             def testSrcDir = file("src/test/java/org/gradle/example/${packagePath}")
             assert testSrcDir.directory
             assert testSrcDir.list().findAll { it.endsWith(".java") }

@@ -8,22 +8,16 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public abstract class ComponentSpecificProjectFileGenerator<T extends Component> extends ProjectFileGenerator {
-    private final Class<T> type;
+public abstract class ProjectComponentSpecificSingleFileGenerator<T extends Component> extends ProjectComponentSpecificGenerator<T> {
     private final String filePath;
 
-    public ComponentSpecificProjectFileGenerator(Class<T> type, String filePath) {
-        this.type = type;
+    public ProjectComponentSpecificSingleFileGenerator(Class<T> type, String filePath) {
+        super(type);
         this.filePath = filePath;
     }
 
     @Override
-    protected void generate(Project project) throws IOException {
-        T component = project.component(type);
-        if (component == null) {
-            return;
-        }
-
+    protected void generate(Project project, T component) throws IOException {
         Path file = project.getProjectDir().resolve(filePath);
         Files.createDirectories(file.getParent());
         try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(file))) {

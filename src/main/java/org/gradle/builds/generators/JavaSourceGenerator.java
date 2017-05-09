@@ -7,16 +7,15 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class JavaSourceGenerator extends ProjectFileGenerator {
+public class JavaSourceGenerator extends ProjectComponentSpecificGenerator<HasJavaSource> {
     private int counter = 1000;
 
-    @Override
-    protected void generate(Project project) throws IOException {
-        HasJavaSource component = project.component(HasJavaSource.class);
-        if (component == null) {
-            return;
-        }
+    public JavaSourceGenerator() {
+        super(HasJavaSource.class);
+    }
 
+    @Override
+    protected void generate(Project project, HasJavaSource component) throws IOException {
         for (JavaClass javaClass : component.getSourceFiles()) {
             if (javaClass.role(UnitTest.class) != null) {
                 generateUnitTest(project, javaClass);

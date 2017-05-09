@@ -148,6 +148,7 @@ public class Main {
                             new AndroidStringResourcesGenerator(),
                             new AndroidImageGenerator(),
                             new JavaSourceGenerator(),
+                            new JavaResourceGenerator(),
                             new CppSourceGenerator(),
                             new HttpServerMainGenerator(),
                             new ScenarioFileGenerator()));

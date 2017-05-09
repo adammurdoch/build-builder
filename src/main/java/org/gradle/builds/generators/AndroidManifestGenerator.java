@@ -7,7 +7,7 @@ import org.gradle.builds.model.Project;
 
 import java.io.PrintWriter;
 
-public class AndroidManifestGenerator extends ComponentSpecificProjectFileGenerator<AndroidComponent> {
+public class AndroidManifestGenerator extends ProjectComponentSpecificSingleFileGenerator<AndroidComponent> {
     public AndroidManifestGenerator() {
         super(AndroidComponent.class, "src/main/AndroidManifest.xml");
     }

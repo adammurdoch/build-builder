@@ -6,7 +6,7 @@ import org.gradle.builds.model.Project;
 import java.io.PrintWriter;
 import java.util.Map;
 
-public class AndroidStringResourcesGenerator extends ComponentSpecificProjectFileGenerator<AndroidComponent> {
+public class AndroidStringResourcesGenerator extends ProjectComponentSpecificSingleFileGenerator<AndroidComponent> {
     public AndroidStringResourcesGenerator() {
         super(AndroidComponent.class, "src/main/res/values/strings.xml");
     }

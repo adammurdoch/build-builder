@@ -7,14 +7,13 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class CppSourceGenerator extends ProjectFileGenerator {
-    @Override
-    protected void generate(Project project) throws IOException {
-        HasNativeSource component = project.component(HasNativeSource.class);
-        if (component == null) {
-            return;
-        }
+public class CppSourceGenerator extends ProjectComponentSpecificGenerator<HasNativeSource> {
+    public CppSourceGenerator() {
+        super(HasNativeSource.class);
+    }
 
+    @Override
+    protected void generate(Project project, HasNativeSource component) throws IOException {
         for (CppSourceFile cppSource : component.getSourceFiles()) {
             Path sourceFile = project.getProjectDir().resolve("src/main/cpp/" + cppSource.getName());
             Files.createDirectories(sourceFile.getParent());

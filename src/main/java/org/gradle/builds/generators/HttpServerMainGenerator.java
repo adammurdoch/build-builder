@@ -5,7 +5,7 @@ import org.gradle.builds.model.Project;
 
 import java.io.PrintWriter;
 
-public class HttpServerMainGenerator extends ComponentSpecificProjectFileGenerator<HttpServerImplementation> {
+public class HttpServerMainGenerator extends ProjectComponentSpecificSingleFileGenerator<HttpServerImplementation> {
     public HttpServerMainGenerator() {
         super(HttpServerImplementation.class, "src/main/java/org/gradle/example/http/RepoMain.java");
     }
