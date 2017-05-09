@@ -108,6 +108,10 @@ public class Project {
         return externalDependencies;
     }
 
+    public void dependsOn(PublishedJvmLibrary library) {
+        this.externalDependencies.add(library);
+    }
+
     public void dependsOn(List<PublishedJvmLibrary> libraries) {
         this.externalDependencies.addAll(libraries);
     }

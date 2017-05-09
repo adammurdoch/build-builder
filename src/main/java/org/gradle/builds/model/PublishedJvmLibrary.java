@@ -2,14 +2,14 @@ package org.gradle.builds.model;
 
 public class PublishedJvmLibrary implements Component {
     private final ExternalDependencyDeclaration gav;
-    private final JavaClass apiClass;
+    private final JavaClassApi apiClass;
 
-    public PublishedJvmLibrary(ExternalDependencyDeclaration gav, JavaClass apiClass) {
+    public PublishedJvmLibrary(ExternalDependencyDeclaration gav, JavaClassApi apiClass) {
         this.gav = gav;
         this.apiClass = apiClass;
     }
 
-    public JavaClass getApiClass() {
+    public JavaClassApi getApiClass() {
         return apiClass;
     }
 

@@ -2,10 +2,14 @@ package org.gradle.builds.assemblers;
 
 import org.gradle.builds.model.*;
 
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.function.Consumer;
 
 public abstract class JvmModelAssembler extends AbstractModelAssembler {
+    protected static final JavaClassApi slf4jApi = new JavaClassApi("org.slf4j.LoggerFactory", Collections.singleton("getLogger(\"abc\")"), Collections.emptySet());
+    protected static final PublishedJvmLibrary slfj4 = new PublishedJvmLibrary(new ExternalDependencyDeclaration("org.slf4j:slf4j-api:1.7.25"), slf4jApi);
+
     @Override
     protected void rootProject(Project rootProject) {
         ProjectScriptBlock allProjects = rootProject.getBuildScript().allProjects();

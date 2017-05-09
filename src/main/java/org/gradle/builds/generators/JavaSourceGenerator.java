@@ -62,9 +62,8 @@ public class JavaSourceGenerator extends ProjectFileGenerator {
             printWriter.println();
             printWriter.println("    // public method referenced by other classes");
             printWriter.println("    public static String getSomeValue() {");
-            for (JavaClass dep : javaClass.getReferencedClasses()) {
-                printWriter.println("        " + dep.getName() + ".getSomeValue();");
-                printWriter.println("        String.valueOf(" + dep.getName() + ".INT_CONST);");
+            for (String method : javaClass.getMethodReferences()) {
+                printWriter.println("        " + method + ";");
             }
             for (String field : javaClass.getFieldReferences()) {
                 printWriter.println("        String.valueOf(" + field + ");");

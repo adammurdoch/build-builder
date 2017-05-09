@@ -16,6 +16,9 @@ public class JavaModelAssembler extends JvmModelAssembler {
     protected void populate(Settings settings, Project project) {
         if (project.component(JavaLibrary.class) != null) {
             JavaLibrary library = project.component(JavaLibrary.class);
+
+            project.dependsOn(slfj4);
+
             JavaClass apiClass = library.addClass(javaPackageFor(project) + "." + classNameFor(project));
             library.setApiClass(apiClass);
             addSource(project, library, apiClass, javaClass -> {});
@@ -28,6 +31,9 @@ public class JavaModelAssembler extends JvmModelAssembler {
             addJavaVersion(library, buildScript);
         } else if (project.component(JavaApplication.class) != null) {
             JavaApplication application = project.component(JavaApplication.class);
+
+            project.dependsOn(slfj4);
+
             JavaClass mainClass = application.addClass(javaPackageFor(project) + "." + classNameFor(project));
             mainClass.addRole(new AppEntryPoint());
             addSource(project, application, mainClass, javaClass -> {});
@@ -46,7 +52,7 @@ public class JavaModelAssembler extends JvmModelAssembler {
             String group = "org.gradle.example";
             String module = project.getName();
             String version = "1.2";
-            project.addComponent(new PublishedJvmLibrary(new ExternalDependencyDeclaration(group, module, version), apiClass));
+            project.addComponent(new PublishedJvmLibrary(new ExternalDependencyDeclaration(group, module, version), apiClass.getApi()));
             buildScript.requirePlugin("maven");
             buildScript.property("group", group);
             buildScript.property("version", version);
@@ -68,7 +74,6 @@ public class JavaModelAssembler extends JvmModelAssembler {
         for (PublishedJvmLibrary library : project.getExternalDependencies()) {
             buildScript.dependsOn("compile", library.getGav());
         }
-        buildScript.dependsOnExternal("compile", "org.slf4j:slf4j-api:1.7.25");
         buildScript.dependsOnExternal("testCompile", "junit:junit:4.12");
     }
 }

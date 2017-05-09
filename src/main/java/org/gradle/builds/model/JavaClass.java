@@ -1,12 +1,13 @@
 package org.gradle.builds.model;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class JavaClass {
     private final String name;
-    private final Set<JavaClass> referencedClasses = new LinkedHashSet<>();
+    private final Set<JavaClassApi> references = new LinkedHashSet<>();
     private final Set<String> fieldReferences = new LinkedHashSet<>();
     private final Set<ClassRole> roles = new HashSet<>();
 
@@ -28,12 +29,16 @@ public class JavaClass {
         return name;
     }
 
-    public Set<JavaClass> getReferencedClasses() {
-        return referencedClasses;
+    public JavaClassApi getApi() {
+        return new JavaClassApi(name, Collections.singleton("getSomeValue()"), Collections.singleton("INT_CONST"));
     }
 
     public void uses(JavaClass javaClass) {
-        referencedClasses.add(javaClass);
+        uses(javaClass.getApi());
+    }
+
+    public void uses(JavaClassApi javaClass) {
+        references.add(javaClass);
     }
 
     public <T extends ClassRole> T role(Class<T> type) {
@@ -49,7 +54,24 @@ public class JavaClass {
         roles.add(role);
     }
 
+    public Set<String> getMethodReferences() {
+        Set<String> methodReferences = new LinkedHashSet<>();
+        for (JavaClassApi javaClass : references) {
+            for (String methodName : javaClass.getMethods()) {
+                methodReferences.add(javaClass.getName() + "." + methodName);
+            }
+        }
+        return methodReferences;
+    }
+
     public Set<String> getFieldReferences() {
+        Set<String> fieldReferences = new LinkedHashSet<>();
+        for (JavaClassApi javaClass : references) {
+            for (String fieldName : javaClass.getFields()) {
+                fieldReferences.add(javaClass.getName() + "." + fieldName);
+            }
+        }
+        fieldReferences.addAll(this.fieldReferences);
         return fieldReferences;
     }
 

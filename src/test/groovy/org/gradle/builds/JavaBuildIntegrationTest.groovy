@@ -8,7 +8,13 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
         build.project(":").isJavaApplication()
-        build.project(":").file("src/main/java/org/gradle/example").list() as Set == ["App.java", "AppImpl1_1.java", "AppNoDeps1.java"] as Set
+        def srcDir = build.project(":").file("src/main/java/org/gradle/example")
+        srcDir.list() as Set == ["App.java", "AppImpl1_1.java", "AppNoDeps1.java"] as Set
+        new File(srcDir, "App.java").text.contains("org.gradle.example.AppImpl1_1.getSomeValue()")
+        new File(srcDir, "App.java").text.contains("org.gradle.example.AppImpl1_1.INT_CONST")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.AppNoDeps1.getSomeValue()")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.AppNoDeps1.INT_CONST")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.slf4j.LoggerFactory.getLogger(\"abc\")")
 
         build.buildSucceeds(":installDist")
         build.app("build/install/testApp/bin/testApp").succeeds()

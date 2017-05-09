@@ -8,7 +8,14 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
         build.project(":").isAndroidApplication()
-        build.project(":").file("src/main/java/org/gradle/example").list() as Set == ["AppMainActivity.java", "AppImpl1_1.java", "AppNoDeps1.java"] as Set
+        def srcDir = build.project(":").file("src/main/java/org/gradle/example")
+        srcDir.list() as Set == ["AppMainActivity.java", "AppImpl1_1.java", "AppNoDeps1.java"] as Set
+        new File(srcDir, "AppMainActivity.java").text.contains("org.gradle.example.AppImpl1_1.getSomeValue()")
+        new File(srcDir, "AppMainActivity.java").text.contains("org.gradle.example.AppImpl1_1.INT_CONST")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.AppNoDeps1.getSomeValue()")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.AppNoDeps1.INT_CONST")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.slf4j.LoggerFactory.getLogger(\"abc\")")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.R.string.testapp_string")
 
         build.buildSucceeds(":assembleDebug")
         file("build/outputs/apk/testApp-debug.apk").exists()

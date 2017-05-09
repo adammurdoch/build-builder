@@ -51,6 +51,7 @@ public class AndroidModelAssembler extends JvmModelAssembler {
             if (androidApplication.getPackageName() == null) {
                 androidApplication.setPackageName(javaPackageFor(project));
             }
+            project.dependsOn(slfj4);
 
             JavaClass appActivity = androidApplication.addClass(androidApplication.getPackageName() + "." + classNameFor(project) + "MainActivity");
             appActivity.addRole(new AndroidActivity());
@@ -77,6 +78,7 @@ public class AndroidModelAssembler extends JvmModelAssembler {
             if (androidLibrary.getPackageName() == null) {
                 androidLibrary.setPackageName(javaPackageFor(project));
             }
+            project.dependsOn(slfj4);
 
             JavaClass libraryActivity = androidLibrary.addClass(androidLibrary.getPackageName() + "." + classNameFor(project) + "Activity");
             libraryActivity.addRole(new AndroidActivity());
@@ -112,7 +114,7 @@ public class AndroidModelAssembler extends JvmModelAssembler {
             String group = "org.gradle.example";
             String module = project.getName();
             String version = "1.2";
-            project.addComponent(new PublishedJvmLibrary(new ExternalDependencyDeclaration(group, module, version), libraryActivity));
+            project.addComponent(new PublishedJvmLibrary(new ExternalDependencyDeclaration(group, module, version), libraryActivity.getApi()));
             buildScript.requirePlugin("maven");
             buildScript.property("group", group);
             buildScript.property("version", version);
@@ -129,7 +131,6 @@ public class AndroidModelAssembler extends JvmModelAssembler {
             buildScript.dependsOn("compile", library.getGav());
         }
         buildScript.dependsOnExternal("compile", "com.android.support:support-core-utils:25.1.0");
-        buildScript.dependsOnExternal("compile", "org.slf4j:slf4j-api:1.7.25");
         buildScript.dependsOnExternal("testCompile", "junit:junit:4.12");
     }
 
