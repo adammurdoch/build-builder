@@ -144,6 +144,7 @@ public class Main {
                             new SettingsFileGenerator(),
                             new BuildFileGenerator(),
                             new AndroidManifestGenerator(),
+                            new AndroidLocalPropertiesGenerator(),
                             new AndroidStringResourcesGenerator(),
                             new AndroidImageGenerator(),
                             new JavaSourceGenerator(),
