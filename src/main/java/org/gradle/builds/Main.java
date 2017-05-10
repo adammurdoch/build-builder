@@ -146,6 +146,7 @@ public class Main {
                             new AndroidManifestGenerator(),
                             new AndroidLocalPropertiesGenerator(),
                             new AndroidStringResourcesGenerator(),
+                            new AndroidLayoutGenerator(),
                             new AndroidImageGenerator(),
                             new JavaSourceGenerator(),
                             new JavaResourceGenerator(),

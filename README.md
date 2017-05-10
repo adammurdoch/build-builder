@@ -75,17 +75,17 @@ Here's an example:
 
 - Android application 
     - Doesn't do anything, but can be installed and started.
-    - Can include only a single Java project.
+    - Can include only a single Java project in an Android build.
     - There are no instrumented tests.
 - No annotation processors are used.
 - External HTTP repo
     - Has fixed size and structure.
     - Not available for C++.
-    - Dependencies used by 'impl' class only.
+    - Dependencies used by 'impl' class only, and this project uses all libraries from the repo directly rather than a set of API libraries
     - Broken when used with `android --java`
-- External dependencies are the same for all projects and not used by the source.
+- External dependencies are the same for all projects.
     - slf4j
-    - support-core-utils (Android builds)
+    - support-core-utils (Android builds only)
 - There are no external dependencies for C++.
 - There are no tests for C++
 - Only a basic dependency graph is available, between projects and between source files and external libraries
@@ -93,6 +93,8 @@ Here's an example:
     - Only one layer of a project references classes from other projects
 - Generated classes are small.
 - There are no transitive API classes. 
+- Only a single Java source is generated for each project.
+- No Java 8 source for Android or Java builds.
 
 #### Adding source to an existing build
 

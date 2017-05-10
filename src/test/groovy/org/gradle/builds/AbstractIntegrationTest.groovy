@@ -235,6 +235,8 @@ abstract class AbstractIntegrationTest extends Specification {
         void isAndroidProject() {
             isProject()
             assert file("src/main/AndroidManifest.xml").file
+            assert file("src/main/res/values/strings.xml").file
+            assert file("src/main/res/layout/main_layout.xml").file
             hasJavaSource()
         }
 
