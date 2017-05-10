@@ -18,7 +18,7 @@ public class Project {
     private final List<PublishedJvmLibrary> externalDependencies = new ArrayList<>();
     private Graph classGraph;
     private boolean mayUseOtherLanguage;
-    private HttpRepository publishRepository;
+    private PublicationTarget publicationTarget;
 
     public Project(Project parent, String name, Path projectDir) {
         this.parent = parent;
@@ -96,12 +96,12 @@ public class Project {
         return mayUseOtherLanguage;
     }
 
-    public HttpRepository getPublishRepository() {
-        return publishRepository;
+    public PublicationTarget getPublicationTarget() {
+        return publicationTarget;
     }
 
-    public void publishTo(HttpRepository httpRepository) {
-        this.publishRepository = httpRepository;
+    public void publishAs(PublicationTarget publicationTarget) {
+        this.publicationTarget = publicationTarget;
     }
 
     public List<PublishedJvmLibrary> getExternalDependencies() {

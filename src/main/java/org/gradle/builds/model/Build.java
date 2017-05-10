@@ -13,8 +13,9 @@ public class Build {
     private Settings settings;
     private Class<? extends Component> rootProjectType = Application.class;
     private final List<Build> dependsOn = new ArrayList<>();
+    private final List<Build> childBuilds = new ArrayList<>();
     private final List<PublishedJvmLibrary> publishedLibraries = new ArrayList<>();
-    private HttpRepository httpRepository;
+    private PublicationTarget publicationTarget;
     private String projectNamePrefix = "";
 
     public Build(Path rootDir, String rootProjectName) {
@@ -101,12 +102,12 @@ public class Build {
         publishedLibraries.add(library);
     }
 
-    public HttpRepository getHttpRepository() {
-        return httpRepository;
+    public PublicationTarget getPublicationTarget() {
+        return publicationTarget;
     }
 
-    public void publishTo(HttpRepository httpRepository) {
-        this.httpRepository = httpRepository;
+    public void publishAs(PublicationTarget publicationTarget) {
+        this.publicationTarget = publicationTarget;
     }
 
     public List<Build> getDependsOn() {
@@ -123,5 +124,13 @@ public class Build {
 
     public String getProjectNamePrefix() {
         return projectNamePrefix;
+    }
+
+    public List<Build> getChildBuilds() {
+        return childBuilds;
+    }
+
+    public void includeBuild(Build build) {
+        childBuilds.add(build);
     }
 }

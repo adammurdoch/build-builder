@@ -119,9 +119,10 @@ public class Main {
 
             Model model = new Model(new Build(rootDir, "testApp"));
 
-            // Create model
+            // Create structure
             createModelStructureAssembler().attachBuilds(settings, model);
 
+            // Configure model
             createModelConfigurer().populate(model);
 
             // Generate files
@@ -191,9 +192,17 @@ public class Main {
 
     @Command(name = "java", description = "Generates a Java build with source files")
     public static class InitJavaBuild extends InitJvmBuild {
+        @Option(name = "--builds", description = "The number of builds to generate (default: 1)")
+        int builds = 1;
+
         @Override
         protected String getType() {
             return "Java";
+        }
+
+        @Override
+        protected ModelStructureAssembler createModelStructureAssembler() {
+            return new CompositeBuildAssembler(super.createModelStructureAssembler(), builds);
         }
 
         protected ModelAssembler createModelAssembler() {

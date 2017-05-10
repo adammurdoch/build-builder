@@ -31,6 +31,8 @@ The `--source-files` option specifies the number of source files per project. De
 
 The `--java` option includes some Java libraries in an Android build. Default is false. 
 
+The `--builds` option specifies the number of builds to generate. Set to greater than 1 to generate a composite build. Default is 1.
+
 The `--http-repo` option generates an additional build that produces an HTTP repository that provides external libraries. This repository and its classes are referenced by the generated build. Use `gradle -p repo run` to build and start the HTTP server and libraries.
 
 #### Add source files to an existing build
@@ -83,6 +85,9 @@ Here's an example:
     - Not available for C++.
     - Dependencies used by 'impl' class only, and this project uses all libraries from the repo directly rather than a set of API libraries
     - Broken when used with `android --java`
+- Composite builds
+    - Not available for C++ or Android
+    - Dependencies used by 'impl' class only, and this project uses all libraries from the repo directly rather than a set of API libraries
 - External dependencies are the same for all projects.
     - slf4j
     - support-core-utils (Android builds only)
@@ -93,8 +98,9 @@ Here's an example:
     - Only one layer of a project references classes from other projects
 - Generated classes are small.
 - There are no transitive API classes. 
-- Only a single Java source is generated for each project.
+- There are no type hierarchies.
 - No Java 8 source for Android or Java builds.
+- Only a single Java resource is generated for each project.
 
 #### Adding source to an existing build
 

@@ -27,15 +27,17 @@ public class InitialProjectSetupBuildConfigurer implements ModelAssembler {
             modelAssembler.apply(Library.class, project);
         }
 
-        if (build.getHttpRepository() != null) {
+        if (build.getPublicationTarget() != null) {
             for (Project project : build.getProjects()) {
-                project.publishTo(build.getHttpRepository());
+                project.publishAs(build.getPublicationTarget());
             }
         }
 
         // Add incoming dependencies
         for (Build other : build.getDependsOn()) {
-            build.getRootProject().getBuildScript().allProjects().maven(other.getHttpRepository());
+            if (other.getPublicationTarget().getHttpRepository() != null) {
+                build.getRootProject().getBuildScript().allProjects().maven(other.getPublicationTarget().getHttpRepository());
+            }
             for (Project project : build.getProjects()) {
                 project.dependsOn(other.getPublishedLibraries());
             }
@@ -44,7 +46,7 @@ public class InitialProjectSetupBuildConfigurer implements ModelAssembler {
         modelAssembler.populate(build);
 
         // Collect published libraries
-        if (build.getHttpRepository() != null) {
+        if (build.getPublicationTarget() != null) {
             for (Project project : build.getProjects()) {
                 PublishedJvmLibrary jvmLibrary = project.component(PublishedJvmLibrary.class);
                 if (jvmLibrary != null) {

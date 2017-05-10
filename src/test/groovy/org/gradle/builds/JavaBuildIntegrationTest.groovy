@@ -108,6 +108,30 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         sourceFiles << ["1", "2", "5"]
     }
 
+    def "can generate composite build"() {
+        when:
+        new Main().run("java", "--dir", projectDir.absolutePath, "--projects", "2", "--builds", "2")
+
+        then:
+        build.isBuild()
+
+        build.project(":").isJavaApplication()
+        build.project(":core1").isJavaLibrary()
+        def srcDir = build.project(":").file("src/main/java/org/gradle/example")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.child1_core1.Child1_core1.getSomeValue()")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.child1_core1.Child1_core1.INT_CONST")
+
+        def child = build(file("child1"))
+        child.isBuild()
+        child.project(":").isEmptyProject()
+        child.project(":child1_core1").isJavaLibrary()
+
+        build.buildSucceeds(":installDist")
+        build.app("build/install/testApp/bin/testApp").succeeds()
+
+        build.buildSucceeds("build")
+    }
+
     def "can generate single project build with http repo"() {
         given:
         useIsolatedUserHome()

@@ -15,8 +15,18 @@ public class SettingsFileGenerator implements BuildGenerator {
         try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(settingsFile))) {
             printWriter.println("// GENERATED SETTINGS SCRIPT");
             printWriter.println("rootProject.name = '" + build.getRootProject().getName() + "'");
-            for (Project project : build.getSubprojects()) {
-                printWriter.println("include '" + project.getName() + "'");
+            if (!build.getSubprojects().isEmpty()) {
+                printWriter.println();
+                for (Project project : build.getSubprojects()) {
+                    printWriter.println("include '" + project.getName() + "'");
+                }
+            }
+
+            if (!build.getChildBuilds().isEmpty()) {
+                printWriter.println();
+                for (Build childBuild : build.getChildBuilds()) {
+                    printWriter.println("includeBuild '" + build.getRootDir().relativize(childBuild.getRootDir()) + "'");
+                }
             }
         }
     }

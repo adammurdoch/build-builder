@@ -117,16 +117,18 @@ public class AndroidModelAssembler extends JvmModelAssembler {
     }
 
     private void addPublishing(Project project, JavaClass libraryActivity, JavaClassApi rClass, BuildScript buildScript) {
-        if (project.getPublishRepository() != null) {
+        if (project.getPublicationTarget() != null) {
             String group = "org.gradle.example";
             String module = project.getName();
             String version = "1.2";
             project.addComponent(new PublishedJvmLibrary(new ExternalDependencyDeclaration(group, module, version), Arrays.asList(libraryActivity.getApi(), rClass)));
-            buildScript.requirePlugin("maven");
             buildScript.property("group", group);
             buildScript.property("version", version);
-            ScriptBlock deployerBlock = buildScript.block("uploadArchives").block("repositories").block("mavenDeployer");
-            deployerBlock.statement("repository(url: new URI('" + project.getPublishRepository().getRootDir().toUri() + "'))");
+            if (project.getPublicationTarget().getHttpRepository() != null) {
+                buildScript.requirePlugin("maven");
+                ScriptBlock deployerBlock = buildScript.block("uploadArchives").block("repositories").block("mavenDeployer");
+                deployerBlock.statement("repository(url: new URI('" + project.getPublicationTarget().getHttpRepository().getRootDir().toUri() + "'))");
+            }
         }
     }
 
