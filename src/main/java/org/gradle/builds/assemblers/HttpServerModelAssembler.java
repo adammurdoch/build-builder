@@ -1,15 +1,10 @@
 package org.gradle.builds.assemblers;
 
 import org.gradle.builds.model.BuildScript;
-import org.gradle.builds.model.Component;
 import org.gradle.builds.model.HttpServerImplementation;
 import org.gradle.builds.model.Project;
 
 public class HttpServerModelAssembler extends AbstractModelAssembler {
-    @Override
-    public void apply(Class<? extends Component> component, Project project) {
-    }
-
     @Override
     protected void populate(Settings settings, Project project) {
         HttpServerImplementation component = project.component(HttpServerImplementation.class);
