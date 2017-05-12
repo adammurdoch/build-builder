@@ -1,18 +1,28 @@
 package org.gradle.builds.assemblers
 
 import org.gradle.builds.model.Build
+import org.gradle.builds.model.Project
 import spock.lang.Specification
 
 import java.nio.file.Paths
 
 class StructureAssemblerTest extends Specification {
     def assembler = new StructureAssembler()
+    def initializer = new ProjectInitializer() {
+        @Override
+        void initRootProject(Project project) {
+        }
+
+        @Override
+        void initLibraryProject(Project project) {
+        }
+    }
     def build = new Build(Paths.get("dir"), "testApp")
 
     def "builds dependency graph with one project"() {
         when:
         build.settings = projects(1)
-        assembler.arrangeProjects(build)
+        assembler.arrangeProjects(build, initializer)
 
         then:
         build.projects.size() == 1
@@ -23,7 +33,7 @@ class StructureAssemblerTest extends Specification {
     def "builds dependency graph with two projects"() {
         when:
         build.settings = projects(2)
-        assembler.arrangeProjects(build)
+        assembler.arrangeProjects(build, initializer)
 
         then:
         build.projects.size() == 2
@@ -36,7 +46,7 @@ class StructureAssemblerTest extends Specification {
     def "builds dependency graph with three projects"() {
         when:
         build.settings = projects(3)
-        assembler.arrangeProjects(build)
+        assembler.arrangeProjects(build, initializer)
 
         then:
         build.projects.size() == 3
@@ -51,7 +61,7 @@ class StructureAssemblerTest extends Specification {
     def "builds dependency graph with four projects"() {
         when:
         build.settings = projects(4)
-        assembler.arrangeProjects(build)
+        assembler.arrangeProjects(build, initializer)
 
         then:
         build.projects.size() == 4
@@ -67,7 +77,7 @@ class StructureAssemblerTest extends Specification {
     def "builds dependency graph with five projects"() {
         when:
         build.settings = projects(5)
-        assembler.arrangeProjects(build)
+        assembler.arrangeProjects(build, initializer)
 
         then:
         build.projects.size() == 5
