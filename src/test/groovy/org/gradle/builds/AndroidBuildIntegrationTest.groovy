@@ -1,5 +1,7 @@
 package org.gradle.builds
 
+import spock.lang.Unroll
+
 class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
     def "can generate single project build"() {
         when:
@@ -25,7 +27,8 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
         build.buildSucceeds("build")
     }
 
-    def "can generate single project build with the specified number of source files"() {
+    @Unroll
+    def "can generate single project build with #sourceFiles source files"() {
         when:
         new Main().run("android", "--dir", projectDir.absolutePath, "--source-files", sourceFiles)
 
@@ -66,7 +69,8 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
         build.buildSucceeds("build")
     }
 
-    def "can generate multi-project build"() {
+    @Unroll
+    def "can generate #projects project build"() {
         when:
         new Main().run("android", "--dir", projectDir.absolutePath, "--projects", projects)
 
@@ -99,8 +103,8 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
         build.isBuild()
 
         build.project(":").isAndroidApplication()
-        build.project(":core1").isJavaLibrary()
         build.project(":lib1_1").isAndroidLibrary()
+        build.project(":core1").isJavaLibrary()
 
         build.buildSucceeds(":assembleDebug")
         file("build/outputs/apk/testApp-debug.apk").exists()
@@ -116,11 +120,11 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
         build.isBuild()
 
         build.project(":").isAndroidApplication()
-        build.project(":core1").isAndroidLibrary()
-        build.project(":core2").isJavaLibrary()
         build.project(":lib1_1").isAndroidLibrary()
         build.project(":lib1_2").isAndroidLibrary()
         build.project(":lib1_3").isJavaProject()
+        build.project(":core1").isAndroidLibrary()
+        build.project(":core2").isJavaLibrary()
 
         build.buildSucceeds(":assembleDebug")
         file("build/outputs/apk/testApp-debug.apk").exists()
@@ -128,7 +132,8 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
         build.buildSucceeds("build")
     }
 
-    def "can generate multi-project build with the specified number of source files"() {
+    @Unroll
+    def "can generate multi-project build with #sourceFiles source files"() {
         when:
         new Main().run("android", "--dir", projectDir.absolutePath, "--projects", "4", "--source-files", sourceFiles)
 
@@ -164,6 +169,12 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
         new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo_core1.Repo_core1Activity.getSomeValue()")
         new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo_core1.Repo_core1Activity.INT_CONST")
         new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo_core1.R.string.repo_core1_string")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo_lib1_1.Repo_lib1_1Activity.getSomeValue()")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo_lib1_1.Repo_lib1_1Activity.INT_CONST")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo_lib1_1.R.string.repo_lib1_1_string")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo_lib1_2.Repo_lib1_2Activity.getSomeValue()")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo_lib1_2.Repo_lib1_2Activity.INT_CONST")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo_lib1_2.R.string.repo_lib1_2_string")
 
         def repoBuild = build(file('repo'))
         repoBuild.isBuild()

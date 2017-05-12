@@ -1,5 +1,7 @@
 package org.gradle.builds
 
+import spock.lang.Unroll
+
 class JavaBuildIntegrationTest extends AbstractIntegrationTest {
     def "can generate single project build"() {
         when:
@@ -23,7 +25,8 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         build.buildSucceeds("build")
     }
 
-    def "can generate single project build with specified number of source files"() {
+    @Unroll
+    def "can generate single project build with #sourceFiles source files"() {
         when:
         new Main().run("java", "--dir", projectDir.absolutePath, "--source-files", sourceFiles)
 
@@ -62,7 +65,8 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         build.buildSucceeds("build")
     }
 
-    def "can generate multi-project build"() {
+    @Unroll
+    def "can generate #projects project build"() {
         when:
         new Main().run("java", "--dir", projectDir.absolutePath, "--projects", projects)
 
@@ -84,10 +88,11 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         build.buildSucceeds("build")
 
         where:
-        projects << ["3", "4", "5"]
+        projects << ["3", "4", "10"]
     }
 
-    def "can generate multi-project build with specified number of source files"() {
+    @Unroll
+    def "can generate multi-project build with #sourceFiles source files"() {
         when:
         new Main().run("java", "--dir", projectDir.absolutePath, "--projects", "4", "--source-files", sourceFiles)
 
@@ -146,6 +151,61 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         def srcDir = build.project(":").file("src/main/java/org/gradle/example")
         new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo_core1.Repo_core1.getSomeValue()")
         new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo_core1.Repo_core1.INT_CONST")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo_lib1_1.Repo_lib1_1.getSomeValue()")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo_lib1_1.Repo_lib1_1.INT_CONST")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo_lib1_2.Repo_lib1_2.getSomeValue()")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo_lib1_2.Repo_lib1_2.INT_CONST")
+
+        def repoBuild = build(file('repo'))
+        repoBuild.isBuild()
+        repoBuild.project(':').isEmptyProject()
+        repoBuild.project(':repo_lib1_1').isJavaLibrary()
+        repoBuild.project(':repo_lib1_2').isJavaLibrary()
+        repoBuild.project(':repo_core1').isJavaLibrary()
+
+        repoBuild.buildSucceeds("installDist")
+        new File(repoBuild.rootDir, "build/repo/org/gradle/example/repo_core1/1.2/repo_core1-1.2.jar").file
+        new File(repoBuild.rootDir, "build/repo/org/gradle/example/repo_core1/1.2/repo_core1-1.2.pom").file
+
+        def server = repoBuild.app("build/install/repo/bin/repo").start()
+        waitFor(new URI("http://localhost:5005"))
+
+        build.buildSucceeds(":installDist")
+
+        build.file("build/install/testApp/lib/testApp.jar").file
+        build.file("build/install/testApp/lib/repo_core1-1.2.jar").file
+        build.file("build/install/testApp/lib/repo_lib1_1-1.2.jar").file
+        build.file("build/install/testApp/lib/repo_lib1_2-1.2.jar").file
+        build.app("build/install/testApp/bin/testApp").succeeds()
+
+        build.buildSucceeds("build")
+
+        cleanup:
+        server?.kill()
+    }
+
+    def "can generate multi-project build with http repo"() {
+        given:
+        useIsolatedUserHome()
+
+        when:
+        new Main().run("java", "--http-repo", "--projects", "3", "--dir", projectDir.absolutePath)
+
+        then:
+        build.isBuild()
+        build.project(":").isJavaApplication()
+        build.project(":lib1_1").isJavaLibrary()
+        build.project(":core1").isJavaLibrary()
+
+        def srcDir = build.project(":").file("src/main/java/org/gradle/example")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo_core1.Repo_core1.getSomeValue()")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo_core1.Repo_core1.INT_CONST")
+        def libSrcDir = build.project(":lib1_1").file("src/main/java/org/gradle/example/lib1_1")
+        new File(libSrcDir, "Lib1_1Impl1_1.java").text.contains("org.gradle.example.repo_core1.Repo_core1.getSomeValue()")
+        new File(libSrcDir, "Lib1_1Impl1_1.java").text.contains("org.gradle.example.repo_core1.Repo_core1.INT_CONST")
+        def coreSrcDir = build.project(":core1").file("src/main/java/org/gradle/example/core1")
+        new File(coreSrcDir, "Core1Impl1_1.java").text.contains("org.gradle.example.repo_core1.Repo_core1.getSomeValue()")
+        new File(coreSrcDir, "Core1Impl1_1.java").text.contains("org.gradle.example.repo_core1.Repo_core1.INT_CONST")
 
         def repoBuild = build(file('repo'))
         repoBuild.isBuild()

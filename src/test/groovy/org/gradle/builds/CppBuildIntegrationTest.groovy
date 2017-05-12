@@ -1,5 +1,7 @@
 package org.gradle.builds
 
+import spock.lang.Unroll
+
 class CppBuildIntegrationTest extends AbstractIntegrationTest {
     def "can generate single project build"() {
         when:
@@ -20,7 +22,8 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         build.buildSucceeds("build")
     }
 
-    def "can generate single project build with specified number of source files"() {
+    @Unroll
+    def "can generate single project build with #sourceFiles source files"() {
         when:
         new Main().run("cpp", "--dir", projectDir.absolutePath, "--source-files", sourceFiles)
 
@@ -59,7 +62,8 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         build.buildSucceeds("build")
     }
 
-    def "can generate multi-project build"() {
+    @Unroll
+    def "can generate #projects project build"() {
         when:
         new Main().run("cpp", "--dir", projectDir.absolutePath, "--projects", projects)
 
@@ -86,7 +90,8 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         projects << ["3", "4", "5"]
     }
 
-    def "can generate multi-project build with specified number of source files"() {
+    @Unroll
+    def "can generate multi-project build with #sourceFiles source files"() {
         when:
         new Main().run("cpp", "--dir", projectDir.absolutePath, "--projects", "4", "--source-files", sourceFiles)
 
