@@ -64,7 +64,7 @@ public class AndroidModelAssembler extends JvmModelAssembler {
 
             JavaClass libraryActivity = androidLibrary.addClass(androidLibrary.getPackageName() + "." + classNameFor(project) + "Activity");
             libraryActivity.addRole(new AndroidActivity());
-            androidLibrary.setApiClass(libraryActivity);
+            androidLibrary.setActivity(libraryActivity);
             androidLibrary.setRClass(rClass);
             androidLibrary.activity(libraryActivity);
             addSourceFiles(project, androidLibrary, libraryActivity, rClass);

@@ -6,18 +6,22 @@ import java.util.Set;
 
 public class AndroidLibrary extends AndroidComponent implements JvmLibrary {
     private JavaClassApi rClass;
-    private JavaClass apiClass;
+    private JavaClass activity;
 
     @Override
     public Set<JavaClassApi> getApi() {
-        return new LinkedHashSet<>(Arrays.asList(apiClass.getApi(), rClass));
+        return new LinkedHashSet<>(Arrays.asList(activity.getApi(), rClass));
     }
 
     public void setRClass(JavaClassApi rClass) {
         this.rClass = rClass;
     }
 
-    public void setApiClass(JavaClass apiClass) {
-        this.apiClass = apiClass;
+    public JavaClass getActivity() {
+        return activity;
+    }
+
+    public void setActivity(JavaClass apiClass) {
+        this.activity = apiClass;
     }
 }

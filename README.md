@@ -29,9 +29,11 @@ The `--projects` option specifies the number of projects. Default is 1.
 
 The `--source-files` option specifies the number of source files per project. Default is 3.
 
+The `--builds` option specifies the number of builds to generate. Set to greater than 1 to generate a composite build. Default is 1.
+
 The `--java` option includes some Java libraries in an Android build. Default is false. 
 
-The `--builds` option specifies the number of builds to generate. Set to greater than 1 to generate a composite build. Default is 1.
+The `--version` option specifies the Android plugin version to use. Default is 2.3.1.
 
 The `--http-repo` option generates an additional build that produces an HTTP repository that provides external libraries. This repository and its classes are referenced by the generated build. Use `gradle -p repo run` to build and start the HTTP server and libraries.
 
@@ -78,6 +80,7 @@ Here's an example:
 - Android application 
     - Doesn't do anything, but can be installed and started.
     - Includes a single Java project per layer.
+    - Does not use activities/views from http-repo libraries (or included builds).
     - There are no instrumented tests.
 - No annotation processors are used.
 - External HTTP repo

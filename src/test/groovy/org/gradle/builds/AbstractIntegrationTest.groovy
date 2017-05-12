@@ -236,7 +236,9 @@ abstract class AbstractIntegrationTest extends Specification {
             isProject()
             assert file("src/main/AndroidManifest.xml").file
             assert file("src/main/res/values/strings.xml").file
-            assert file("src/main/res/layout/main_layout.xml").file
+            def layoutDir = file("src/main/res/layout")
+            assert layoutDir.directory
+            assert layoutDir.list().findAll { it.endsWith(".xml") }
             hasJavaSource()
         }
 

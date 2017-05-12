@@ -79,10 +79,20 @@ public class JavaSourceGenerator extends ProjectComponentSpecificGenerator<HasJa
                 printWriter.println();
                 printWriter.println("    public void onCreate(android.os.Bundle bundle) {");
                 printWriter.println("        super.onCreate(bundle);");
-                printWriter.println("        setContentView(R.layout.main_layout);");
+                printWriter.println("        setContentView(R.layout." + project.getName().toLowerCase() + "_layout);");
                 printWriter.println("        android.widget.TextView text = (android.widget.TextView)findViewById(R.id.textbox);");
                 printWriter.println("        text.setText(getSomeValue());");
                 printWriter.println("    }");
+                for (Project dep : project.getDependencies()) {
+                    AndroidLibrary androidLibrary = dep.component(AndroidLibrary.class);
+                    if (androidLibrary != null) {
+                        printWriter.println();
+                        printWriter.println("    public void click" + dep.getName() + "(android.view.View view) {");
+                        printWriter.println("        android.content.Intent intent = new android.content.Intent(this, " + androidLibrary.getActivity().getName() + ".class);");
+                        printWriter.println("        startActivity(intent);");
+                        printWriter.println("    }");
+                    }
+                }
             }
             printWriter.println("}");
             printWriter.println();
