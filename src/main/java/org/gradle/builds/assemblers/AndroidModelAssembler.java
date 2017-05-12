@@ -2,11 +2,9 @@ package org.gradle.builds.assemblers;
 
 import org.gradle.builds.model.*;
 
-import java.util.Arrays;
-
 public class AndroidModelAssembler extends JvmModelAssembler {
     public static final String defaultVersion = "2.3.1";
-    private static final PublishedJvmLibrary supportUtils = new PublishedJvmLibrary(new ExternalDependencyDeclaration("com.android.support:support-core-utils:25.1.0"), JavaClassApi.field("android.support.v4.app.NavUtils", "PARENT_ACTIVITY"));
+    private static final PublishedJvmLibrary supportUtils = new PublishedJavaLibrary(new ExternalDependencyDeclaration("com.android.support:support-core-utils:25.1.0"), JavaClassApi.field("android.support.v4.app.NavUtils", "PARENT_ACTIVITY"));
     private final String pluginVersion;
 
     public AndroidModelAssembler(String pluginVersion) {
@@ -72,7 +70,7 @@ public class AndroidModelAssembler extends JvmModelAssembler {
 
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("com.android.library");
-            addPublishing(project, libraryActivity, rClass, buildScript);
+            addPublishing(project, androidLibrary.getApi(), buildScript);
             addDependencies(project, buildScript);
 
             ScriptBlock androidBlock = buildScript.block("android");
@@ -92,12 +90,12 @@ public class AndroidModelAssembler extends JvmModelAssembler {
         application.setLabelResource(labelResource);
     }
 
-    private void addPublishing(Project project, JavaClass libraryActivity, JavaClassApi rClass, BuildScript buildScript) {
+    private void addPublishing(Project project, AndroidLibraryApi api, BuildScript buildScript) {
         if (project.getPublicationTarget() != null) {
             String group = "org.gradle.example";
             String module = project.getName();
             String version = "1.2";
-            project.addComponent(new PublishedJvmLibrary(new ExternalDependencyDeclaration(group, module, version), Arrays.asList(libraryActivity.getApi(), rClass)));
+            project.addComponent(new PublishedAndroidLibrary(new ExternalDependencyDeclaration(group, module, version), api));
             buildScript.property("group", group);
             buildScript.property("version", version);
             if (project.getPublicationTarget().getHttpRepository() != null) {

@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 
 public abstract class JvmModelAssembler extends AbstractModelAssembler {
     protected static final JavaClassApi slf4jApi = JavaClassApi.method("org.slf4j.LoggerFactory", "getLogger(\"abc\")");
-    protected static final PublishedJvmLibrary slfj4 = new PublishedJvmLibrary(new ExternalDependencyDeclaration("org.slf4j:slf4j-api:1.7.25"), slf4jApi);
+    protected static final PublishedJvmLibrary slfj4 = new PublishedJavaLibrary(new ExternalDependencyDeclaration("org.slf4j:slf4j-api:1.7.25"), slf4jApi);
 
     @Override
     protected void rootProject(Project rootProject) {
@@ -23,7 +23,7 @@ public abstract class JvmModelAssembler extends AbstractModelAssembler {
         }
     }
 
-    protected <T extends HasJavaSource> void addSource(Project project, T component, JavaClass apiClass, Consumer<JavaClass> implClass) {
+    protected void addSource(Project project, HasJavaSource component, JavaClass apiClass, Consumer<JavaClass> implClass) {
         int implLayer = Math.max(0, project.getClassGraph().getLayers().size() - 2);
         String className = javaPackageFor(project) + "." + classNameFor(project);
         project.getClassGraph().visit((Graph.Visitor<JavaClass>) (nodeDetails, dependencies) -> {
@@ -43,10 +43,10 @@ public abstract class JvmModelAssembler extends AbstractModelAssembler {
             }
             if (layer == implLayer) {
                 for (Project depProject : project.getDependencies()) {
-                    javaClass.uses(depProject.component(JvmLibrary.class).getApi());
+                    javaClass.uses(depProject.component(JvmLibrary.class).getApi().getApiClasses());
                 }
                 for (PublishedJvmLibrary library : project.getExternalDependencies()) {
-                    javaClass.uses(library.getApi());
+                    javaClass.uses(library.getApi().getApiClasses());
                 }
                 implClass.accept(javaClass);
             }

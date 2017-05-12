@@ -20,7 +20,11 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         new File(srcDir, "AppImpl1_1.java").text.contains("org.slf4j.LoggerFactory.getLogger(\"abc\")")
 
         build.buildSucceeds(":installDist")
-        build.app("build/install/testApp/bin/testApp").succeeds()
+
+        def app = build.app("build/install/testApp/bin/testApp")
+        app.isApp()
+        app.libDir.list() as Set == ["slf4j-api-1.7.25.jar", "testApp.jar"] as Set
+        app.succeeds()
 
         build.buildSucceeds("build")
     }
@@ -60,7 +64,11 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":core1").file("src/main/java/org/gradle/example/core1").list() as Set == ["Core1.java", "Core1Impl1_1.java", "Core1NoDeps1.java"] as Set
 
         build.buildSucceeds(":installDist")
-        build.app("build/install/testApp/bin/testApp").succeeds()
+
+        def app = build.app("build/install/testApp/bin/testApp")
+        app.isApp()
+        app.libDir.list() as Set == ["core1.jar", "slf4j-api-1.7.25.jar", "testApp.jar"] as Set
+        app.succeeds()
 
         build.buildSucceeds("build")
     }
@@ -132,7 +140,11 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         child.project(":child1_core1").isJavaLibrary()
 
         build.buildSucceeds(":installDist")
-        build.app("build/install/testApp/bin/testApp").succeeds()
+
+        def app = build.app("build/install/testApp/bin/testApp")
+        app.isApp()
+        app.libDir.list() as Set == ["child1_core1-1.2.jar", "core1.jar", "slf4j-api-1.7.25.jar", "testApp.jar"] as Set
+        app.succeeds()
 
         build.buildSucceeds("build")
     }
@@ -172,11 +184,10 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
 
         build.buildSucceeds(":installDist")
 
-        build.file("build/install/testApp/lib/testApp.jar").file
-        build.file("build/install/testApp/lib/repo_core1-1.2.jar").file
-        build.file("build/install/testApp/lib/repo_lib1_1-1.2.jar").file
-        build.file("build/install/testApp/lib/repo_lib1_2-1.2.jar").file
-        build.app("build/install/testApp/bin/testApp").succeeds()
+        def app = build.app("build/install/testApp/bin/testApp")
+        app.isApp()
+        app.libDir.list() as Set == ["repo_core1-1.2.jar", "repo_lib1_1-1.2.jar", "repo_lib1_2-1.2.jar", "slf4j-api-1.7.25.jar", "testApp.jar"] as Set
+        app.succeeds()
 
         build.buildSucceeds("build")
 
@@ -223,11 +234,10 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
 
         build.buildSucceeds(":installDist")
 
-        build.file("build/install/testApp/lib/testApp.jar").file
-        build.file("build/install/testApp/lib/repo_core1-1.2.jar").file
-        build.file("build/install/testApp/lib/repo_lib1_1-1.2.jar").file
-        build.file("build/install/testApp/lib/repo_lib1_2-1.2.jar").file
-        build.app("build/install/testApp/bin/testApp").succeeds()
+        def app = build.app("build/install/testApp/bin/testApp")
+        app.isApp()
+        app.libDir.list() as Set == ["repo_core1-1.2.jar", "repo_lib1_1-1.2.jar", "repo_lib1_2-1.2.jar", "core1.jar", "lib1_1.jar", "slf4j-api-1.7.25.jar", "testApp.jar"] as Set
+        app.succeeds()
 
         build.buildSucceeds("build")
 

@@ -17,7 +17,7 @@ public class JavaModelAssembler extends JvmModelAssembler {
 
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("java");
-            addPublishing(project, apiClass, buildScript);
+            addPublishing(project, library.getApi(), buildScript);
             addDependencies(project, buildScript);
             addJavaVersion(library, buildScript);
         } else if (project.component(JavaApplication.class) != null) {
@@ -38,12 +38,12 @@ public class JavaModelAssembler extends JvmModelAssembler {
         }
     }
 
-    private void addPublishing(Project project, JavaClass apiClass, BuildScript buildScript) {
+    private void addPublishing(Project project, JavaLibraryApi api, BuildScript buildScript) {
         if (project.getPublicationTarget() != null) {
             String group = "org.gradle.example";
             String module = project.getName();
             String version = "1.2";
-            project.addComponent(new PublishedJvmLibrary(new ExternalDependencyDeclaration(group, module, version), apiClass.getApi()));
+            project.addComponent(new PublishedJavaLibrary(new ExternalDependencyDeclaration(group, module, version), api));
             buildScript.property("group", group);
             buildScript.property("version", version);
             if (project.getPublicationTarget().getHttpRepository() != null) {

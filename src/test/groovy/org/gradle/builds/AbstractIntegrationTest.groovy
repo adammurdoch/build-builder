@@ -68,6 +68,15 @@ abstract class AbstractIntegrationTest extends Specification {
             return owner.start(this)
         }
 
+        File getLibDir() {
+            return new File(binFile.parentFile.parentFile, "lib")
+        }
+
+        void isApp() {
+            assert binFile.file
+            assert libDir.directory
+        }
+
         void succeeds() {
             owner.start(this).waitFor()
         }
