@@ -17,6 +17,10 @@ class GraphAssemblerTest extends Specification {
         graph.layers.size() == 1
 
         graph.root.dependsOn.empty
+        graph.root.layer == 0
+        graph.root.item == 0
+        graph.root.lastLayer
+        !graph.root.useAlternate
     }
 
     def "arranges 2 nodes"() {
@@ -31,8 +35,19 @@ class GraphAssemblerTest extends Specification {
         graph.nodes.size() == 2
         graph.layers.size() == 2
 
-        graph.root.dependsOn as List == [nodes[1]]
-        nodes[1].dependsOn.empty
+        def n1 = nodes[1]
+
+        graph.root.dependsOn as List == [n1]
+        graph.root.layer == 0
+        graph.root.item == 0
+        !graph.root.lastLayer
+        !graph.root.useAlternate
+
+        n1.dependsOn.empty
+        n1.layer == 1
+        n1.item == 0
+        n1.lastLayer
+        !n1.useAlternate
     }
 
     def "arranges 3 nodes"() {
@@ -47,9 +62,26 @@ class GraphAssemblerTest extends Specification {
         graph.nodes.size() == 3
         graph.layers.size() == 3
 
-        graph.root.dependsOn as List == [nodes[1]]
-        nodes[1].dependsOn == [nodes[2]]
-        nodes[2].dependsOn.empty
+        def n1 = nodes[1]
+        def n2 = nodes[2]
+
+        graph.root.dependsOn as List == [n1]
+        graph.root.layer == 0
+        graph.root.item == 0
+        !graph.root.lastLayer
+        !graph.root.useAlternate
+
+        n1.dependsOn == [n2]
+        n1.layer == 1
+        n1.item == 0
+        !n1.lastLayer
+        !n1.useAlternate
+
+        n2.dependsOn.empty
+        n2.layer == 2
+        n2.item == 0
+        n2.lastLayer
+        n2.useAlternate
     }
 
     def "arranges 4 nodes"() {
@@ -65,10 +97,33 @@ class GraphAssemblerTest extends Specification {
         graph.nodes.size() == 4
         graph.layers.size() == 3
 
-        graph.root.dependsOn as List == [nodes[1], nodes[2]]
-        nodes[1].dependsOn == [nodes[3]]
-        nodes[2].dependsOn == [nodes[3]]
-        nodes[3].dependsOn.empty
+        def n1 = nodes[1]
+        def n2 = nodes[2]
+        def n3 = nodes[3]
+
+        graph.root.dependsOn as List == [n1, n2]
+        graph.root.layer == 0
+        graph.root.item == 0
+        !graph.root.lastLayer
+        !graph.root.useAlternate
+
+        n1.dependsOn == [n3]
+        n1.layer == 1
+        n1.item == 0
+        !n1.lastLayer
+        !n1.useAlternate
+
+        n2.dependsOn == [n3]
+        n2.layer == 1
+        n2.item == 1
+        !n2.lastLayer
+        n2.useAlternate
+
+        n3.dependsOn.empty
+        n3.layer == 2
+        n3.item == 0
+        n3.lastLayer
+        n3.useAlternate
     }
 
     def "arranges 5 nodes"() {
@@ -85,11 +140,40 @@ class GraphAssemblerTest extends Specification {
         graph.nodes.size() == 5
         graph.layers.size() == 3
 
-        graph.root.dependsOn as List == [nodes[1], nodes[2], nodes[3]]
-        nodes[1].dependsOn == [nodes[4]]
-        nodes[2].dependsOn == [nodes[4]]
-        nodes[3].dependsOn == [nodes[4]]
-        nodes[4].dependsOn.empty
+        def n1 = nodes[1]
+        def n2 = nodes[2]
+        def n3 = nodes[3]
+        def n4 = nodes[4]
+
+        graph.root.dependsOn as List == [n1, n2, n3]
+        graph.root.layer == 0
+        graph.root.item == 0
+        !graph.root.lastLayer
+        !graph.root.useAlternate
+
+        n1.dependsOn == [n4]
+        n1.layer == 1
+        n1.item == 0
+        !n1.lastLayer
+        !n1.useAlternate
+
+        n2.dependsOn == [n4]
+        n2.layer == 1
+        n2.item == 1
+        !n2.lastLayer
+        !n2.useAlternate
+
+        n3.dependsOn == [n4]
+        n3.layer == 1
+        n3.item == 2
+        !n3.lastLayer
+        n3.useAlternate
+
+        n4.dependsOn.empty
+        n4.layer == 2
+        n4.item == 0
+        n4.lastLayer
+        n4.useAlternate
     }
 
     def "arranges 6 nodes"() {
@@ -106,12 +190,29 @@ class GraphAssemblerTest extends Specification {
         graph.nodes.size() == 6
         graph.layers.size() == 3
 
-        graph.root.dependsOn as List == [nodes[1], nodes[2], nodes[3]]
-        nodes[1].dependsOn == [nodes[4], nodes[5]]
-        nodes[2].dependsOn == [nodes[4], nodes[5]]
-        nodes[3].dependsOn == [nodes[4], nodes[5]]
-        nodes[4].dependsOn.empty
-        nodes[5].dependsOn.empty
+        def n1 = nodes[1]
+        def n2 = nodes[2]
+        def n3 = nodes[3]
+        def n4 = nodes[4]
+        def n5 = nodes[5]
+
+        graph.root.dependsOn as List == [n1, n2, n3]
+        !graph.root.useAlternate
+
+        n1.dependsOn == [n4, n5]
+        !n1.useAlternate
+
+        n2.dependsOn == [n4, n5]
+        !n2.useAlternate
+
+        n3.dependsOn == [n4, n5]
+        n3.useAlternate
+
+        n4.dependsOn.empty
+        !n4.useAlternate
+
+        n5.dependsOn.empty
+        n5.useAlternate
     }
 
     def "arranges 7 nodes"() {

@@ -84,7 +84,7 @@ public class Main {
             ModelAssembler modelAssembler = new AllTypesProjectDecorator();
             Settings settings = new Settings(build.getProjects().size(), sourceFiles);
             build.setSettings(settings);
-            new BuildInspector(modelAssembler).inspect(build);
+            new BuildInspector().inspect(build);
 
             System.out.println("* Projects: " + build.getProjects().size());
 
@@ -108,6 +108,8 @@ public class Main {
 
         @Override
         public Void call() throws Exception {
+            validate();
+
             Path rootDir = getRootDir();
 
             System.out.println("* Generating build in " + rootDir);
@@ -119,7 +121,7 @@ public class Main {
 
             Model model = new Model(new Build(rootDir, "testApp"));
 
-            // Create structure
+            // Create build structure
             createModelStructureAssembler().attachBuilds(settings, model);
 
             // Configure model
@@ -129,6 +131,15 @@ public class Main {
             createModelGenerator().generate(model);
 
             return null;
+        }
+
+        protected void validate() {
+            if (projects < 1) {
+                throw new IllegalArgumentException("Minimum of 1 project.");
+            }
+            if (sourceFiles < 1) {
+                throw new IllegalArgumentException("Minimum of 1 source files per project.");
+            }
         }
 
         private ModelConfigurer createModelConfigurer() {
@@ -157,7 +168,7 @@ public class Main {
         }
 
         protected ModelStructureAssembler createModelStructureAssembler() {
-            return new SingleBuildModelStructureAssembler();
+            return new SingleBuildModelStructureAssembler(createProjectInitializer());
         }
 
         private Path getRootDir() throws IOException {
@@ -165,16 +176,12 @@ public class Main {
         }
 
         private Settings createSettings() {
-            if (projects < 1) {
-                throw new IllegalArgumentException("Minimum of 1 project.");
-            }
-            if (sourceFiles < 1) {
-                throw new IllegalArgumentException("Minimum of 1 source files per project.");
-            }
             return new Settings(projects, sourceFiles);
         }
 
         protected abstract String getType();
+
+        protected abstract ProjectInitializer createProjectInitializer();
 
         protected abstract ModelAssembler createModelAssembler();
     }
@@ -186,7 +193,13 @@ public class Main {
         @Override
         protected ModelStructureAssembler createModelStructureAssembler() {
             ModelStructureAssembler mainBuildAssembler = super.createModelStructureAssembler();
-            return httpRepo ? new HttpRepoModelStructureAssembler(mainBuildAssembler) : mainBuildAssembler;
+            if (httpRepo) {
+                return new CompositeModelStructureAssembler(
+                        mainBuildAssembler,
+                        new HttpRepoModelStructureAssembler(createProjectInitializer()));
+            } else {
+                return mainBuildAssembler;
+            }
         }
     }
 
@@ -201,10 +214,28 @@ public class Main {
         }
 
         @Override
-        protected ModelStructureAssembler createModelStructureAssembler() {
-            return new CompositeBuildAssembler(super.createModelStructureAssembler(), builds);
+        protected void validate() {
+            super.validate();
+            if (builds < 1) {
+                throw new IllegalArgumentException("Minimum of 1 build.");
+            }
         }
 
+        @Override
+        protected ModelStructureAssembler createModelStructureAssembler() {
+            return new CompositeModelStructureAssembler(
+                    super.createModelStructureAssembler(),
+                    new IncludedBuildAssembler(
+                            createProjectInitializer(),
+                            builds));
+        }
+
+        @Override
+        protected ProjectInitializer createProjectInitializer() {
+            return new JavaBuildProjectInitializer();
+        }
+
+        @Override
         protected ModelAssembler createModelAssembler() {
             return new JavaModelAssembler();
         }
@@ -217,6 +248,12 @@ public class Main {
             return "C++";
         }
 
+        @Override
+        protected ProjectInitializer createProjectInitializer() {
+            return new CppBuildProjectInitializer();
+        }
+
+        @Override
         protected ModelAssembler createModelAssembler() {
             return new CppModelAssembler();
         }
@@ -231,12 +268,29 @@ public class Main {
         boolean includeJavaLibraries = false;
 
         @Override
+        protected void validate() {
+            if (includeJavaLibraries && projects < 3) {
+                throw new IllegalArgumentException("Minimum of 3 projects required to add Java libraries to Android build");
+            }
+        }
+
+        @Override
         protected String getType() {
             return "Android";
         }
 
+        @Override
+        protected ProjectInitializer createProjectInitializer() {
+            return new AndroidBuildProjectInitializer(includeJavaLibraries);
+        }
+
+        @Override
         protected ModelAssembler createModelAssembler() {
-            return new AndroidModelAssembler(experimentalAndroid, includeJavaLibraries);
+            AndroidModelAssembler modelAssembler = new AndroidModelAssembler(experimentalAndroid);
+            if (includeJavaLibraries) {
+                return new CompositeModelAssembler(new JavaModelAssembler(), modelAssembler);
+            }
+            return modelAssembler;
         }
     }
 }

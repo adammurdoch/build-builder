@@ -1,4 +1,4 @@
 package org.gradle.builds.assemblers;
 
-public interface ModelAssembler extends ProjectDecorator, BuildConfigurer {
+public interface ModelAssembler extends BuildConfigurer {
 }

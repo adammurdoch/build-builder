@@ -7,27 +7,9 @@ import java.util.Arrays;
 public class AndroidModelAssembler extends JvmModelAssembler {
     private static final PublishedJvmLibrary supportUtils = new PublishedJvmLibrary(new ExternalDependencyDeclaration("com.android.support:support-core-utils:25.1.0"), JavaClassApi.field("android.support.v4.app.NavUtils", "PARENT_ACTIVITY"));
     private final boolean experimentalAndroid;
-    private final boolean includeJavaLibraries;
-    private final JavaModelAssembler javaModelAssembler;
 
-    public AndroidModelAssembler(boolean experimentalAndroid, boolean includeJavaLibraries) {
+    public AndroidModelAssembler(boolean experimentalAndroid) {
         this.experimentalAndroid = experimentalAndroid;
-        this.includeJavaLibraries = includeJavaLibraries;
-        javaModelAssembler = new JavaModelAssembler();
-    }
-
-    @Override
-    public void apply(Class<? extends Component> component, Project project) {
-        if (component.equals(AndroidLibrary.class) || component.equals(Library.class)) {
-            if (project.isMayUseOtherLanguage() && includeJavaLibraries) {
-                javaModelAssembler.apply(component, project);
-                project.component(JavaLibrary.class).setTargetJavaVersion("1.7");
-            } else {
-                project.addComponent(new AndroidLibrary());
-            }
-        } else if (component.equals(AndroidApplication.class) || component.equals(Application.class)) {
-            project.addComponent(new AndroidApplication());
-        }
     }
 
     @Override
@@ -44,11 +26,6 @@ public class AndroidModelAssembler extends JvmModelAssembler {
 
     @Override
     protected void populate(Settings settings, Project project) {
-        if (project.isMayUseOtherLanguage() && includeJavaLibraries) {
-            javaModelAssembler.populate(settings, project);
-            return;
-        }
-
         if (project.component(AndroidApplication.class) != null) {
             AndroidApplication androidApplication = project.component(AndroidApplication.class);
             if (androidApplication.getPackageName() == null) {

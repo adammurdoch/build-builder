@@ -14,26 +14,31 @@ public class StructureAssembler {
         }
     }
 
-    public void arrangeProjects(Build build) {
+    public void arrangeProjects(Build build, ProjectInitializer projectInitializer) {
         Graph projectGraph = new Graph();
         Settings settings = build.getSettings();
         new GraphAssembler().arrange(settings.getProjectCount(), projectGraph);
         System.out.println("* Arranging projects in " + projectGraph.getLayers().size() + " layers.");
 
-        projectGraph.visit((Graph.Visitor<Project>) (layer, item, lastLayer, dependencies) -> {
+        projectGraph.visit((Graph.Visitor<Project>) (nodeDetails, dependencies) -> {
             Project project;
+            int layer = nodeDetails.getLayer();
+            int item = nodeDetails.getItem();
             if (layer == 0) {
                 project = build.getRootProject();
+                projectInitializer.initRootProject(project);
             } else {
                 String name;
-                if (lastLayer) {
+                if (nodeDetails.isLastLayer()) {
                     name = build.getProjectNamePrefix() + "core" + (item + 1);
                 } else {
                     name = build.getProjectNamePrefix() + "lib" + layer + "_" + (item + 1);
                 }
                 project = build.addProject(name);
-                if (lastLayer && item == 0) {
-                    project.setMayUseOtherLanguage(true);
+                if (nodeDetails.isUseAlternate()) {
+                    projectInitializer.initAlternateLibraryProject(project);
+                } else {
+                    projectInitializer.initLibraryProject(project);
                 }
             }
             for (Project dep : dependencies) {

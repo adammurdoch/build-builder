@@ -4,15 +4,6 @@ import org.gradle.builds.model.*;
 
 public class JavaModelAssembler extends JvmModelAssembler {
     @Override
-    public void apply(Class<? extends Component> component, Project project) {
-        if (component.equals(JavaLibrary.class) || component.equals(Library.class)) {
-            project.addComponent(new JavaLibrary());
-        } else if (component.equals(JavaApplication.class) || component.equals(Application.class)) {
-            project.addComponent(new JavaApplication());
-        }
-    }
-
-    @Override
     protected void populate(Settings settings, Project project) {
         if (project.component(JavaLibrary.class) != null) {
             JavaLibrary library = project.component(JavaLibrary.class);

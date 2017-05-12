@@ -1,17 +1,12 @@
 package org.gradle.builds.assemblers;
 
 import org.gradle.builds.model.Build;
-import org.gradle.builds.model.Component;
 import org.gradle.builds.model.Project;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public abstract class AbstractModelAssembler implements ModelAssembler {
-    @Override
-    public void apply(Class<? extends Component> component, Project project) {
-    }
-
     @Override
     public void populate(Build build) {
         rootProject(build.getRootProject());

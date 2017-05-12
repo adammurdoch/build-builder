@@ -26,13 +26,15 @@ public abstract class JvmModelAssembler extends AbstractModelAssembler {
     protected <T extends HasJavaSource> void addSource(Project project, T component, JavaClass apiClass, Consumer<JavaClass> implClass) {
         int implLayer = Math.max(0, project.getClassGraph().getLayers().size() - 2);
         String className = javaPackageFor(project) + "." + classNameFor(project);
-        project.getClassGraph().visit((Graph.Visitor<JavaClass>) (layer, item, lastLayer, dependencies) -> {
+        project.getClassGraph().visit((Graph.Visitor<JavaClass>) (nodeDetails, dependencies) -> {
             JavaClass javaClass;
+            int layer = nodeDetails.getLayer();
+            int item = nodeDetails.getItem();
             if (layer == 0) {
                 javaClass = apiClass;
             } else {
                 String name;
-                if (lastLayer) {
+                if (nodeDetails.isLastLayer()) {
                     name = "NoDeps" + (item + 1);
                 } else {
                     name = "Impl" + (layer) + "_" + (item + 1);

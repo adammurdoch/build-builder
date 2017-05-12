@@ -1,5 +1,6 @@
 package org.gradle.builds.model;
 
+import org.gradle.builds.assemblers.ProjectInitializer;
 import org.gradle.builds.assemblers.Settings;
 
 import java.nio.file.Path;
@@ -11,12 +12,12 @@ public class Build {
     private final Project rootProject;
     private final Map<String, Project> projects = new LinkedHashMap<>();
     private Settings settings;
-    private Class<? extends Component> rootProjectType = Application.class;
     private final List<Build> dependsOn = new ArrayList<>();
     private final List<Build> childBuilds = new ArrayList<>();
     private final List<PublishedJvmLibrary> publishedLibraries = new ArrayList<>();
     private PublicationTarget publicationTarget;
     private String projectNamePrefix = "";
+    private ProjectInitializer projectInitializer;
 
     public Build(Path rootDir, String rootProjectName) {
         this.rootDir = rootDir;
@@ -78,12 +79,12 @@ public class Build {
         return project;
     }
 
-    public Class<? extends Component> getRootProjectType() {
-        return rootProjectType;
+    public ProjectInitializer getProjectInitializer() {
+        return projectInitializer;
     }
 
-    public void setRootProjectType(Class<? extends Component> rootProjectType) {
-        this.rootProjectType = rootProjectType;
+    public void setProjectInitializer(ProjectInitializer projectInitializer) {
+        this.projectInitializer = projectInitializer;
     }
 
     public void setSettings(Settings settings) {

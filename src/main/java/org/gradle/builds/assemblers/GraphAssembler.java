@@ -55,9 +55,9 @@ public class GraphAssembler {
         }
 
         for (int layer = 0; layer < layers.size(); layer++) {
-            Integer itemsInLayer = layers.get(layer);
+            int itemsInLayer = layers.get(layer);
             for (int item = 0; item < itemsInLayer; item++) {
-                graph.addNode(layer, item);
+                graph.addNode(layer, item, nodes > 3 && item == itemsInLayer - 1 || nodes == 3 && layer == 2);
             }
         }
     }

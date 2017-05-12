@@ -1,6 +1,5 @@
 package org.gradle.builds.inspectors;
 
-import org.gradle.builds.assemblers.ProjectDecorator;
 import org.gradle.builds.model.*;
 import org.gradle.tooling.GradleConnector;
 import org.gradle.tooling.ProjectConnection;
@@ -15,12 +14,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class BuildInspector {
-    private final ProjectDecorator decorator;
-
-    public BuildInspector(ProjectDecorator decorator) {
-        this.decorator = decorator;
-    }
-
     public void inspect(Build build) throws IOException {
         System.out.println("* Inspecting build");
         Path initScript = Files.createTempFile("init", ".gradle");
@@ -66,24 +59,24 @@ public class BuildInspector {
             }
             switch (type) {
                 case "android-application":
-                    decorator.apply(AndroidApplication.class, project);
+                    project.addComponent(new AndroidApplication());
                     inspectManifest(project);
                     break;
                 case "android-library":
-                    decorator.apply(AndroidLibrary.class, project);
+                    project.addComponent(new AndroidLibrary());
                     inspectManifest(project);
                     break;
                 case "java-library":
-                    decorator.apply(JavaLibrary.class, project);
+                    project.addComponent(new JavaLibrary());
                     break;
                 case "java-application":
-                    decorator.apply(JavaApplication.class, project);
+                    project.addComponent(new JavaApplication());
                     break;
                 case "cpp-library":
-                    decorator.apply(NativeLibrary.class, project);
+                    project.addComponent(new NativeLibrary());
                     break;
                 case "cpp-application":
-                    decorator.apply(NativeApplication.class, project);
+                    project.addComponent(new NativeApplication());
                     break;
                 case "empty":
                     break;

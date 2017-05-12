@@ -5,7 +5,7 @@ import java.util.*;
 public class Graph {
     private final List<Node> nodes = new ArrayList<>();
     private final List<List<Node>> layers = new ArrayList<>();
-    private final Node root = new Node(0) {
+    private final Node root = new Node(0, 0, false) {
         @Override
         public String toString() {
             return "<root>";
@@ -24,13 +24,13 @@ public class Graph {
         return nodes;
     }
 
-    void addNode(int layer, int item) {
+    void addNode(int layer, int item, boolean useAlternate) {
         Node node;
         if (layer == 0 && nodes.isEmpty()) {
             node = root;
             nodes.add(root);
         } else {
-            node = new Node(layer) {
+            node = new Node(layer, item, useAlternate) {
                 @Override
                 public String toString() {
                     return "{layer: " + (layer + 1) + ", item: " + (item + 1) + "}";
@@ -55,21 +55,55 @@ public class Graph {
                 for (Node dep : node.getDependsOn()) {
                     deps.add(values.get(dep));
                 }
-                T value = visitor.visitNode(layer, item, lastLayer == layer, deps);
+                T value = visitor.visitNode(node, deps);
                 values.put(node, value);
             }
         }
     }
 
-    public interface Visitor<T> {
-        T visitNode(int layer, int item, boolean lastLayer, Set<T> dependencies);
+    public interface NodeDetails {
+        int getLayer();
+
+        int getItem();
+
+        boolean isUseAlternate();
+
+        boolean isLastLayer();
     }
 
-    public class Node {
-        private final int layer;
+    public interface Visitor<T> {
+        T visitNode(NodeDetails node, Set<T> dependencies);
+    }
 
-        public Node(int layer) {
+    private class Node implements NodeDetails {
+        private final int layer;
+        private final int item;
+        private final boolean useAlternate;
+
+        Node(int layer, int item, boolean useAlternate) {
             this.layer = layer;
+            this.item = item;
+            this.useAlternate = useAlternate;
+        }
+
+        @Override
+        public int getLayer() {
+            return layer;
+        }
+
+        @Override
+        public int getItem() {
+            return item;
+        }
+
+        @Override
+        public boolean isLastLayer() {
+            return layer == getLayers().size() - 1;
+        }
+
+        @Override
+        public boolean isUseAlternate() {
+            return useAlternate;
         }
 
         public List<Node> getDependsOn() {

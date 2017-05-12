@@ -91,9 +91,9 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
         projects << ["3", "5"]
     }
 
-    def "can generate multi-project build containing some java libraries"() {
+    def "can generate 3 project build containing some java libraries"() {
         when:
-        new Main().run("android", "--dir", projectDir.absolutePath, "--projects", "4", "--java")
+        new Main().run("android", "--dir", projectDir.absolutePath, "--projects", "3", "--java")
 
         then:
         build.isBuild()
@@ -101,7 +101,26 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":").isAndroidApplication()
         build.project(":core1").isJavaLibrary()
         build.project(":lib1_1").isAndroidLibrary()
+
+        build.buildSucceeds(":assembleDebug")
+        file("build/outputs/apk/testApp-debug.apk").exists()
+
+        build.buildSucceeds("build")
+    }
+
+    def "can generate 6 project build containing some java libraries"() {
+        when:
+        new Main().run("android", "--dir", projectDir.absolutePath, "--projects", "6", "--java")
+
+        then:
+        build.isBuild()
+
+        build.project(":").isAndroidApplication()
+        build.project(":core1").isAndroidLibrary()
+        build.project(":core2").isJavaLibrary()
+        build.project(":lib1_1").isAndroidLibrary()
         build.project(":lib1_2").isAndroidLibrary()
+        build.project(":lib1_3").isJavaProject()
 
         build.buildSucceeds(":assembleDebug")
         file("build/outputs/apk/testApp-debug.apk").exists()

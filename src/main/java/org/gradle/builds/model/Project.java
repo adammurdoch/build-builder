@@ -17,7 +17,6 @@ public class Project {
     private final Set<Component> components = new LinkedHashSet<>();
     private final List<PublishedJvmLibrary> externalDependencies = new ArrayList<>();
     private Graph classGraph;
-    private boolean mayUseOtherLanguage;
     private PublicationTarget publicationTarget;
 
     public Project(Project parent, String name, Path projectDir) {
@@ -86,14 +85,6 @@ public class Project {
     public <T extends Component> T addComponent(T component) {
         components.add(component);
         return component;
-    }
-
-    public void setMayUseOtherLanguage(boolean mayUseOtherLanguage) {
-        this.mayUseOtherLanguage = mayUseOtherLanguage;
-    }
-
-    public boolean isMayUseOtherLanguage() {
-        return mayUseOtherLanguage;
     }
 
     public PublicationTarget getPublicationTarget() {

@@ -4,12 +4,12 @@ import org.gradle.builds.model.Build;
 import org.gradle.builds.model.Model;
 import org.gradle.builds.model.PublicationTarget;
 
-public class CompositeBuildAssembler implements ModelStructureAssembler {
-    private final ModelStructureAssembler structureAssembler;
+public class IncludedBuildAssembler implements ModelStructureAssembler {
+    private final ProjectInitializer initializer;
     private final int builds;
 
-    public CompositeBuildAssembler(ModelStructureAssembler structureAssembler, int builds) {
-        this.structureAssembler = structureAssembler;
+    public IncludedBuildAssembler(ProjectInitializer initializer, int builds) {
+        this.initializer = new EmptyRootProjectInitializer(initializer);
         this.builds = builds;
     }
 
@@ -19,13 +19,12 @@ public class CompositeBuildAssembler implements ModelStructureAssembler {
             String name = "child" + i;
             Build childBuild = new Build(model.getBuild().getRootDir().resolve(name), name);
             childBuild.setSettings(settings);
-            childBuild.setRootProjectType(null);
+            childBuild.setProjectInitializer(initializer);
             childBuild.setProjectNamePrefix(name + "_");
             childBuild.publishAs(new PublicationTarget(null));
             model.addBuild(childBuild);
             model.getBuild().includeBuild(childBuild);
             model.getBuild().dependsOn(childBuild);
         }
-        structureAssembler.attachBuilds(settings, model);
     }
 }

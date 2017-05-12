@@ -77,7 +77,7 @@ Here's an example:
 
 - Android application 
     - Doesn't do anything, but can be installed and started.
-    - Can include only a single Java project in an Android build.
+    - Includes a single Java project per layer.
     - There are no instrumented tests.
 - No annotation processors are used.
 - External HTTP repo
@@ -86,6 +86,7 @@ Here's an example:
     - Dependencies used by 'impl' class only, and this project uses all libraries from the repo directly rather than a set of API libraries
     - Broken when used with `android --java`
 - Composite builds
+    - Doesn't generate a library project with `--projects 1` (the default)
     - Not available for C++ or Android
     - Dependencies used by 'impl' class only, and this project uses all libraries from the repo directly rather than a set of API libraries
 - External dependencies are the same for all projects.

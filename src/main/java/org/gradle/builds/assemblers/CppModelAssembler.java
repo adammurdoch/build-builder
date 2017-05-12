@@ -7,15 +7,6 @@ import java.util.Set;
 
 public class CppModelAssembler extends AbstractModelAssembler {
     @Override
-    public void apply(Class<? extends Component> component, Project project) {
-        if (component.equals(NativeLibrary.class) || component.equals(Library.class)) {
-            project.addComponent(new NativeLibrary());
-        } else if (component.equals(NativeApplication.class) || component.equals(Application.class)) {
-            project.addComponent(new NativeApplication());
-        }
-    }
-
-    @Override
     protected void populate(Settings settings, Project project) {
         if (project.component(NativeLibrary.class) != null) {
             NativeLibrary lib = project.component(NativeLibrary.class);
@@ -66,15 +57,17 @@ public class CppModelAssembler extends AbstractModelAssembler {
 
     private void addSource(Project project, HasNativeSource component, CppClass apiClass, CppSourceFile apiSourceFile, CppHeaderFile implHeader) {
         int implLayer = Math.max(0, project.getClassGraph().getLayers().size() - 2);
-        project.getClassGraph().visit((Graph.Visitor<CppClass>) (layer, item, lastLayer, dependencies) -> {
+        project.getClassGraph().visit((Graph.Visitor<CppClass>) (nodeDetails, dependencies) -> {
             CppClass cppClass;
             CppSourceFile cppSourceFile;
+            int layer = nodeDetails.getLayer();
+            int item = nodeDetails.getItem();
             if (layer == 0) {
                 cppClass = apiClass;
                 cppSourceFile = apiSourceFile;
             } else {
                 String name;
-                if (lastLayer) {
+                if (nodeDetails.isLastLayer()) {
                     name = "NoDeps" + (item + 1);
                 } else {
                     name = "Impl" + (layer) + "_" + (item + 1);
