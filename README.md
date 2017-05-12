@@ -78,20 +78,17 @@ Here's an example:
 #### Generating builds
 
 - Android application 
-    - Doesn't do anything, but can be installed and started.
     - Includes a single Java project per layer.
-    - Does not use activities/views from http-repo libraries (or included builds).
     - There are no instrumented tests.
 - No annotation processors are used.
 - External HTTP repo
     - Has fixed size and structure.
     - Not available for C++.
-    - Dependencies used by 'impl' class only, and this project uses all libraries from the repo directly rather than a set of API libraries
-    - Broken when used with `android --java`
+    - Dependencies used by 'impl' class only, and this project uses all libraries from the repo directly rather than some set of API libraries
 - Composite builds
     - Doesn't generate a library project with `--projects 1` (the default)
     - Not available for C++ or Android
-    - Dependencies used by 'impl' class only, and this project uses all libraries from the repo directly rather than a set of API libraries
+    - Dependencies used by 'impl' class only, and this project uses all libraries from the repo directly rather than some set of API libraries
 - External dependencies are the same for all projects.
     - slf4j
     - support-core-utils (Android builds only)
