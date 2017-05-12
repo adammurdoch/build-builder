@@ -261,10 +261,10 @@ public class Main {
 
     @Command(name = "android", description = "Generates an Android build with source files")
     public static class InitAndroidBuild extends InitJvmBuild {
-        @Option(name = "--experimental", description = "Use the experimental Android plugin (default: false")
-        boolean experimentalAndroid = false;
+        @Option(name = "--version", description = "Android plugin version (default: " + AndroidModelAssembler.defaultVersion + ")")
+        String androidVersion = AndroidModelAssembler.defaultVersion;
 
-        @Option(name = "--java", description = "Include some Java libraries (default: false")
+        @Option(name = "--java", description = "Include some Java libraries (default: false)")
         boolean includeJavaLibraries = false;
 
         @Override
@@ -286,7 +286,7 @@ public class Main {
 
         @Override
         protected ModelAssembler createModelAssembler() {
-            AndroidModelAssembler modelAssembler = new AndroidModelAssembler(experimentalAndroid);
+            AndroidModelAssembler modelAssembler = new AndroidModelAssembler(androidVersion);
             if (includeJavaLibraries) {
                 return new CompositeModelAssembler(new JavaModelAssembler(), modelAssembler);
             }

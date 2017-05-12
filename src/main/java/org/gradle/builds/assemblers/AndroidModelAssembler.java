@@ -5,23 +5,22 @@ import org.gradle.builds.model.*;
 import java.util.Arrays;
 
 public class AndroidModelAssembler extends JvmModelAssembler {
+    public static final String defaultVersion = "2.3.1";
     private static final PublishedJvmLibrary supportUtils = new PublishedJvmLibrary(new ExternalDependencyDeclaration("com.android.support:support-core-utils:25.1.0"), JavaClassApi.field("android.support.v4.app.NavUtils", "PARENT_ACTIVITY"));
-    private final boolean experimentalAndroid;
+    private final String pluginVersion;
 
-    public AndroidModelAssembler(boolean experimentalAndroid) {
-        this.experimentalAndroid = experimentalAndroid;
+    public AndroidModelAssembler(String pluginVersion) {
+        this.pluginVersion = pluginVersion;
     }
 
     @Override
     protected void rootProject(Project rootProject) {
         super.rootProject(rootProject);
         BuildScript buildScript = rootProject.getBuildScript();
-        if (experimentalAndroid) {
+        if (pluginVersion.startsWith("2.5.")) {
             buildScript.useMavenLocalForBuildScriptClasspath();
-            buildScript.requireOnBuildScriptClasspath("com.android.tools.build:gradle:2.5.0-dev");
-        } else {
-            buildScript.requireOnBuildScriptClasspath("com.android.tools.build:gradle:2.3.1");
         }
+        buildScript.requireOnBuildScriptClasspath("com.android.tools.build:gradle:" + pluginVersion);
     }
 
     @Override

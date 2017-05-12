@@ -200,4 +200,53 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
         server?.kill()
     }
 
+    def "can generate single project build with http repo and Java libraries"() {
+        given:
+        useIsolatedUserHome()
+
+        when:
+        new Main().run("android", "--projects", "3", "--java", "--http-repo", "--dir", projectDir.absolutePath)
+
+        then:
+        build.isBuild()
+
+        build.project(":").isAndroidApplication()
+        def srcDir = build.project(":").file("src/main/java/org/gradle/example")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo_core1.Repo_core1.getSomeValue()")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo_core1.Repo_core1.INT_CONST")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo_lib1_1.Repo_lib1_1Activity.getSomeValue()")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo_lib1_1.Repo_lib1_1Activity.INT_CONST")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo_lib1_1.R.string.repo_lib1_1_string")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo_lib1_2.Repo_lib1_2.getSomeValue()")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo_lib1_2.Repo_lib1_2.INT_CONST")
+
+        build.project(":lib1_1").isAndroidLibrary()
+        build.project(":core1").isJavaLibrary()
+
+        def repoBuild = build(file('repo'))
+        repoBuild.isBuild()
+        repoBuild.project(':').isEmptyProject()
+        repoBuild.project(':repo_lib1_1').isAndroidLibrary()
+        repoBuild.project(':repo_lib1_2').isJavaLibrary()
+        repoBuild.project(':repo_core1').isJavaLibrary()
+
+        repoBuild.buildSucceeds("installDist")
+
+        new File(repoBuild.rootDir, "build/repo/org/gradle/example/repo_core1/1.2/repo_core1-1.2.jar").file
+        new File(repoBuild.rootDir, "build/repo/org/gradle/example/repo_core1/1.2/repo_core1-1.2.pom").file
+        new File(repoBuild.rootDir, "build/repo/org/gradle/example/repo_lib1_1/1.2/repo_lib1_1-1.2.aar").file
+        new File(repoBuild.rootDir, "build/repo/org/gradle/example/repo_lib1_1/1.2/repo_lib1_1-1.2.pom").file
+
+        def server = repoBuild.app("build/install/repo/bin/repo").start()
+        waitFor(new URI("http://localhost:5005"))
+
+        build.buildSucceeds(":assembleDebug")
+        file("build/outputs/apk/testApp-debug.apk").exists()
+
+        build.buildSucceeds("build")
+
+        cleanup:
+        server?.kill()
+    }
+
 }
