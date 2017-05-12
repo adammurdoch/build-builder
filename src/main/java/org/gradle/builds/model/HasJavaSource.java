@@ -5,6 +5,15 @@ import java.util.Set;
 
 public class HasJavaSource implements Component {
     private final Set<JavaClass> sourceFiles = new LinkedHashSet<>();
+    private final Set<JvmLibraryApi> referencedLibraries = new LinkedHashSet<>();
+
+    public Set<JvmLibraryApi> getReferencedLibraries() {
+        return referencedLibraries;
+    }
+
+    public void uses(JvmLibraryApi libraryApi) {
+        referencedLibraries.add(libraryApi);
+    }
 
     public Set<JavaClass> getSourceFiles() {
         return sourceFiles;

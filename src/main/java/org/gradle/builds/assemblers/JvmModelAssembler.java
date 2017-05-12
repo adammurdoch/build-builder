@@ -42,11 +42,8 @@ public abstract class JvmModelAssembler extends AbstractModelAssembler {
                 javaClass = component.addClass(className + name);
             }
             if (layer == implLayer) {
-                for (Project depProject : project.getDependencies()) {
-                    javaClass.uses(depProject.component(JvmLibrary.class).getApi().getApiClasses());
-                }
-                for (PublishedJvmLibrary library : project.getExternalDependencies()) {
-                    javaClass.uses(library.getApi().getApiClasses());
+                for (JvmLibraryApi library : component.getReferencedLibraries()) {
+                    javaClass.uses(library.getApiClasses());
                 }
                 implClass.accept(javaClass);
             }

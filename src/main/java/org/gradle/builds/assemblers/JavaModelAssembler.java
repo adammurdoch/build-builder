@@ -12,14 +12,15 @@ public class JavaModelAssembler extends JvmModelAssembler {
 
             JavaClass apiClass = library.addClass(javaPackageFor(project) + "." + classNameFor(project));
             library.setApiClass(apiClass);
-            addSource(project, library, apiClass, javaClass -> {});
-            addTests(project, library);
 
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("java");
             addPublishing(project, library.getApi(), buildScript);
-            addDependencies(project, buildScript);
+            addDependencies(project, library, buildScript);
             addJavaVersion(library, buildScript);
+
+            addSource(project, library, apiClass, javaClass -> {});
+            addTests(project, library);
         } else if (project.component(JavaApplication.class) != null) {
             JavaApplication application = project.component(JavaApplication.class);
 
@@ -27,14 +28,15 @@ public class JavaModelAssembler extends JvmModelAssembler {
 
             JavaClass mainClass = application.addClass(javaPackageFor(project) + "." + classNameFor(project));
             mainClass.addRole(new AppEntryPoint());
-            addSource(project, application, mainClass, javaClass -> {});
-            addTests(project, application);
 
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("java");
             buildScript.requirePlugin("application");
-            addDependencies(project, buildScript);
+            addDependencies(project, application, buildScript);
             buildScript.property("mainClassName", mainClass.getName());
+
+            addSource(project, application, mainClass, javaClass -> {});
+            addTests(project, application);
         }
     }
 
@@ -60,13 +62,24 @@ public class JavaModelAssembler extends JvmModelAssembler {
         }
     }
 
-    private void addDependencies(Project project, BuildScript buildScript) {
+    private void addDependencies(Project project, HasJavaSource component, BuildScript buildScript) {
         for (Project dep : project.getDependencies()) {
+            if (dep.component(AndroidComponent.class) != null) {
+                // Don't use Android libraries
+                continue;
+            }
             buildScript.dependsOnProject("compile", dep.getPath());
+            component.uses(dep.component(JvmLibrary.class).getApi());
         }
         for (PublishedJvmLibrary library : project.getExternalDependencies()) {
+            if (library instanceof PublishedAndroidLibrary) {
+                // Don't use Android libraries
+                continue;
+            }
             buildScript.dependsOn("compile", library.getGav());
+            component.uses(library.getApi());
         }
+
         buildScript.dependsOnExternal("testCompile", "junit:junit:4.12");
     }
 }

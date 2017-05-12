@@ -4,12 +4,24 @@ import java.util.Arrays;
 import java.util.List;
 
 public class AndroidLibraryApi implements JvmLibraryApi {
+    private final String projectName;
     private final JavaClassApi activityClass;
     private final JavaClassApi rClass;
 
-    public AndroidLibraryApi(JavaClassApi activityClass, JavaClassApi rClass) {
+    public AndroidLibraryApi(String projectName, JavaClassApi activityClass, JavaClassApi rClass) {
+        this.projectName = projectName;
         this.activityClass = activityClass;
         this.rClass = rClass;
+    }
+
+    @Override
+    public String getIdentifier() {
+        return projectName;
+    }
+
+    @Override
+    public String getDisplayName() {
+        return "project " + projectName;
     }
 
     public JavaClassApi getActivity() {

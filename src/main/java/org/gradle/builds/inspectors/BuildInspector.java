@@ -63,11 +63,11 @@ public class BuildInspector {
                     inspectManifest(project);
                     break;
                 case "android-library":
-                    project.addComponent(new AndroidLibrary());
+                    project.addComponent(new AndroidLibrary(project.getName()));
                     inspectManifest(project);
                     break;
                 case "java-library":
-                    project.addComponent(new JavaLibrary());
+                    project.addComponent(new JavaLibrary(project.getName()));
                     break;
                 case "java-application":
                     project.addComponent(new JavaApplication());

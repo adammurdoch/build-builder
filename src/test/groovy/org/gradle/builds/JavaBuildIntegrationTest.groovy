@@ -134,6 +134,10 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.child1_core1.Child1_core1.getSomeValue()")
         new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.child1_core1.Child1_core1.INT_CONST")
 
+        def coreSrcDir = build.project(":core1").file("src/main/java/org/gradle/example/core1")
+        new File(coreSrcDir, "Core1Impl1_1.java").text.contains("org.gradle.example.child1_core1.Child1_core1.getSomeValue()")
+        new File(coreSrcDir, "Core1Impl1_1.java").text.contains("org.gradle.example.child1_core1.Child1_core1.INT_CONST")
+
         def child = build(file("child1"))
         child.isBuild()
         child.project(":").isEmptyProject()

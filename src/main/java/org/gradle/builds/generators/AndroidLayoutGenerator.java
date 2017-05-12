@@ -1,8 +1,8 @@
 package org.gradle.builds.generators;
 
 import org.gradle.builds.model.AndroidComponent;
-import org.gradle.builds.model.AndroidLibrary;
-import org.gradle.builds.model.JvmLibrary;
+import org.gradle.builds.model.AndroidLibraryApi;
+import org.gradle.builds.model.JvmLibraryApi;
 import org.gradle.builds.model.Project;
 
 import java.io.IOException;
@@ -37,18 +37,18 @@ public class AndroidLayoutGenerator extends ProjectComponentSpecificGenerator<An
         printWriter.println("      android:layout_height='wrap_content'");
         printWriter.println("      android:layout_centerHorizontal='true'");
         printWriter.println("      android:layout_centerVertical='true' />");
-        for (Project dep : project.getDependencies()) {
-            if (dep.component(AndroidLibrary.class) != null) {
+        for (JvmLibraryApi library : component.getReferencedLibraries()) {
+            if (library instanceof AndroidLibraryApi) {
                 printWriter.println("    <Button");
                 printWriter.println("      android:layout_width='wrap_content'");
                 printWriter.println("      android:layout_height='wrap_content'");
-                printWriter.println("      android:text='project " + dep.getPath() + "'");
-                printWriter.println("      android:onClick='click" + dep.getName() + "' />");
-            } else if (dep.component(JvmLibrary.class) != null) {
+                printWriter.println("      android:text='" + library.getDisplayName() + "'");
+                printWriter.println("      android:onClick='click" + library.getIdentifier() + "' />");
+            } else {
                 printWriter.println("    <TextView");
                 printWriter.println("      android:layout_width='wrap_content'");
                 printWriter.println("      android:layout_height='wrap_content'");
-                printWriter.println("      android:text='project " + dep.getPath() + "' />");
+                printWriter.println("      android:text='" + library.getDisplayName() + "' />");
             }
         }
         printWriter.println("</LinearLayout>");

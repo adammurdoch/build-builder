@@ -19,13 +19,13 @@ public class AndroidBuildProjectInitializer extends ProjectInitializer {
 
     @Override
     public void initLibraryProject(Project project) {
-        project.addComponent(new AndroidLibrary());
+        project.addComponent(new AndroidLibrary(project.getName()));
     }
 
     @Override
     public void initAlternateLibraryProject(Project project) {
         if (includeJavaLibraries) {
-            JavaLibrary javaLibrary = new JavaLibrary();
+            JavaLibrary javaLibrary = new JavaLibrary(project.getName());
             javaLibrary.setTargetJavaVersion("1.7");
             project.addComponent(javaLibrary);
         } else {

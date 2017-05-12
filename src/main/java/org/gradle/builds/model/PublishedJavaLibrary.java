@@ -7,7 +7,7 @@ public class PublishedJavaLibrary extends PublishedJvmLibrary {
 
     public PublishedJavaLibrary(ExternalDependencyDeclaration gav, JavaClassApi apiClass) {
         super(gav);
-        this.api = new JavaLibraryApi(Collections.singletonList(apiClass));
+        this.api = new JavaLibraryApi(gav.getGav(), Collections.singletonList(apiClass));
     }
 
     public PublishedJavaLibrary(ExternalDependencyDeclaration gav, JavaLibraryApi api) {

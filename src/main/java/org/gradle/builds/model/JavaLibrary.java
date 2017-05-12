@@ -3,8 +3,13 @@ package org.gradle.builds.model;
 import java.util.Collections;
 
 public class JavaLibrary extends HasJavaSource implements JvmLibrary {
+    private final String projectName;
     private String targetJavaVersion;
     private JavaClass apiClass;
+
+    public JavaLibrary(String projectName) {
+        this.projectName = projectName;
+    }
 
     public String getTargetJavaVersion() {
         return targetJavaVersion;
@@ -16,7 +21,7 @@ public class JavaLibrary extends HasJavaSource implements JvmLibrary {
 
     @Override
     public JavaLibraryApi getApi() {
-        return new JavaLibraryApi(Collections.singletonList(apiClass.getApi()));
+        return new JavaLibraryApi(projectName, Collections.singletonList(apiClass.getApi()));
     }
 
     public void setApiClass(JavaClass apiClass) {

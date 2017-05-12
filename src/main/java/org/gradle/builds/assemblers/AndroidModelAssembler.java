@@ -35,12 +35,10 @@ public class AndroidModelAssembler extends JvmModelAssembler {
             JavaClass appActivity = androidApplication.addClass(androidApplication.getPackageName() + "." + classNameFor(project) + "MainActivity");
             appActivity.addRole(new AndroidActivity());
             androidApplication.activity(appActivity);
-            addSourceFiles(project, androidApplication, appActivity, rClass);
-            addTests(project, androidApplication);
 
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("com.android.application");
-            addDependencies(project, buildScript);
+            addDependencies(project, androidApplication, buildScript);
             addApplicationResources(androidApplication);
 
             ScriptBlock androidBlock = buildScript.block("android");
@@ -52,6 +50,9 @@ public class AndroidModelAssembler extends JvmModelAssembler {
             configBlock.property("targetSdkVersion", 25);
             configBlock.property("versionCode", 1);
             configBlock.property("versionName", "1.0");
+
+            addSourceFiles(project, androidApplication, appActivity, rClass);
+            addTests(project, androidApplication);
         } else if (project.component(AndroidLibrary.class) != null) {
             AndroidLibrary androidLibrary = project.component(AndroidLibrary.class);
             if (androidLibrary.getPackageName() == null) {
@@ -65,13 +66,11 @@ public class AndroidModelAssembler extends JvmModelAssembler {
             androidLibrary.setActivity(libraryActivity);
             androidLibrary.setRClass(rClass);
             androidLibrary.activity(libraryActivity);
-            addSourceFiles(project, androidLibrary, libraryActivity, rClass);
-            addTests(project, androidLibrary);
 
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("com.android.library");
             addPublishing(project, androidLibrary.getApi(), buildScript);
-            addDependencies(project, buildScript);
+            addDependencies(project, androidLibrary, buildScript);
 
             ScriptBlock androidBlock = buildScript.block("android");
             androidBlock.property("buildToolsVersion", "25.0.0");
@@ -81,6 +80,9 @@ public class AndroidModelAssembler extends JvmModelAssembler {
             configBlock.property("targetSdkVersion", 25);
             configBlock.property("versionCode", 1);
             configBlock.property("versionName", "1.0");
+
+            addSourceFiles(project, androidLibrary, libraryActivity, rClass);
+            addTests(project, androidLibrary);
         }
     }
 
@@ -106,12 +108,14 @@ public class AndroidModelAssembler extends JvmModelAssembler {
         }
     }
 
-    private void addDependencies(Project project, BuildScript buildScript) {
+    private void addDependencies(Project project, HasJavaSource component, BuildScript buildScript) {
         for (Project dep : project.getDependencies()) {
             buildScript.dependsOnProject("compile", dep.getPath());
+            component.uses(dep.component(JvmLibrary.class).getApi());
         }
         for (PublishedJvmLibrary library : project.getExternalDependencies()) {
             buildScript.dependsOn("compile", library.getGav());
+            component.uses(library.getApi());
         }
         buildScript.dependsOnExternal("testCompile", "junit:junit:4.12");
     }
