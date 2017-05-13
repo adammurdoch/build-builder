@@ -32,13 +32,4 @@ public class AndroidBuildProjectInitializer extends ProjectInitializer {
             initLibraryProject(project);
         }
     }
-
-    @Override
-    public void dependsOn(Project project, Project dependency) {
-        if (includeJavaLibraries && project.component(JavaLibrary.class) != null && dependency.component(AndroidLibrary.class) != null) {
-            // Ignore
-            return;
-        }
-        project.dependsOn(dependency);
-    }
 }

@@ -10,8 +10,4 @@ public abstract class ProjectInitializer {
     public void initAlternateLibraryProject(Project project) {
         initLibraryProject(project);
     }
-
-    public void dependsOn(Project project, Project dependency) {
-        project.dependsOn(dependency);
-    }
 }

@@ -42,7 +42,7 @@ public class StructureAssembler {
                 }
             }
             for (Project dep : dependencies) {
-                projectInitializer.dependsOn(project, dep);
+                project.dependsOn(dep);
             }
             return project;
         });

@@ -23,13 +23,4 @@ class EmptyRootProjectInitializer extends ProjectInitializer {
     public void initAlternateLibraryProject(Project project) {
         initializer.initAlternateLibraryProject(project);
     }
-
-    @Override
-    public void dependsOn(Project project, Project dependency) {
-        if (project.getParent() == null) {
-            // Ignore
-            return;
-        }
-        initializer.dependsOn(project, dependency);
-    }
 }
