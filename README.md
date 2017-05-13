@@ -78,11 +78,11 @@ Here's an example:
 #### Generating builds
 
 - Android application 
-    - Includes a single Java project per layer.
-    - There are no instrumented tests.
+    - Only a single Java project per layer.
+    - Only a single instrumented test per project.
 - No annotation processors are used.
 - External HTTP repo
-    - Has fixed size and structure.
+    - Has fixed size and structure, only a small number of libraries.
     - Not available for C++.
     - Dependencies used by 'impl' class only, and this project uses all libraries from the repo directly rather than some set of API libraries
 - Composite builds
@@ -90,6 +90,7 @@ Here's an example:
     - Not available for C++ or Android
     - Dependencies used by 'impl' class only, and this project uses all libraries from the repo directly rather than some set of API libraries
 - External dependencies are the same for all projects.
+    - Only a small number of external dependencies
     - slf4j
     - support-core-utils (Android builds only)
 - There are no external dependencies for C++.

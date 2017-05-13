@@ -199,15 +199,16 @@ abstract class AbstractIntegrationTest extends Specification {
             !buildFile.text.contains('apply plugin')
         }
 
+        String getPackagePath() {
+            if (path == ':') {
+                return ''
+            } else {
+                return path.replace(':', '/')
+            }
+        }
+
         // TODO - add more checks
         void hasJavaSource() {
-            def packagePath
-            if (path == ':') {
-                packagePath = ''
-            } else {
-                packagePath = path.replace(':', '/')
-            }
-
             def srcDir = file("src/main/java/org/gradle/example/${packagePath}")
             assert srcDir.directory
             assert srcDir.list().findAll { it.endsWith(".java") }
@@ -244,11 +245,15 @@ abstract class AbstractIntegrationTest extends Specification {
         void isAndroidProject() {
             isProject()
             assert file("src/main/AndroidManifest.xml").file
+            hasJavaSource()
             assert file("src/main/res/values/strings.xml").file
             def layoutDir = file("src/main/res/layout")
             assert layoutDir.directory
             assert layoutDir.list().findAll { it.endsWith(".xml") }
-            hasJavaSource()
+
+            def testSrcDir = file("src/androidTest/java/org/gradle/example/${packagePath}")
+            assert testSrcDir.directory
+            assert testSrcDir.list().findAll { it.endsWith(".java") }
         }
 
         // TODO - add more checks

@@ -50,6 +50,7 @@ public class AndroidModelAssembler extends JvmModelAssembler {
             configBlock.property("targetSdkVersion", 25);
             configBlock.property("versionCode", 1);
             configBlock.property("versionName", "1.0");
+            configBlock.property("testInstrumentationRunner", "android.support.test.runner.AndroidJUnitRunner");
 
             addSourceFiles(project, androidApplication, appActivity, rClass);
             addTests(project, androidApplication);
@@ -80,6 +81,7 @@ public class AndroidModelAssembler extends JvmModelAssembler {
             configBlock.property("targetSdkVersion", 25);
             configBlock.property("versionCode", 1);
             configBlock.property("versionName", "1.0");
+            configBlock.property("testInstrumentationRunner", "android.support.test.runner.AndroidJUnitRunner");
 
             addSourceFiles(project, androidLibrary, libraryActivity, rClass);
             addTests(project, androidLibrary);
@@ -118,6 +120,14 @@ public class AndroidModelAssembler extends JvmModelAssembler {
             component.uses(library.getApi());
         }
         buildScript.dependsOnExternal("testCompile", "junit:junit:4.12");
+        buildScript.dependsOnExternal("androidTestCompile", "com.android.support:support-annotations:25.1.0");
+        buildScript.dependsOnExternal("androidTestCompile", "com.android.support.test:runner:0.5");
+    }
+
+    @Override
+    protected void addTests(Project project, HasJavaSource application) {
+        super.addTests(project, application);
+        application.addClass(javaPackageFor(project) + "." + classNameFor(project) + "InstrumentedTest").addRole(new InstrumentedTest());
     }
 
     private void addSourceFiles(Project project, AndroidComponent androidComponent, JavaClass activity, JavaClassApi rClass) {

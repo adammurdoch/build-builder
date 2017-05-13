@@ -19,6 +19,8 @@ public class JavaSourceGenerator extends ProjectComponentSpecificGenerator<HasJa
         for (JavaClass javaClass : component.getSourceFiles()) {
             if (javaClass.role(UnitTest.class) != null) {
                 generateUnitTest(project, javaClass);
+            } else if (javaClass.role(InstrumentedTest.class) != null) {
+                generateInstrumentedTest(project, javaClass);
             } else {
                 generateMainClass(project, javaClass);
             }
@@ -111,6 +113,27 @@ public class JavaSourceGenerator extends ProjectComponentSpecificGenerator<HasJa
             printWriter.println("    @org.junit.Test");
             printWriter.println("    public void ok() {");
             printWriter.println("        " + javaClass.role(UnitTest.class).getClassUnderTest().getName() + ".getSomeValue();");
+            printWriter.println("    }");
+            printWriter.println("}");
+            printWriter.println();
+        }
+    }
+
+    private void generateInstrumentedTest(Project project, JavaClass javaClass) throws IOException {
+        Path sourceFile = project.getProjectDir().resolve("src/androidTest/java/" + javaClass.getName().replace(".", "/") + ".java");
+        Files.createDirectories(sourceFile.getParent());
+        try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(sourceFile))) {
+            printWriter.println("// GENERATED SOURCE FILE");
+            printWriter.println("package " + javaClass.getPackage() + ";");
+            printWriter.println();
+            printWriter.println("import android.support.test.runner.AndroidJUnit4;");
+            printWriter.println("import org.junit.runner.RunWith;");
+            printWriter.println("import org.junit.Test;");
+            printWriter.println();
+            printWriter.println("@RunWith(AndroidJUnit4.class)");
+            printWriter.println("public class " + javaClass.getSimpleName() + " {");
+            printWriter.println("    @Test");
+            printWriter.println("    public void ok() {");
             printWriter.println("    }");
             printWriter.println("}");
             printWriter.println();
