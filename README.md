@@ -11,7 +11,9 @@ Supported build types:
 Generates one or more projects with source files. Can also be used to add source files to an existing skeleton build. 
 The source files have dependencies between each other, as described below.
 
-Generates JUnit tests for Java and Android projects.
+Generates JUnit tests for Java and Android projects, and on-device tests for Android projects.
+
+Can optionally generate a composite build.
 
 Can optionally generate a local HTTP repository and server.
 
@@ -80,6 +82,7 @@ Here's an example:
 - Android application 
     - Only a single Java project per layer.
     - Only a single instrumented test per project.
+    - No multi-dex, multi-apk splits, instant app
 - No annotation processors are used.
 - External HTTP repo
     - Has fixed size and structure, only a small number of libraries.
