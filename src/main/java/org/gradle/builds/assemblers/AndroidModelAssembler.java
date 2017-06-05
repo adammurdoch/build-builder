@@ -3,7 +3,7 @@ package org.gradle.builds.assemblers;
 import org.gradle.builds.model.*;
 
 public class AndroidModelAssembler extends JvmModelAssembler {
-    public static final String defaultVersion = "2.3.1";
+    public static final String defaultVersion = "2.3.2";
     private static final PublishedJvmLibrary supportUtils = new PublishedJavaLibrary(new ExternalDependencyDeclaration("com.android.support:support-core-utils:25.1.0"), JavaClassApi.field("android.support.v4.app.NavUtils", "PARENT_ACTIVITY"));
     private final String pluginVersion;
 
@@ -16,8 +16,12 @@ public class AndroidModelAssembler extends JvmModelAssembler {
         super.rootProject(rootProject);
         BuildScript buildScript = rootProject.getBuildScript();
         if (pluginVersion.startsWith("2.5.")) {
-            buildScript.useMavenLocalForBuildScriptClasspath();
+            buildScript.buildScriptBlock().mavenLocal();
         }
+        if (pluginVersion.startsWith("3.0.0")) {
+            buildScript.buildScriptBlock().google();
+        }
+        buildScript.buildScriptBlock().jcenter();
         buildScript.requireOnBuildScriptClasspath("com.android.tools.build:gradle:" + pluginVersion);
     }
 

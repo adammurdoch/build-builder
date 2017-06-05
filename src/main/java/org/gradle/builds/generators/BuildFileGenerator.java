@@ -21,12 +21,16 @@ public class BuildFileGenerator extends ProjectFileGenerator {
             if (!buildScript.getBuildScriptClasspath().isEmpty()) {
                 printWriter.println();
                 printWriter.println("buildscript {");
-                printWriter.println("    repositories {");
-                if (buildScript.isUseMavenLocalForBuildScriptClasspath()) {
-                    printWriter.println("        mavenLocal()");
+                if (buildScript.getBuildScriptBlock() != null) {
+                    if (!buildScript.getBuildScriptBlock().getRepositories().isEmpty()) {
+                        printWriter.println("    repositories {");
+                        for (ScriptBlock repoBlock : buildScript.getBuildScriptBlock().getRepositories()) {
+                            writeBlock(repoBlock, "        ", printWriter);
+                        }
+                        printWriter.println("    }");
+                    }
+                    writeBlockContents(buildScript.getBuildScriptBlock(), "    ", printWriter);
                 }
-                printWriter.println("        jcenter()");
-                printWriter.println("    }");
                 printWriter.println("    dependencies {");
                 for (ExternalDependencyDeclaration dep : buildScript.getBuildScriptClasspath()) {
                     printWriter.println("        classpath '" + dep.getGav() + "'");
@@ -98,6 +102,10 @@ public class BuildFileGenerator extends ProjectFileGenerator {
     }
 
     private void writeBlock(ScriptBlock block, String indent, PrintWriter printWriter) {
+        if (block.getBlocks().isEmpty() && block.getStatements().isEmpty()) {
+            printWriter.println(indent + block.getName() + "()");
+            return;
+        }
         printWriter.println(indent + block.getName() + " {");
         doWriteBlockContents(block, indent + "    ", printWriter, false);
         printWriter.println(indent + "}");

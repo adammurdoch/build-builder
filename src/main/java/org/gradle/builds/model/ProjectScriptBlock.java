@@ -14,6 +14,14 @@ public class ProjectScriptBlock extends Scope {
         repositories.add(new ScriptBlock("jcenter"));
     }
 
+    public void google() {
+        repositories.add(new ScriptBlock("google"));
+    }
+
+    public void mavenLocal() {
+        repositories.add(new ScriptBlock("mavenCentral"));
+    }
+
     public void maven(HttpRepository repo) {
         ScriptBlock block = new ScriptBlock("maven");
         block.property("url", repo.getUri().toString());

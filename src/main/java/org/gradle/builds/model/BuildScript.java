@@ -11,7 +11,7 @@ public class BuildScript extends ProjectScriptBlock {
     private final Set<SoftwareModelDeclaration> componentDeclarations = new LinkedHashSet<>();
     private final Map<String, Set<DependencyDeclaration>> dependencies = new LinkedHashMap<>();
     private ProjectScriptBlock allProjects;
-    private boolean mavenLocalForBuildScriptClasspath;
+    private ProjectScriptBlock buildscriptBlock;
 
     public ProjectScriptBlock getAllProjects() {
         return allProjects;
@@ -32,12 +32,15 @@ public class BuildScript extends ProjectScriptBlock {
         plugins.add(id);
     }
 
-    public void useMavenLocalForBuildScriptClasspath() {
-        mavenLocalForBuildScriptClasspath = true;
+    public ProjectScriptBlock getBuildScriptBlock() {
+        return buildscriptBlock;
     }
 
-    public boolean isUseMavenLocalForBuildScriptClasspath() {
-        return mavenLocalForBuildScriptClasspath;
+    public ProjectScriptBlock buildScriptBlock() {
+        if (buildscriptBlock == null) {
+            buildscriptBlock = new ProjectScriptBlock();
+        }
+        return buildscriptBlock;
     }
 
     public Set<ExternalDependencyDeclaration> getBuildScriptClasspath() {
