@@ -49,28 +49,36 @@ public class CppSourceGenerator extends ProjectComponentSpecificGenerator<HasNat
             }
         }
 
-        for (CppHeaderFile cppHeader : component.getHeaderFiles()) {
+        for (CppHeaderFile cppHeader : component.getPublicHeaderFiles()) {
+            Path sourceFile = project.getProjectDir().resolve("src/main/public/" + cppHeader.getName());
+            writeHeader(cppHeader, sourceFile);
+        }
+        for (CppHeaderFile cppHeader : component.getImplementationHeaderFiles()) {
             Path sourceFile = project.getProjectDir().resolve("src/main/headers/" + cppHeader.getName());
-            Files.createDirectories(sourceFile.getParent());
-            try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(sourceFile))) {
-                String macro = "_" + cppHeader.getName().replace(".", "_").toUpperCase() + "_";
-                printWriter.println("// GENERATED SOURCE FILE");
-                printWriter.println("#ifndef " + macro);
-                printWriter.println("#define " + macro);
-                for (CppHeaderFile headerFile : cppHeader.getHeaderFiles()) {
-                    printWriter.println("#include \"" + headerFile.getName() + "\"");
-                }
-                for (CppClass cppClass : cppHeader.getClasses()) {
-                    printWriter.println();
-                    printWriter.println("class " + cppClass.getName() + " {");
-                    printWriter.println("  public:");
-                    printWriter.println("    void doSomething();");
-                    printWriter.println("};");
-                }
-                printWriter.println();
-                printWriter.println("#endif");
-                printWriter.println();
+            writeHeader(cppHeader, sourceFile);
+        }
+    }
+
+    private void writeHeader(CppHeaderFile cppHeader, Path sourceFile) throws IOException {
+        Files.createDirectories(sourceFile.getParent());
+        try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(sourceFile))) {
+            String macro = "_" + cppHeader.getName().replace(".", "_").toUpperCase() + "_";
+            printWriter.println("// GENERATED SOURCE FILE");
+            printWriter.println("#ifndef " + macro);
+            printWriter.println("#define " + macro);
+            for (CppHeaderFile headerFile : cppHeader.getHeaderFiles()) {
+                printWriter.println("#include \"" + headerFile.getName() + "\"");
             }
+            for (CppClass cppClass : cppHeader.getClasses()) {
+                printWriter.println();
+                printWriter.println("class " + cppClass.getName() + " {");
+                printWriter.println("  public:");
+                printWriter.println("    void doSomething();");
+                printWriter.println("};");
+            }
+            printWriter.println();
+            printWriter.println("#endif");
+            printWriter.println();
         }
     }
 }

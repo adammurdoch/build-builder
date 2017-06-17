@@ -13,6 +13,7 @@ abstract class AbstractIntegrationTest extends Specification {
     static File rootTmpDir
     File projectDir
     File userHomeDir
+    String gradleVersion = "3.5"
     BuildLayout build
 
     static File getRootTempDir() {
@@ -65,6 +66,7 @@ abstract class AbstractIntegrationTest extends Specification {
         }
 
         CommandHandle start() {
+            assert binFile.isFile()
             return owner.start(this)
         }
 
@@ -78,7 +80,7 @@ abstract class AbstractIntegrationTest extends Specification {
         }
 
         void succeeds() {
-            owner.start(this).waitFor()
+            start().waitFor()
         }
     }
 
@@ -150,7 +152,7 @@ abstract class AbstractIntegrationTest extends Specification {
                 @Override
                 void run() {
                     def buffer = new byte[1024]
-                    while(true) {
+                    while (true) {
                         int nread = process.inputStream.read(buffer)
                         if (nread < 0) {
                             break;
@@ -165,7 +167,7 @@ abstract class AbstractIntegrationTest extends Specification {
 
         void buildSucceeds(String... tasks) {
             def gradleRunner = GradleRunner.create()
-            gradleRunner.withGradleVersion("3.5")
+            gradleRunner.withGradleVersion(gradleVersion)
             gradleRunner.withTestKitDir(userHomeDir ?: new File(rootTempDir, "testkit"))
             gradleRunner.withProjectDir(rootDir)
             gradleRunner.withArguments(["-S"] + (tasks as List))

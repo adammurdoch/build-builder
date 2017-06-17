@@ -3,6 +3,10 @@ package org.gradle.builds
 import spock.lang.Unroll
 
 class CppBuildIntegrationTest extends AbstractIntegrationTest {
+    def setup() {
+        gradleVersion = "4.1-20170607235835+0000"
+    }
+
     def "can generate single project build"() {
         when:
         new Main().run("cpp", "--dir", projectDir.absolutePath)
@@ -17,7 +21,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         new File(srcDir, "app_impl1_1.cpp").text.contains("AppNoDeps1")
 
         build.buildSucceeds(":installMain")
-        build.app("build/install/main/testApp").succeeds()
+        build.app("build/install/testApp/testApp").succeeds()
 
         build.buildSucceeds("build")
     }
@@ -32,7 +36,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":").isCppProject()
 
         build.buildSucceeds(":installMain")
-        build.app("build/install/main/testApp").succeeds()
+        build.app("build/install/testApp/testApp").succeeds()
 
         build.buildSucceeds("build")
 
@@ -53,11 +57,12 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         new File(srcDir, "app_impl1_1.cpp").text.contains("Core1")
 
         build.project(":core1").isCppProject()
-        build.project(":core1").file("src/main/headers").list() as Set == ["core1.h", "core1_impl.h"] as Set
+        build.project(":core1").file("src/main/public").list() as Set == ["core1.h"] as Set
+        build.project(":core1").file("src/main/headers").list() as Set == ["core1_impl.h"] as Set
         build.project(":core1").file("src/main/cpp").list() as Set == ["core1.cpp", "core1_impl1_1.cpp", "core1_nodeps1.cpp"] as Set
 
         build.buildSucceeds(":installMain")
-        build.app("build/install/main/testApp").succeeds()
+        build.app("build/install/testApp/testApp").succeeds()
 
         build.buildSucceeds("build")
     }
@@ -74,15 +79,17 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":").file("src/main/cpp").list() as Set == ["app.cpp", "app_impl1_1.cpp", "app_nodeps1.cpp"] as Set
 
         build.project(":lib1_1").isCppProject()
-        build.project(":lib1_1").file("src/main/headers").list() as Set == ["lib1_1.h", "lib1_1_impl.h"] as Set
+        build.project(":lib1_1").file("src/main/public").list() as Set == ["lib1_1.h"] as Set
+        build.project(":lib1_1").file("src/main/headers").list() as Set == ["lib1_1_impl.h"] as Set
         build.project(":lib1_1").file("src/main/cpp").list() as Set == ["lib1_1.cpp", "lib1_1_impl1_1.cpp", "lib1_1_nodeps1.cpp"] as Set
 
         build.project(":core1").isCppProject()
-        build.project(":core1").file("src/main/headers").list() as Set == ["core1.h", "core1_impl.h"] as Set
+        build.project(":core1").file("src/main/public").list() as Set == ["core1.h"] as Set
+        build.project(":core1").file("src/main/headers").list() as Set == ["core1_impl.h"] as Set
         build.project(":core1").file("src/main/cpp").list() as Set == ["core1.cpp", "core1_impl1_1.cpp", "core1_nodeps1.cpp"] as Set
 
         build.buildSucceeds(":installMain")
-        build.app("build/install/main/testApp").succeeds()
+        build.app("build/install/testApp/testApp").succeeds()
 
         build.buildSucceeds("build")
 
@@ -103,7 +110,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":core1").isCppProject()
 
         build.buildSucceeds(":installMain")
-        build.app("build/install/main/testApp").succeeds()
+        build.app("build/install/testApp/testApp").succeeds()
 
         build.buildSucceeds("build")
 
