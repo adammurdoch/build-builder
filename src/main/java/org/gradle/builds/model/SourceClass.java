@@ -3,9 +3,14 @@ package org.gradle.builds.model;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public abstract class SourceClass<T> {
+/**
+ * Some source class that references other classes.
+ *
+ * @param <REF> The type of classes referenced by this class.
+ */
+public abstract class SourceClass<REF> {
     private final String name;
-    private final Set<T> referencedClasses = new LinkedHashSet<>();
+    private final Set<REF> referencedClasses = new LinkedHashSet<>();
 
     protected SourceClass(String name) {
         this.name = name;
@@ -15,11 +20,11 @@ public abstract class SourceClass<T> {
         return name;
     }
 
-    public Set<T> getReferencedClasses() {
+    public Set<REF> getReferencedClasses() {
         return referencedClasses;
     }
 
-    public void uses(T refClass) {
+    public void uses(REF refClass) {
         referencedClasses.add(refClass);
     }
 

@@ -48,7 +48,7 @@ public class CppModelAssembler extends AbstractModelAssembler {
         }
     }
 
-    private void addSource(Project project, HasNativeSource component, CppClass apiClass, CppSourceFile apiSourceFile, CppHeaderFile implHeader) {
+    private void addSource(Project project, HasCppSource component, CppClass apiClass, CppSourceFile apiSourceFile, CppHeaderFile implHeader) {
         int implLayer = Math.max(0, project.getClassGraph().getLayers().size() - 2);
         project.getClassGraph().visit((Graph.Visitor<CppClass>) (nodeDetails, dependencies) -> {
             CppClass cppClass;

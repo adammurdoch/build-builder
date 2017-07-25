@@ -164,6 +164,7 @@ public class Main {
                             new JavaSourceGenerator(),
                             new JavaResourceGenerator(),
                             new CppSourceGenerator(),
+                            new SwiftSourceGenerator(),
                             new HttpServerMainGenerator(),
                             new ScenarioFileGenerator()));
         }

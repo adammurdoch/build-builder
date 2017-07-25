@@ -1,4 +1,4 @@
 package org.gradle.builds.model;
 
-public class CppApplication extends HasNativeSource {
+public class CppApplication extends HasCppSource {
 }

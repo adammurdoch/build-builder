@@ -11,14 +11,14 @@ class SwiftBuildIntegrationTest extends AbstractIntegrationTest {
 
         then:
         build.isBuild()
-//        build.project(":").isSwiftProject()
-//        def srcDir = build.project(":").file("src/main/swift")
+        build.project(":").isSwiftProject()
+        def srcDir = build.project(":").file("src/main/swift")
 //        srcDir.list() as Set == ["main.swift", "app_impl1_1.swift", "app_nodeps1.swift"] as Set
 //        new File(srcDir, "main.swift").text.contains("AppImpl1_1")
 //        new File(srcDir, "app_impl1_1.swift").text.contains("AppNoDeps1")
 
-//        build.buildSucceeds(":installMain")
-//        build.app("build/install/testApp/testApp").succeeds()
+        build.buildSucceeds(":installMain")
+        build.app("build/install/testApp/testApp").succeeds()
 
         build.buildSucceeds("build")
     }

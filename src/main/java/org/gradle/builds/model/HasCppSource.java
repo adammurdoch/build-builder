@@ -3,10 +3,9 @@ package org.gradle.builds.model;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class HasNativeSource implements Component {
+public class HasCppSource extends HasSource<CppSourceFile> {
     private final Set<CppHeaderFile> implHeaders = new LinkedHashSet<>();
     private final Set<CppHeaderFile> publicHeaders = new LinkedHashSet<>();
-    private final Set<CppSourceFile> sourceFiles = new LinkedHashSet<>();
 
     public Set<CppHeaderFile> getPublicHeaderFiles() {
         return publicHeaders;
@@ -28,13 +27,9 @@ public class HasNativeSource implements Component {
         return headerFile;
     }
 
-    public Set<CppSourceFile> getSourceFiles() {
-        return sourceFiles;
-    }
-
     public CppSourceFile addSourceFile(String name) {
         CppSourceFile sourceFile = new CppSourceFile(name);
-        sourceFiles.add(sourceFile);
+        addSourceFile(sourceFile);
         return sourceFile;
     }
 }

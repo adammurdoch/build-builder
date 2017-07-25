@@ -1,4 +1,4 @@
 package org.gradle.builds.model;
 
-public class SwiftLibrary implements Component {
+public class SwiftLibrary extends HasSwiftSource {
 }
