@@ -5,32 +5,28 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class JavaClass {
-    private final String name;
-    private final Set<JavaClassApi> references = new LinkedHashSet<>();
+public class JavaClass extends SourceClass<JavaClassApi> {
     private final Set<String> fieldReferences = new LinkedHashSet<>();
     private final Set<ClassRole> roles = new HashSet<>();
 
     public JavaClass(String name) {
-        this.name = name;
+        super(name);
     }
 
     public String getPackage() {
+        String name = getName();
         int pos = name.lastIndexOf(".");
         return name.substring(0, pos);
     }
 
     public String getSimpleName() {
+        String name = getName();
         int pos = name.lastIndexOf(".");
         return name.substring(pos+1);
     }
 
-    public String getName() {
-        return name;
-    }
-
     public JavaClassApi getApi() {
-        return new JavaClassApi(name, Collections.singleton("getSomeValue()"), Collections.singleton("INT_CONST"));
+        return new JavaClassApi(getName(), Collections.singleton("getSomeValue()"), Collections.singleton("INT_CONST"));
     }
 
     public void uses(JavaClass javaClass) {
@@ -41,10 +37,6 @@ public class JavaClass {
         for (JavaClassApi javaClass : javaClasses) {
             uses(javaClass);
         }
-    }
-
-    public void uses(JavaClassApi javaClass) {
-        references.add(javaClass);
     }
 
     public <T extends ClassRole> T role(Class<T> type) {
@@ -62,7 +54,7 @@ public class JavaClass {
 
     public Set<String> getMethodReferences() {
         Set<String> methodReferences = new LinkedHashSet<>();
-        for (JavaClassApi javaClass : references) {
+        for (JavaClassApi javaClass : getReferencedClasses()) {
             for (String methodName : javaClass.getMethods()) {
                 methodReferences.add(javaClass.getName() + "." + methodName);
             }
@@ -72,7 +64,7 @@ public class JavaClass {
 
     public Set<String> getFieldReferences() {
         Set<String> fieldReferences = new LinkedHashSet<>();
-        for (JavaClassApi javaClass : references) {
+        for (JavaClassApi javaClass : getReferencedClasses()) {
             for (String fieldName : javaClass.getFields()) {
                 fieldReferences.add(javaClass.getName() + "." + fieldName);
             }

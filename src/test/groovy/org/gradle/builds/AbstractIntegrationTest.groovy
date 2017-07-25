@@ -284,6 +284,15 @@ abstract class AbstractIntegrationTest extends Specification {
             assert headerDir.list().findAll { it.endsWith(".h") }
         }
 
+        // TODO - add more checks
+        void isSwiftProject() {
+            isProject()
+
+            def srcDir = file("src/main/swift")
+            assert srcDir.directory
+            assert srcDir.list().findAll { it.endsWith(".swift") }
+        }
+
         private File getBuildFile() {
             return file("build.gradle")
         }

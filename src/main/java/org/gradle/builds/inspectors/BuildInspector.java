@@ -73,10 +73,10 @@ public class BuildInspector {
                     project.addComponent(new JavaApplication());
                     break;
                 case "cpp-library":
-                    project.addComponent(new NativeLibrary());
+                    project.addComponent(new CppLibrary());
                     break;
                 case "cpp-application":
-                    project.addComponent(new NativeApplication());
+                    project.addComponent(new CppApplication());
                     break;
                 case "empty":
                     break;

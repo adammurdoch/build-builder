@@ -1,6 +1,6 @@
 package org.gradle.builds.model;
 
-public class NativeLibrary extends HasNativeSource {
+public class CppLibrary extends HasNativeSource {
     private CppClass apiClass;
     private CppHeaderFile apiHeader;
 

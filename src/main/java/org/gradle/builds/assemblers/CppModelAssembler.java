@@ -5,8 +5,8 @@ import org.gradle.builds.model.*;
 public class CppModelAssembler extends AbstractModelAssembler {
     @Override
     protected void populate(Settings settings, Project project) {
-        if (project.component(NativeLibrary.class) != null) {
-            NativeLibrary lib = project.component(NativeLibrary.class);
+        if (project.component(CppLibrary.class) != null) {
+            CppLibrary lib = project.component(CppLibrary.class);
 
             CppClass apiClass = new CppClass(classNameFor(project));
             lib.setApiClass(apiClass);
@@ -27,8 +27,8 @@ public class CppModelAssembler extends AbstractModelAssembler {
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("cpp-library");
             addDependencies(project, buildScript);
-        } else if (project.component(NativeApplication.class) != null) {
-            NativeApplication app = project.component(NativeApplication.class);
+        } else if (project.component(CppApplication.class) != null) {
+            CppApplication app = project.component(CppApplication.class);
 
             CppClass appClass = new CppClass(classNameFor(project));
 
@@ -84,13 +84,13 @@ public class CppModelAssembler extends AbstractModelAssembler {
 
     private void addLibHeaders(Project project, CppSourceFile sourceFile) {
         for (Project dep : project.getDependencies()) {
-            sourceFile.addHeader(dep.component(NativeLibrary.class).getApiHeader());
+            sourceFile.addHeader(dep.component(CppLibrary.class).getApiHeader());
         }
     }
 
     private void addReferences(Project project, CppClass cppClass) {
         for (Project dep : project.getDependencies()) {
-            cppClass.uses(dep.component(NativeLibrary.class).getApiClass());
+            cppClass.uses(dep.component(CppLibrary.class).getApiClass());
         }
     }
 

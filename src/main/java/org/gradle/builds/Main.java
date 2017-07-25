@@ -33,6 +33,7 @@ public class Main {
         cliBuilder.withCommand(InitJavaBuild.class);
         cliBuilder.withCommand(InitCppBuild.class);
         cliBuilder.withCommand(InitAndroidBuild.class);
+        cliBuilder.withCommand(InitSwiftBuild.class);
         cliBuilder.withCommand(AddSource.class);
         cliBuilder.withCommand(Help.class);
         cliBuilder.withDefaultCommand(Help.class);
@@ -256,6 +257,24 @@ public class Main {
         @Override
         protected ModelAssembler createModelAssembler() {
             return new CppModelAssembler();
+        }
+    }
+
+    @Command(name = "swift", description = "Generates a Swift build with source files")
+    public static class InitSwiftBuild extends InitBuild {
+        @Override
+        protected String getType() {
+            return "Swift";
+        }
+
+        @Override
+        protected ProjectInitializer createProjectInitializer() {
+            return new SwiftBuildProjectInitializer();
+        }
+
+        @Override
+        protected ModelAssembler createModelAssembler() {
+            return new SwiftModelAssembler();
         }
     }
 
