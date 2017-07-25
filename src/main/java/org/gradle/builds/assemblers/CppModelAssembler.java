@@ -48,7 +48,7 @@ public class CppModelAssembler extends AbstractModelAssembler {
         }
     }
 
-    private void addSource(Project project, HasCppSource component, CppClass apiClass, CppSourceFile apiSourceFile, CppHeaderFile implHeader) {
+    private void addSource(Project project, HasCppSource component, CppClass entryPoint, CppSourceFile entryPointSourceFile, CppHeaderFile implHeader) {
         int implLayer = Math.max(0, project.getClassGraph().getLayers().size() - 2);
         project.getClassGraph().visit((Graph.Visitor<CppClass>) (nodeDetails, dependencies) -> {
             CppClass cppClass;
@@ -56,8 +56,8 @@ public class CppModelAssembler extends AbstractModelAssembler {
             int layer = nodeDetails.getLayer();
             int item = nodeDetails.getItem();
             if (layer == 0) {
-                cppClass = apiClass;
-                cppSourceFile = apiSourceFile;
+                cppClass = entryPoint;
+                cppSourceFile = entryPointSourceFile;
             } else {
                 String name;
                 if (nodeDetails.isLastLayer()) {
@@ -65,7 +65,7 @@ public class CppModelAssembler extends AbstractModelAssembler {
                 } else {
                     name = "Impl" + (layer) + "_" + (item + 1);
                 }
-                cppClass = new CppClass(apiClass.getName() + name);
+                cppClass = new CppClass(entryPoint.getName() + name);
                 implHeader.addClass(cppClass);
                 cppSourceFile = component.addSourceFile(fileNameFor(project) + "_" + name.toLowerCase() + ".cpp");
                 cppSourceFile.addClass(cppClass);
