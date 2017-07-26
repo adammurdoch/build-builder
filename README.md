@@ -7,6 +7,7 @@ Supported build types:
 - Java application
 - Android application
 - C++ application
+- Swift application
 
 Generates one or more projects with source files. Can also be used to add source files to an existing skeleton build. 
 The source files have dependencies between each other, as described below.
@@ -23,7 +24,7 @@ Generates a [gradle-profiler](https://www.github.com/gradle/gradle-profiler) sce
 
 #### Create a build
 
-`build-builder java|cpp|android [options]`
+`build-builder java|cpp|swift|android [options]`
 
 The `--dir` option specifies the directory to create the build init. Default is the current directory.
 
@@ -31,13 +32,13 @@ The `--projects` option specifies the number of projects. Default is 1.
 
 The `--source-files` option specifies the number of source files per project. Default is 3.
 
-The `--builds` option specifies the number of builds to generate. Set to greater than 1 to generate a composite build. Default is 1.
+The `--builds` option specifies the number of builds to generate. Set to greater than 1 to generate a composite build. Default is 1. Only available for Java builds.
 
 The `--java` option includes some Java libraries in an Android build. Default is false. 
 
 The `--version` option specifies the Android plugin version to use. Default is 2.3.1.
 
-The `--http-repo` option generates an additional build that produces an HTTP repository that provides external libraries. This repository and its classes are referenced by the generated build. Use `gradle -p repo run` to build and start the HTTP server and libraries.
+The `--http-repo` option generates an additional build that produces an HTTP repository that provides external libraries. This repository and its classes are referenced by the generated build. Use `gradle -p repo run` to build and start the HTTP server and libraries. Only available for Java and Android builds.
 
 #### Add source files to an existing build
 
@@ -86,18 +87,18 @@ Here's an example:
 - No annotation processors are used.
 - External HTTP repo
     - Has fixed size and structure, only a small number of libraries.
-    - Not available for C++.
+    - Not available for C++ or Swift
     - Dependencies used by 'impl' class only, and this project uses all libraries from the repo directly rather than some set of API libraries
 - Composite builds
     - Doesn't generate a library project with `--projects 1` (the default)
-    - Not available for C++ or Android
+    - Not available for C++, Swift or Android
     - Dependencies used by 'impl' class only, and this project uses all libraries from the repo directly rather than some set of API libraries
 - External dependencies are the same for all projects.
     - Only a small number of external dependencies
     - slf4j
     - support-core-utils (Android builds only)
-- There are no external dependencies for C++.
-- There are no tests for C++
+- There are no external dependencies for C++ or Swift
+- There are no tests for C++ or Swift
 - Only a basic dependency graph is available, between projects and between source files and external libraries
     - Arranged in layers 
     - Only one layer of a project references classes from other projects
@@ -106,6 +107,7 @@ Here's an example:
 - There are no type hierarchies.
 - No Java 8 source for Android or Java builds.
 - Only a single Java resource is generated for each project.
+- Implementation classes are public.
 
 #### Adding source to an existing build
 
