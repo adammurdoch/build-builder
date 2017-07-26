@@ -2,6 +2,7 @@ package org.gradle.builds.model;
 
 public class SwiftLibrary extends HasSwiftSource {
     private SwiftClass apiClass;
+    private String module;
 
     public void setApiClass(SwiftClass apiClass) {
         this.apiClass = apiClass;
@@ -9,5 +10,13 @@ public class SwiftLibrary extends HasSwiftSource {
 
     public SwiftClass getApiClass() {
         return apiClass;
+    }
+
+    public void setModule(String module) {
+        this.module = module;
+    }
+
+    public String getModule() {
+        return module;
     }
 }

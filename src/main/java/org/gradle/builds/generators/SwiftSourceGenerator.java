@@ -22,14 +22,18 @@ public class SwiftSourceGenerator extends ProjectComponentSpecificGenerator<HasS
             Files.createDirectories(sourceFile.getParent());
             try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(sourceFile))) {
                 printWriter.println("// GENERATED SOURCE FILE");
+                printWriter.println();
                 if (swiftSource.hasMainFunction()) {
-                    printWriter.println();
                     printWriter.println("import Foundation");
+                }
+                for (String module : swiftSource.getModules()) {
+                    printWriter.println("import " + module);
                 }
                 for (SwiftClass swiftClass : swiftSource.getClasses()) {
                     printWriter.println();
-                    printWriter.println("class " + swiftClass.getName() + " {");
-                    printWriter.println("    func doSomething() {");
+                    printWriter.println("public class " + swiftClass.getName() + " {");
+                    printWriter.println("    public init() { }");
+                    printWriter.println("    public func doSomething() {");
                     for (SwiftClass dep : swiftClass.getReferencedClasses()) {
                         String varName = dep.getName().toLowerCase();
                         printWriter.println("        let " + varName + " = " + dep.getName() + "()");

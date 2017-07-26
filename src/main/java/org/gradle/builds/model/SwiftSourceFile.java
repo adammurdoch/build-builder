@@ -4,10 +4,19 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class SwiftSourceFile extends SourceFile<SwiftClass> {
-    private Set<SwiftClass> mainClasses = new LinkedHashSet<>();
+    private final Set<String> modules = new LinkedHashSet<>();
+    private final Set<SwiftClass> mainClasses = new LinkedHashSet<>();
 
     public SwiftSourceFile(String name) {
         super(name);
+    }
+
+    public Set<String> getModules() {
+        return modules;
+    }
+
+    public void addModule(String module) {
+        this.modules.add(module);
     }
 
     public boolean hasMainFunction() {

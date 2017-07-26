@@ -22,4 +22,25 @@ class SwiftBuildIntegrationTest extends AbstractIntegrationTest {
 
         build.buildSucceeds("build")
     }
+
+    def "can generate 2 project build"() {
+        when:
+        new Main().run("swift", "--dir", projectDir.absolutePath, "--projects", "2")
+
+        then:
+        build.isBuild()
+        build.project(":").isSwiftProject()
+        def srcDir = build.project(":").file("src/main/swift")
+        srcDir.list() as Set == ["main.swift", "app_impl1_1.swift", "app_nodeps1.swift"] as Set
+        new File(srcDir, "app_impl1_1.swift").text.contains("Core1")
+
+        build.project(":core1").isSwiftProject()
+        build.project(":core1").file("src/main/swift").list() as Set == ["core1.swift", "core1_impl1_1.swift", "core1_nodeps1.swift"] as Set
+
+        build.buildSucceeds(":installMain")
+        build.app("build/install/testApp/testApp").succeeds()
+
+        build.buildSucceeds("build")
+    }
+
 }
