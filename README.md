@@ -22,6 +22,10 @@ Generates a [gradle-profiler](https://www.github.com/gradle/gradle-profiler) sce
 
 ### Command line usage
 
+#### Installation
+
+Run `./gradlew installDist` to build and install into `build/install/build-builder`.
+
 #### Create a build
 
 `build-builder java|cpp|swift|android [options]`
