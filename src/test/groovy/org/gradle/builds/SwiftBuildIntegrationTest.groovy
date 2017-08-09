@@ -2,7 +2,7 @@ package org.gradle.builds
 
 class SwiftBuildIntegrationTest extends AbstractIntegrationTest {
     def setup() {
-        gradleVersion = "4.1-rc-1"
+        gradleVersion = "4.2-20170807012333+0000"
     }
 
     def "can generate single project build"() {
@@ -43,4 +43,23 @@ class SwiftBuildIntegrationTest extends AbstractIntegrationTest {
         build.buildSucceeds("build")
     }
 
+    def "can generate using Swift PM layout"() {
+        when:
+        new Main().run("swift", "--dir", projectDir.absolutePath, "--projects", "2", "--swift-pm")
+
+        then:
+        build.isBuild()
+        build.project(":").isSwiftPMProject()
+        def srcDir = build.project(":").file("Sources")
+        srcDir.list() as Set == ["main.swift", "app_impl1_1.swift", "app_nodeps1.swift"] as Set
+        new File(srcDir, "app_impl1_1.swift").text.contains("Core1")
+
+        build.project(":core1").isSwiftPMProject()
+        build.project(":core1").file("Sources").list() as Set == ["core1.swift", "core1_impl1_1.swift", "core1_nodeps1.swift"] as Set
+
+        build.buildSucceeds(":installMain")
+        build.app("build/install/testApp/testApp").succeeds()
+
+        build.buildSucceeds("build")
+    }
 }

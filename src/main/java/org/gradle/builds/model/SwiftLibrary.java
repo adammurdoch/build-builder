@@ -4,6 +4,10 @@ public class SwiftLibrary extends HasSwiftSource {
     private SwiftClass apiClass;
     private String module;
 
+    public SwiftLibrary(boolean swiftPm) {
+        super(swiftPm);
+    }
+
     public void setApiClass(SwiftClass apiClass) {
         this.apiClass = apiClass;
     }

@@ -6,8 +6,8 @@ Supported build types:
 
 - Java application
 - Android application
-- C++ application
-- Swift application
+- C++ application (Gradle 4.1 and later)
+- Swift application (Gradle 4.2 and later)
 
 Generates one or more projects with source files. Can also be used to add source files to an existing skeleton build. 
 The source files have dependencies between each other, as described below.
@@ -36,13 +36,21 @@ The `--projects` option specifies the number of projects. Default is 1.
 
 The `--source-files` option specifies the number of source files per project. Default is 3.
 
+The `--http-repo` option generates an additional build that produces an HTTP repository that provides external libraries. This repository and its classes are referenced by the generated build. Use `gradle -p repo run` to build and start the HTTP server and libraries. Only available for Java and Android builds.
+
+##### Java specific options
+
 The `--builds` option specifies the number of builds to generate. Set to greater than 1 to generate a composite build. Default is 1. Only available for Java builds.
+
+### Android specific options
 
 The `--java` option includes some Java libraries in an Android build. Default is false. 
 
 The `--version` option specifies the Android plugin version to use. Default is 2.3.1.
 
-The `--http-repo` option generates an additional build that produces an HTTP repository that provides external libraries. This repository and its classes are referenced by the generated build. Use `gradle -p repo run` to build and start the HTTP server and libraries. Only available for Java and Android builds.
+### Swift specific options
+
+The `--swift-pm` option uses Swift package manager source conventions, and also generates a Swift PM build file.
 
 #### Add source files to an existing build
 

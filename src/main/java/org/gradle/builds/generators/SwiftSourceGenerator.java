@@ -17,8 +17,9 @@ public class SwiftSourceGenerator extends ProjectComponentSpecificGenerator<HasS
 
     @Override
     protected void generate(Project project, HasSwiftSource component) throws IOException {
+        String srcDir = component.isSwiftPm() ? "Sources/" : "src/main/swift/";
         for (SwiftSourceFile swiftSource : component.getSourceFiles()) {
-            Path sourceFile = project.getProjectDir().resolve("src/main/swift/" + swiftSource.getName());
+            Path sourceFile = project.getProjectDir().resolve(srcDir + swiftSource.getName());
             Files.createDirectories(sourceFile.getParent());
             try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(sourceFile))) {
                 printWriter.println("// GENERATED SOURCE FILE");

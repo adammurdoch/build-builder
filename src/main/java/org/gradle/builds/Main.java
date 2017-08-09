@@ -164,6 +164,7 @@ public class Main {
                             new JavaSourceGenerator(),
                             new JavaResourceGenerator(),
                             new CppSourceGenerator(),
+                            new SwiftPackageManagerManifestGenerator(),
                             new SwiftSourceGenerator(),
                             new HttpServerMainGenerator(),
                             new ScenarioFileGenerator()));
@@ -263,6 +264,9 @@ public class Main {
 
     @Command(name = "swift", description = "Generates a Swift build with source files")
     public static class InitSwiftBuild extends InitBuild {
+        @Option(name = "--swift-pm", description = "Use the Swift package manager source layout (default: false)")
+        boolean swiftPm = false;
+
         @Override
         protected String getType() {
             return "Swift";
@@ -270,7 +274,7 @@ public class Main {
 
         @Override
         protected ProjectInitializer createProjectInitializer() {
-            return new SwiftBuildProjectInitializer();
+            return new SwiftBuildProjectInitializer(swiftPm);
         }
 
         @Override
