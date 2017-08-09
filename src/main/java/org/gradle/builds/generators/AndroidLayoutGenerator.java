@@ -1,9 +1,6 @@
 package org.gradle.builds.generators;
 
-import org.gradle.builds.model.AndroidComponent;
-import org.gradle.builds.model.AndroidLibraryApi;
-import org.gradle.builds.model.JvmLibraryApi;
-import org.gradle.builds.model.Project;
+import org.gradle.builds.model.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -16,7 +13,7 @@ public class AndroidLayoutGenerator extends ProjectComponentSpecificGenerator<An
     }
 
     @Override
-    protected void generate(Project project, AndroidComponent component) throws IOException {
+    protected void generate(Build build, Project project, AndroidComponent component) throws IOException {
         Path layoutXml = project.getProjectDir().resolve("src/main/res/layout/" + project.getName().toLowerCase() + "_layout.xml");
         Files.createDirectories(layoutXml.getParent());
         try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(layoutXml))) {

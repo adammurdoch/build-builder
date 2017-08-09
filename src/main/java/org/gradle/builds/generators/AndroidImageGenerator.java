@@ -1,6 +1,7 @@
 package org.gradle.builds.generators;
 
 import org.gradle.builds.model.AndroidApplication;
+import org.gradle.builds.model.Build;
 import org.gradle.builds.model.Project;
 
 import java.io.IOException;
@@ -15,7 +16,7 @@ public class AndroidImageGenerator extends ProjectComponentSpecificGenerator<And
     }
 
     @Override
-    protected void generate(Project project, AndroidApplication component) throws IOException {
+    protected void generate(Build build, Project project, AndroidApplication component) throws IOException {
         Path outFile = project.getProjectDir().resolve("src/main/res/mipmap-hdpi/ic_launcher.png");
         Files.createDirectories(outFile.getParent());
         try (InputStream imageContent = getClass().getClassLoader().getResourceAsStream("ic_launcher.png")) {

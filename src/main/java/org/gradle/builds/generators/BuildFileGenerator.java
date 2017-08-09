@@ -11,7 +11,7 @@ import java.util.Set;
 
 public class BuildFileGenerator extends ProjectFileGenerator {
     @Override
-    protected void generate(Project project) throws IOException {
+    protected void generate(Build build, Project project) throws IOException {
         Path buildFile = project.getProjectDir().resolve("build.gradle");
         Files.createDirectories(buildFile.getParent());
 

@@ -1,9 +1,6 @@
 package org.gradle.builds.generators;
 
-import org.gradle.builds.model.HasSwiftSource;
-import org.gradle.builds.model.Project;
-import org.gradle.builds.model.SwiftClass;
-import org.gradle.builds.model.SwiftSourceFile;
+import org.gradle.builds.model.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -16,10 +13,10 @@ public class SwiftSourceGenerator extends ProjectComponentSpecificGenerator<HasS
     }
 
     @Override
-    protected void generate(Project project, HasSwiftSource component) throws IOException {
-        String srcDir = component.isSwiftPm() ? "Sources/" : "src/main/swift/";
+    protected void generate(Build build, Project project, HasSwiftSource component) throws IOException {
+        Path srcDir = component.isSwiftPm() ? build.getRootDir().resolve("Sources/" + project.getName()) : project.getProjectDir().resolve("src/main/swift/");
         for (SwiftSourceFile swiftSource : component.getSourceFiles()) {
-            Path sourceFile = project.getProjectDir().resolve(srcDir + swiftSource.getName());
+            Path sourceFile = srcDir.resolve(swiftSource.getName());
             Files.createDirectories(sourceFile.getParent());
             try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(sourceFile))) {
                 printWriter.println("// GENERATED SOURCE FILE");

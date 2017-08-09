@@ -128,9 +128,9 @@ abstract class AbstractIntegrationTest extends Specification {
 
         ProjectLayout project(String path) {
             if (path == ':') {
-                return new ProjectLayout(path, this.rootDir)
+                return new ProjectLayout(path, rootDir, rootDir)
             } else {
-                return new ProjectLayout(path, new File(rootDir, path.replace(':', '/')))
+                return new ProjectLayout(path, new File(rootDir, path.replace(':', '/')), rootDir)
             }
         }
 
@@ -179,10 +179,12 @@ abstract class AbstractIntegrationTest extends Specification {
     static class ProjectLayout {
         final String path
         final File projectDir
+        final File rootDir
 
-        ProjectLayout(String path, File projectDir) {
+        ProjectLayout(String path, File projectDir, File rootDir) {
             this.path = path
             this.projectDir = projectDir
+            this.rootDir = rootDir
         }
 
         File file(String path) {
@@ -297,9 +299,7 @@ abstract class AbstractIntegrationTest extends Specification {
         void isSwiftPMProject() {
             isProject()
 
-            assert file("Package.swift").file
-
-            def srcDir = file("Sources")
+            def srcDir = new File(rootDir,"Sources/" + (path == ':' ? 'testApp' : path.substring(1)))
             assert srcDir.directory
             assert srcDir.list().findAll { it.endsWith(".swift") }
         }

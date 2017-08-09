@@ -15,7 +15,7 @@ public class JavaSourceGenerator extends ProjectComponentSpecificGenerator<HasJa
     }
 
     @Override
-    protected void generate(Project project, HasJavaSource component) throws IOException {
+    protected void generate(Build build, Project project, HasJavaSource component) throws IOException {
         for (JavaClass javaClass : component.getSourceFiles()) {
             if (javaClass.role(UnitTest.class) != null) {
                 generateUnitTest(project, javaClass);

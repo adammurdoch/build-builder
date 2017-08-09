@@ -8,9 +8,9 @@ import java.io.IOException;
 public abstract class ProjectFileGenerator implements BuildGenerator {
     public void generate(Build build) throws IOException {
         for (Project project : build.getProjects()) {
-            generate(project);
+            generate(build, project);
         }
     }
 
-    protected abstract void generate(Project project) throws IOException;
+    protected abstract void generate(Build build, Project project) throws IOException;
 }

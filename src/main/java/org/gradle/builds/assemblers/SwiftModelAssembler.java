@@ -21,7 +21,7 @@ public class SwiftModelAssembler extends AbstractModelAssembler {
             buildScript.requirePlugin("swift-library");
             addDependencies(project, buildScript);
             if (library.isSwiftPm()) {
-                buildScript.block("library").property("source.from", "Sources");
+                buildScript.block("library").property("source.from", new Scope.Code("rootProject.file('Sources/" + project.getName() + "')"));
             }
         } else if (project.component(SwiftApplication.class) != null) {
             SwiftApplication application = project.component(SwiftApplication.class);
@@ -38,7 +38,7 @@ public class SwiftModelAssembler extends AbstractModelAssembler {
             buildScript.requirePlugin("swift-executable");
             addDependencies(project, buildScript);
             if (application.isSwiftPm()) {
-                buildScript.block("executable").property("source.from", "Sources");
+                buildScript.block("executable").property("source.from", new Scope.Code("rootProject.file('Sources/" + project.getName() + "')"));
             }
         }
     }

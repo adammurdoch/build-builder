@@ -50,12 +50,15 @@ class SwiftBuildIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
         build.project(":").isSwiftPMProject()
-        def srcDir = build.project(":").file("Sources")
+
+        build.file("Package.swift").file
+
+        def srcDir = build.file("Sources/testApp")
         srcDir.list() as Set == ["main.swift", "app_impl1_1.swift", "app_nodeps1.swift"] as Set
         new File(srcDir, "app_impl1_1.swift").text.contains("Core1")
 
         build.project(":core1").isSwiftPMProject()
-        build.project(":core1").file("Sources").list() as Set == ["core1.swift", "core1_impl1_1.swift", "core1_nodeps1.swift"] as Set
+        build.file("Sources/core1").list() as Set == ["core1.swift", "core1_impl1_1.swift", "core1_nodeps1.swift"] as Set
 
         build.buildSucceeds(":installMain")
         build.app("build/install/testApp/testApp").succeeds()
