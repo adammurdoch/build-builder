@@ -94,7 +94,7 @@ Here's an example:
 
 - Android application 
     - Only a single Java project per layer.
-    - Only a single instrumented test per project.
+    - Only a single instrumented test per project, doesn't do anything.
     - No multi-dex, multi-apk splits, instant app
 - No annotation processors are used.
 - External HTTP repo
@@ -111,6 +111,7 @@ Here's an example:
     - support-core-utils (Android builds only)
 - There are no external dependencies for C++ or Swift
 - There are no tests for C++ or Swift
+- There are no private headers for C++ libraries
 - Only a basic dependency graph is available, between projects and between source files and external libraries
     - Arranged in layers 
     - Only one layer of a project references classes from other projects
@@ -120,6 +121,7 @@ Here's an example:
 - No Java 8 source for Android or Java builds.
 - Only a single Java resource is generated for each project.
 - Implementation classes are public.
+- Improve project and source file names, particularly test files.
 
 #### Adding source to an existing build
 
