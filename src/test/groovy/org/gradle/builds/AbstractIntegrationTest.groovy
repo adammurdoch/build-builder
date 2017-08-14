@@ -293,6 +293,10 @@ abstract class AbstractIntegrationTest extends Specification {
             def srcDir = file("src/main/swift")
             assert srcDir.directory
             assert srcDir.list().findAll { it.endsWith(".swift") }
+
+            def testDir = file("src/test/swift")
+            assert testDir.directory
+            assert testDir.list().findAll { it.endsWith(".swift") }
         }
 
         // TODO - add more checks
@@ -302,6 +306,10 @@ abstract class AbstractIntegrationTest extends Specification {
             def srcDir = new File(rootDir,"Sources/" + (path == ':' ? 'testApp' : path.substring(1)))
             assert srcDir.directory
             assert srcDir.list().findAll { it.endsWith(".swift") }
+
+            def testDir = new File(rootDir,"Tests/" + (path == ':' ? 'testApp' : path.substring(1)) + "Tests")
+            assert testDir.directory
+            assert testDir.list().findAll { it.endsWith(".swift") }
         }
 
         private File getBuildFile() {

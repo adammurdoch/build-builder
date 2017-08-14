@@ -131,7 +131,7 @@ public class AndroidModelAssembler extends JvmModelAssembler {
     @Override
     protected void addTests(Project project, HasJavaSource application) {
         super.addTests(project, application);
-        application.addClass(javaPackageFor(project) + "." + classNameFor(project) + "InstrumentedTest").addRole(new InstrumentedTest());
+        application.addTest(javaPackageFor(project) + "." + classNameFor(project) + "InstrumentedTest").addRole(new InstrumentedTest());
     }
 
     private void addSourceFiles(Project project, AndroidComponent androidComponent, JavaClass activity, JavaClassApi rClass) {

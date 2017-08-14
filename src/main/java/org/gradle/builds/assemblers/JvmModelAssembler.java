@@ -2,7 +2,6 @@ package org.gradle.builds.assemblers;
 
 import org.gradle.builds.model.*;
 
-import java.util.LinkedHashSet;
 import java.util.function.Consumer;
 
 public abstract class JvmModelAssembler extends AbstractModelAssembler {
@@ -17,8 +16,8 @@ public abstract class JvmModelAssembler extends AbstractModelAssembler {
     }
 
     protected void addTests(Project project, HasJavaSource application) {
-        for (JavaClass javaClass : new LinkedHashSet<>(application.getSourceFiles())) {
-            JavaClass testClass = application.addClass(javaClass.getName() + "Test");
+        for (JavaClass javaClass : application.getSourceFiles()) {
+            JavaClass testClass = application.addTest(javaClass.getName() + "Test");
             testClass.addRole(new UnitTest(javaClass));
         }
     }

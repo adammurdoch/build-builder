@@ -15,8 +15,10 @@ public class HasJavaSource extends HasSource<JavaClass> {
     }
 
     public JavaClass addClass(String name) {
-        JavaClass javaClass = new JavaClass(name);
-        addSourceFile(javaClass);
-        return javaClass;
+        return addSourceFile(new JavaClass(name));
+    }
+
+    public JavaClass addTest(String name) {
+        return addTestFile(new JavaClass(name));
     }
 }

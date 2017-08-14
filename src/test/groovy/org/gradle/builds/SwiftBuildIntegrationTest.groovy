@@ -12,10 +12,13 @@ class SwiftBuildIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
         build.project(":").isSwiftProject()
+
         def srcDir = build.project(":").file("src/main/swift")
         srcDir.list() as Set == ["main.swift", "app_impl1_1.swift", "app_nodeps1.swift"] as Set
         new File(srcDir, "main.swift").text.contains("AppImpl1_1")
         new File(srcDir, "app_impl1_1.swift").text.contains("AppNoDeps1")
+
+        build.project(":").file("src/test/swift").list() as Set == ["apptest.swift", "appimpl1_1test.swift", "appnodeps1test.swift"] as Set
 
         build.buildSucceeds(":installMain")
         build.app("build/install/testApp/testApp").succeeds()
@@ -30,12 +33,16 @@ class SwiftBuildIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
         build.project(":").isSwiftProject()
+
         def srcDir = build.project(":").file("src/main/swift")
         srcDir.list() as Set == ["main.swift", "app_impl1_1.swift", "app_nodeps1.swift"] as Set
         new File(srcDir, "app_impl1_1.swift").text.contains("Core1")
 
+        build.project(":").file("src/test/swift").list() as Set == ["apptest.swift", "appimpl1_1test.swift", "appnodeps1test.swift"] as Set
+
         build.project(":core1").isSwiftProject()
         build.project(":core1").file("src/main/swift").list() as Set == ["core1.swift", "core1_impl1_1.swift", "core1_nodeps1.swift"] as Set
+        build.project(":core1").file("src/test/swift").list() as Set == ["core1test.swift", "core1impl1_1test.swift", "core1nodeps1test.swift"] as Set
 
         build.buildSucceeds(":installMain")
         build.app("build/install/testApp/testApp").succeeds()
@@ -57,8 +64,12 @@ class SwiftBuildIntegrationTest extends AbstractIntegrationTest {
         srcDir.list() as Set == ["main.swift", "app_impl1_1.swift", "app_nodeps1.swift"] as Set
         new File(srcDir, "app_impl1_1.swift").text.contains("Core1")
 
+        build.file("Tests/testAppTests").list() as Set == ["apptest.swift", "appimpl1_1test.swift", "appnodeps1test.swift"] as Set
+
         build.project(":core1").isSwiftPMProject()
         build.file("Sources/core1").list() as Set == ["core1.swift", "core1_impl1_1.swift", "core1_nodeps1.swift"] as Set
+
+        build.file("Tests/core1Tests").list() as Set == ["core1test.swift", "core1impl1_1test.swift", "core1nodeps1test.swift"] as Set
 
         build.buildSucceeds(":installMain")
         build.app("build/install/testApp/testApp").succeeds()

@@ -17,12 +17,14 @@ public class JavaSourceGenerator extends ProjectComponentSpecificGenerator<HasJa
     @Override
     protected void generate(Build build, Project project, HasJavaSource component) throws IOException {
         for (JavaClass javaClass : component.getSourceFiles()) {
+            generateMainClass(project, javaClass);
+        }
+
+        for (JavaClass javaClass : component.getTestFiles()) {
             if (javaClass.role(UnitTest.class) != null) {
-                generateUnitTest(project, javaClass);
+                generateUnitTest(project, javaClass, javaClass.role(UnitTest.class));
             } else if (javaClass.role(InstrumentedTest.class) != null) {
                 generateInstrumentedTest(project, javaClass);
-            } else {
-                generateMainClass(project, javaClass);
             }
         }
     }
@@ -102,7 +104,7 @@ public class JavaSourceGenerator extends ProjectComponentSpecificGenerator<HasJa
         }
     }
 
-    private void generateUnitTest(Project project, JavaClass javaClass) throws IOException {
+    private void generateUnitTest(Project project, JavaClass javaClass, UnitTest unitTest) throws IOException {
         Path sourceFile = project.getProjectDir().resolve("src/test/java/" + javaClass.getName().replace(".", "/") + ".java");
         Files.createDirectories(sourceFile.getParent());
         try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(sourceFile))) {
@@ -112,7 +114,7 @@ public class JavaSourceGenerator extends ProjectComponentSpecificGenerator<HasJa
             printWriter.println("public class " + javaClass.getSimpleName() + " {");
             printWriter.println("    @org.junit.Test");
             printWriter.println("    public void ok() {");
-            printWriter.println("        " + javaClass.role(UnitTest.class).getClassUnderTest().getName() + ".getSomeValue();");
+            printWriter.println("        " + unitTest.getClassUnderTest().getName() + ".getSomeValue();");
             printWriter.println("    }");
             printWriter.println("}");
             printWriter.println();

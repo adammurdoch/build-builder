@@ -16,6 +16,7 @@ public class SwiftModelAssembler extends AbstractModelAssembler {
             apiSourceFile.addClass(apiClass);
 
             addSource(project, library, apiClass, apiSourceFile);
+            addTests(project, library);
 
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("swift-library");
@@ -33,6 +34,7 @@ public class SwiftModelAssembler extends AbstractModelAssembler {
             mainSourceFile.addClass(appClass);
 
             addSource(project, application, appClass, mainSourceFile);
+            addTests(project, application);
 
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("swift-executable");
@@ -87,4 +89,15 @@ public class SwiftModelAssembler extends AbstractModelAssembler {
             buildScript.dependsOn("implementation", new ProjectDependencyDeclaration(dep.getPath()));
         }
     }
+
+    private void addTests(Project project, HasSwiftSource application) {
+        for (SwiftSourceFile sourceFile : application.getSourceFiles()) {
+            for (SwiftClass swiftClass : sourceFile.getClasses()) {
+                String className = swiftClass.getName() + "Test";
+                SwiftSourceFile testSourceFile = application.addTestFile(new SwiftSourceFile(className.toLowerCase() +  ".swift"));
+                testSourceFile.addClass(new SwiftClass(className));
+            }
+        }
+    }
+
 }
