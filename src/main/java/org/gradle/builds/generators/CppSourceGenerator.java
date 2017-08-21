@@ -51,29 +51,44 @@ public class CppSourceGenerator extends ProjectComponentSpecificGenerator<HasCpp
 
         for (CppHeaderFile cppHeader : component.getPublicHeaderFiles()) {
             Path sourceFile = project.getProjectDir().resolve("src/main/public/" + cppHeader.getName());
-            writeHeader(cppHeader, sourceFile);
+            writeHeader(cppHeader, sourceFile, true);
         }
         for (CppHeaderFile cppHeader : component.getImplementationHeaderFiles()) {
             Path sourceFile = project.getProjectDir().resolve("src/main/headers/" + cppHeader.getName());
-            writeHeader(cppHeader, sourceFile);
+            writeHeader(cppHeader, sourceFile, false);
         }
     }
 
-    private void writeHeader(CppHeaderFile cppHeader, Path sourceFile) throws IOException {
+    private void writeHeader(CppHeaderFile cppHeader, Path sourceFile, boolean exported) throws IOException {
         Files.createDirectories(sourceFile.getParent());
         try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(sourceFile))) {
             String macro = "_" + cppHeader.getName().replace(".", "_").toUpperCase() + "_";
             printWriter.println("// GENERATED SOURCE FILE");
             printWriter.println("#ifndef " + macro);
             printWriter.println("#define " + macro);
+            if (exported) {
+                printWriter.println();
+                printWriter.println("#ifndef EXPORT_FUNC");
+                printWriter.println("#ifdef _WIN32");
+                printWriter.println("#define EXPORT_FUNC __declspec(dllexport)");
+                printWriter.println("#else");
+                printWriter.println("#define EXPORT_FUNC");
+                printWriter.println("#endif");
+                printWriter.println("#endif");
+            }
             for (CppHeaderFile headerFile : cppHeader.getHeaderFiles()) {
+                printWriter.println();
                 printWriter.println("#include \"" + headerFile.getName() + "\"");
             }
             for (CppClass cppClass : cppHeader.getClasses()) {
                 printWriter.println();
                 printWriter.println("class " + cppClass.getName() + " {");
                 printWriter.println("  public:");
-                printWriter.println("    void doSomething();");
+                if (exported) {
+                    printWriter.println("    void EXPORT_FUNC doSomething();");
+                } else {
+                    printWriter.println("    void doSomething();");
+                }
                 printWriter.println("};");
             }
             printWriter.println();

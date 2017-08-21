@@ -66,7 +66,7 @@ public abstract class AbstractModelAssembler implements ModelAssembler {
         return project.getName().toLowerCase();
     }
 
-    private String capitalize(String s) {
+    protected String capitalize(String s) {
         return s.substring(0, 1).toUpperCase() + s.substring(1);
     }
 }

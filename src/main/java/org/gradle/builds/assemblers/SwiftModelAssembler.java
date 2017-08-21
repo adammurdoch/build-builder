@@ -4,13 +4,18 @@ import org.gradle.builds.model.*;
 
 public class SwiftModelAssembler extends AbstractModelAssembler {
     @Override
+    protected void rootProject(Project rootProject) {
+        rootProject.getBuildScript().allProjects().requirePlugin("xcode");
+    }
+
+    @Override
     protected void populate(Settings settings, Project project) {
         if (project.component(SwiftLibrary.class) != null) {
             SwiftLibrary library = project.component(SwiftLibrary.class);
 
             SwiftClass apiClass = new SwiftClass(classNameFor(project));
             library.setApiClass(apiClass);
-            library.setModule(project.getName());
+            library.setModule(capitalize(project.getName()));
 
             SwiftSourceFile apiSourceFile = library.addSourceFile(fileNameFor(project) + ".swift");
             apiSourceFile.addClass(apiClass);

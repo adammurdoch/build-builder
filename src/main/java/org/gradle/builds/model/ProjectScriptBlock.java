@@ -3,28 +3,14 @@ package org.gradle.builds.model;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class ProjectScriptBlock extends Scope {
-    private final Set<ScriptBlock> repositories = new LinkedHashSet<>();
+public class ProjectScriptBlock extends BlockWithDependencies {
+    private final Set<String> plugins = new LinkedHashSet<>();
 
-    public Set<ScriptBlock> getRepositories() {
-        return repositories;
+    public Set<String> getPlugins() {
+        return plugins;
     }
 
-    public void jcenter() {
-        repositories.add(new ScriptBlock("jcenter"));
-    }
-
-    public void google() {
-        repositories.add(new ScriptBlock("google"));
-    }
-
-    public void mavenLocal() {
-        repositories.add(new ScriptBlock("mavenCentral"));
-    }
-
-    public void maven(HttpRepository repo) {
-        ScriptBlock block = new ScriptBlock("maven");
-        block.property("url", repo.getUri().toString());
-        repositories.add(block);
+    public void requirePlugin(String id) {
+        plugins.add(id);
     }
 }

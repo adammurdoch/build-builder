@@ -44,17 +44,24 @@ public class BuildFileGenerator extends ProjectFileGenerator {
                     printWriter.println("apply plugin: '" + pluginId + "'");
                 }
             }
-            if (buildScript.getAllProjects() != null) {
+
+            ProjectScriptBlock allProjects = buildScript.getAllProjects();
+            if (allProjects != null) {
                 printWriter.println();
                 printWriter.println("allprojects {");
-                if (!buildScript.getAllProjects().getRepositories().isEmpty()) {
+                if (!allProjects.getPlugins().isEmpty()) {
+                    for (String pluginId : allProjects.getPlugins()) {
+                        printWriter.println("    apply plugin: '" + pluginId + "'");
+                    }
+                }
+                if (!allProjects.getRepositories().isEmpty()) {
                     printWriter.println("    repositories {");
-                    for (ScriptBlock repoBlock : buildScript.getAllProjects().getRepositories()) {
+                    for (ScriptBlock repoBlock : allProjects.getRepositories()) {
                         writeBlock(repoBlock, "        ", printWriter);
                     }
                     printWriter.println("    }");
                 }
-                writeBlockContents(buildScript.getAllProjects(), "    ", printWriter);
+                writeBlockContents(allProjects, "    ", printWriter);
                 printWriter.println("}");
             }
             if (!buildScript.getDependencies().isEmpty()) {

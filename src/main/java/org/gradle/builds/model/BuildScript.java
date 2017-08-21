@@ -7,11 +7,10 @@ import java.util.Set;
 
 public class BuildScript extends ProjectScriptBlock {
     private final Set<ExternalDependencyDeclaration> buildScriptClasspath = new LinkedHashSet<>();
-    private final Set<String> plugins = new LinkedHashSet<>();
     private final Set<SoftwareModelDeclaration> componentDeclarations = new LinkedHashSet<>();
     private final Map<String, Set<DependencyDeclaration>> dependencies = new LinkedHashMap<>();
     private ProjectScriptBlock allProjects;
-    private ProjectScriptBlock buildscriptBlock;
+    private BlockWithDependencies buildscriptBlock;
 
     public ProjectScriptBlock getAllProjects() {
         return allProjects;
@@ -24,21 +23,13 @@ public class BuildScript extends ProjectScriptBlock {
         return allProjects;
     }
 
-    public Set<String> getPlugins() {
-        return plugins;
-    }
-
-    public void requirePlugin(String id) {
-        plugins.add(id);
-    }
-
-    public ProjectScriptBlock getBuildScriptBlock() {
+    public BlockWithDependencies getBuildScriptBlock() {
         return buildscriptBlock;
     }
 
-    public ProjectScriptBlock buildScriptBlock() {
+    public BlockWithDependencies buildScriptBlock() {
         if (buildscriptBlock == null) {
-            buildscriptBlock = new ProjectScriptBlock();
+            buildscriptBlock = new BlockWithDependencies();
         }
         return buildscriptBlock;
     }

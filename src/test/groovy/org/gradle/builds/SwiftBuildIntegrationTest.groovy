@@ -2,7 +2,7 @@ package org.gradle.builds
 
 class SwiftBuildIntegrationTest extends AbstractIntegrationTest {
     def setup() {
-        gradleVersion = "4.2-20170807012333+0000"
+        gradleVersion = "4.2-20170821011356+0000"
     }
 
     def "can generate single project build"() {

@@ -4,6 +4,11 @@ import org.gradle.builds.model.*;
 
 public class CppModelAssembler extends AbstractModelAssembler {
     @Override
+    protected void rootProject(Project rootProject) {
+        rootProject.getBuildScript().allProjects().requirePlugin("xcode");
+    }
+
+    @Override
     protected void populate(Settings settings, Project project) {
         if (project.component(CppLibrary.class) != null) {
             CppLibrary lib = project.component(CppLibrary.class);
