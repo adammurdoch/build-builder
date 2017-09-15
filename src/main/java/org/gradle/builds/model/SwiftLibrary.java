@@ -12,6 +12,10 @@ public class SwiftLibrary extends HasSwiftSource {
         this.apiClass = apiClass;
     }
 
+    public SwiftLibraryApi getApi() {
+        return new SwiftLibraryApi(apiClass, module);
+    }
+
     public SwiftClass getApiClass() {
         return apiClass;
     }

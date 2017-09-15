@@ -134,12 +134,23 @@ public class Main {
             return null;
         }
 
+        protected int getBuilds() {
+            return 1;
+        }
+
+        protected boolean isHttpRepo() {
+            return false;
+        }
+
         protected void validate() {
             if (projects < 1) {
                 throw new IllegalArgumentException("Minimum of 1 project.");
             }
             if (sourceFiles < 1) {
                 throw new IllegalArgumentException("Minimum of 1 source files per project.");
+            }
+            if (getBuilds() < 1) {
+                throw new IllegalArgumentException("Minimum of 1 build.");
             }
         }
 
@@ -172,8 +183,19 @@ public class Main {
                             new ScenarioFileGenerator()));
         }
 
-        protected ModelStructureAssembler createModelStructureAssembler() {
-            return new SingleBuildModelStructureAssembler(createProjectInitializer());
+        private ModelStructureAssembler createModelStructureAssembler() {
+            ProjectInitializer projectInitializer = createProjectInitializer();
+            ModelStructureAssembler mainBuildAssembler = new CompositeModelStructureAssembler(
+                    new SingleBuildModelStructureAssembler(projectInitializer),
+                    new IncludedBuildAssembler(projectInitializer,
+                            getBuilds()));
+            if (isHttpRepo()) {
+                return new CompositeModelStructureAssembler(
+                        mainBuildAssembler,
+                        new HttpRepoModelStructureAssembler(projectInitializer));
+            } else {
+                return mainBuildAssembler;
+            }
         }
 
         private Path getRootDir() throws IOException {
@@ -196,15 +218,8 @@ public class Main {
         boolean httpRepo = false;
 
         @Override
-        protected ModelStructureAssembler createModelStructureAssembler() {
-            ModelStructureAssembler mainBuildAssembler = super.createModelStructureAssembler();
-            if (httpRepo) {
-                return new CompositeModelStructureAssembler(
-                        mainBuildAssembler,
-                        new HttpRepoModelStructureAssembler(createProjectInitializer()));
-            } else {
-                return mainBuildAssembler;
-            }
+        protected boolean isHttpRepo() {
+            return httpRepo;
         }
     }
 
@@ -219,20 +234,8 @@ public class Main {
         }
 
         @Override
-        protected void validate() {
-            super.validate();
-            if (builds < 1) {
-                throw new IllegalArgumentException("Minimum of 1 build.");
-            }
-        }
-
-        @Override
-        protected ModelStructureAssembler createModelStructureAssembler() {
-            return new CompositeModelStructureAssembler(
-                    super.createModelStructureAssembler(),
-                    new IncludedBuildAssembler(
-                            createProjectInitializer(),
-                            builds));
+        protected int getBuilds() {
+            return builds;
         }
 
         @Override
@@ -269,9 +272,17 @@ public class Main {
         @Option(name = "--swift-pm", description = "Use the Swift package manager source layout (default: false)")
         boolean swiftPm = false;
 
+        @Option(name = "--builds", description = "The number of builds to generate (default: 1)")
+        int builds = 1;
+
         @Override
         protected String getType() {
             return "Swift";
+        }
+
+        @Override
+        protected int getBuilds() {
+            return builds;
         }
 
         @Override

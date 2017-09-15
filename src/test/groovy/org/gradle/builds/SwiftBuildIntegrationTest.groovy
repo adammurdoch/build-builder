@@ -13,7 +13,7 @@ class SwiftBuildIntegrationTest extends AbstractIntegrationTest {
 
         then:
         build.isBuild()
-        build.project(":").isSwiftProject()
+        build.project(":").isSwiftApplication()
 
         def srcDir = build.project(":").file("src/main/swift")
         srcDir.list() as Set == ["main.swift", "app_impl1_1.swift", "app_nodeps1.swift"] as Set
@@ -34,7 +34,7 @@ class SwiftBuildIntegrationTest extends AbstractIntegrationTest {
 
         then:
         build.isBuild()
-        build.project(":").isSwiftProject()
+        build.project(":").isSwiftApplication()
 
         def srcDir = build.project(":").file("src/main/swift")
         srcDir.list() as Set == ["main.swift", "app_impl1_1.swift", "app_nodeps1.swift"] as Set
@@ -42,7 +42,7 @@ class SwiftBuildIntegrationTest extends AbstractIntegrationTest {
 
         build.project(":").file("src/test/swift").list() as Set == ["apptest.swift", "appimpl1_1test.swift", "appnodeps1test.swift"] as Set
 
-        build.project(":core1").isSwiftProject()
+        build.project(":core1").isSwiftLibrary()
         build.project(":core1").file("src/main/swift").list() as Set == ["core1.swift", "core1_impl1_1.swift", "core1_nodeps1.swift"] as Set
         build.project(":core1").file("src/test/swift").list() as Set == ["core1test.swift", "core1impl1_1test.swift", "core1nodeps1test.swift"] as Set
 
@@ -59,7 +59,8 @@ class SwiftBuildIntegrationTest extends AbstractIntegrationTest {
 
         then:
         build.isBuild()
-        build.project(":").isSwiftProject()
+        build.project(":").isSwiftApplication()
+        build.project(":core1").isSwiftLibrary()
 
         build.buildSucceeds(":installDebug")
         build.app("build/install/main/debug/testApp").succeeds()
@@ -93,6 +94,34 @@ class SwiftBuildIntegrationTest extends AbstractIntegrationTest {
 
         build.buildSucceeds(":installDebug")
         build.app("build/install/main/debug/testApp").succeeds()
+
+        build.buildSucceeds("build")
+    }
+
+    def "can generate composite build"() {
+        when:
+        new Main().run("swift", "--dir", projectDir.absolutePath, "--projects", "2", "--builds", "2")
+
+        then:
+        build.isBuild()
+
+        build.project(":").isSwiftApplication()
+        build.project(":core1").isSwiftLibrary()
+        def srcDir = build.project(":").file("src/main/swift")
+        new File(srcDir, "app_impl1_1.swift").text.contains("Child1_core1")
+
+        def coreSrcDir = build.project(":core1").file("src/main/swift")
+        new File(coreSrcDir, "core1_impl1_1.swift").text.contains("Child1_core1")
+
+        def child = build(file("child1"))
+        child.isBuild()
+        child.project(":").isEmptyProject()
+        child.project(":child1_core1").isSwiftLibrary()
+
+        build.buildSucceeds(":installDebug")
+
+        def app = build.app("build/install/main/debug/testApp")
+        app.succeeds()
 
         build.buildSucceeds("build")
     }

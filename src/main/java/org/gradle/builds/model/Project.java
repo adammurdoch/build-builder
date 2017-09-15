@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class Project {
     private final Project parent;
@@ -15,7 +16,7 @@ public class Project {
     private final BuildScript buildScript = new BuildScript();
     private final Set<Project> dependencies = new LinkedHashSet<>();
     private final Set<Component> components = new LinkedHashSet<>();
-    private final List<PublishedJvmLibrary> externalDependencies = new ArrayList<>();
+    private final List<PublishedLibrary> externalDependencies = new ArrayList<>();
     private Graph classGraph;
     private PublicationTarget publicationTarget;
 
@@ -95,15 +96,15 @@ public class Project {
         this.publicationTarget = publicationTarget;
     }
 
-    public List<PublishedJvmLibrary> getExternalDependencies() {
-        return externalDependencies;
+    public <T extends PublishedLibrary> List<T> getExternalDependencies(Class<T> type) {
+        return externalDependencies.stream().filter(d -> type.isInstance(d)).map(d -> type.cast(d)).collect(Collectors.toList());
     }
 
-    public void dependsOn(PublishedJvmLibrary library) {
+    public void dependsOn(PublishedLibrary library) {
         this.externalDependencies.add(library);
     }
 
-    public void dependsOn(List<PublishedJvmLibrary> libraries) {
+    public void dependsOn(List<? extends PublishedLibrary> libraries) {
         this.externalDependencies.addAll(libraries);
     }
 }

@@ -3,6 +3,7 @@ package org.gradle.builds.assemblers;
 import org.gradle.builds.model.Build;
 import org.gradle.builds.model.Project;
 import org.gradle.builds.model.PublishedJvmLibrary;
+import org.gradle.builds.model.PublishedLibrary;
 
 public class InitialProjectSetupBuildConfigurer implements ModelAssembler {
     private final ModelAssembler modelAssembler;
@@ -38,9 +39,9 @@ public class InitialProjectSetupBuildConfigurer implements ModelAssembler {
         // Collect published libraries
         if (build.getPublicationTarget() != null) {
             for (Project project : build.getProjects()) {
-                PublishedJvmLibrary jvmLibrary = project.component(PublishedJvmLibrary.class);
-                if (jvmLibrary != null) {
-                    build.publishLibrary(jvmLibrary);
+                PublishedLibrary library = project.component(PublishedLibrary.class);
+                if (library != null) {
+                    build.publishLibrary(library);
                 }
             }
         }

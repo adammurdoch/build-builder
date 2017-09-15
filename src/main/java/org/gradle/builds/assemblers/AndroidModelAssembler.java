@@ -119,7 +119,7 @@ public class AndroidModelAssembler extends JvmModelAssembler {
             buildScript.dependsOnProject("compile", dep.getPath());
             component.uses(dep.component(JvmLibrary.class).getApi());
         }
-        for (PublishedJvmLibrary library : project.getExternalDependencies()) {
+        for (PublishedJvmLibrary library : project.getExternalDependencies(PublishedJvmLibrary.class)) {
             buildScript.dependsOn("compile", library.getGav());
             component.uses(library.getApi());
         }

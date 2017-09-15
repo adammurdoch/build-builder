@@ -71,11 +71,9 @@ public class JavaModelAssembler extends JvmModelAssembler {
             buildScript.dependsOnProject("compile", dep.getPath());
             component.uses(dep.component(JvmLibrary.class).getApi());
         }
-        for (PublishedJvmLibrary library : project.getExternalDependencies()) {
-            if (library instanceof PublishedAndroidLibrary) {
-                // Don't use Android libraries
-                continue;
-            }
+
+        // Don't use Android libraries, only java libraries
+        for (PublishedJavaLibrary library : project.getExternalDependencies(PublishedJavaLibrary.class)) {
             buildScript.dependsOn("compile", library.getGav());
             component.uses(library.getApi());
         }

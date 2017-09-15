@@ -14,7 +14,7 @@ public class Build {
     private Settings settings;
     private final List<Build> dependsOn = new ArrayList<>();
     private final List<Build> childBuilds = new ArrayList<>();
-    private final List<PublishedJvmLibrary> publishedLibraries = new ArrayList<>();
+    private final List<PublishedLibrary> publishedLibraries = new ArrayList<>();
     private PublicationTarget publicationTarget;
     private String projectNamePrefix = "";
     private ProjectInitializer projectInitializer;
@@ -95,11 +95,11 @@ public class Build {
         return settings;
     }
 
-    public List<PublishedJvmLibrary> getPublishedLibraries() {
+    public List<PublishedLibrary> getPublishedLibraries() {
         return publishedLibraries;
     }
 
-    public void publishLibrary(PublishedJvmLibrary library) {
+    public void publishLibrary(PublishedLibrary library) {
         publishedLibraries.add(library);
     }
 

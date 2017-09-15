@@ -1,7 +1,6 @@
 package org.gradle.builds
 
 import junit.framework.AssertionFailedError
-import org.gradle.builds.model.Build
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
@@ -200,7 +199,7 @@ abstract class AbstractIntegrationTest extends Specification {
         // TODO - add more checks
         void isEmptyProject() {
             isProject()
-            !buildFile.text.contains('apply plugin')
+            !buildFile.text.contains('plugin')
         }
 
         String getPackagePath() {
@@ -226,23 +225,31 @@ abstract class AbstractIntegrationTest extends Specification {
             assert testSrcDir.list().findAll { it.endsWith(".java") }
         }
 
+        void appliesPlugin(String plugin) {
+            assert buildFile.text.contains("apply plugin: '$plugin'")
+        }
+
+        void doesNotApplyPlugin(String plugin) {
+            assert !buildFile.text.contains(plugin)
+        }
+
         // TODO - add more checks
         void isJavaProject() {
             isProject()
-            assert buildFile.text.contains("apply plugin: 'java'")
+            appliesPlugin('java')
             hasJavaSource()
         }
 
         // TODO - add more checks
         void isJavaLibrary() {
             isJavaProject()
-            assert !buildFile.text.contains("apply plugin: 'application'")
+            doesNotApplyPlugin('application')
         }
 
         // TODO - add more checks
         void isJavaApplication() {
             isJavaProject()
-            assert buildFile.text.contains("apply plugin: 'application'")
+            appliesPlugin('application')
         }
 
         // TODO - add more checks
@@ -263,15 +270,15 @@ abstract class AbstractIntegrationTest extends Specification {
         // TODO - add more checks
         void isAndroidLibrary() {
             isAndroidProject()
-            assert buildFile.text.contains("apply plugin: 'com.android.library'")
-            assert !buildFile.text.contains("apply plugin: 'com.android.application'")
+            appliesPlugin('com.android.library')
+            doesNotApplyPlugin('com.android.application')
         }
 
         // TODO - add more checks
         void isAndroidApplication() {
             isAndroidProject()
-            assert !buildFile.text.contains("apply plugin: 'com.android.library'")
-            assert buildFile.text.contains("apply plugin: 'com.android.application'")
+            doesNotApplyPlugin('com.android.library')
+            appliesPlugin('com.android.application')
         }
 
         // TODO - add more checks
@@ -297,6 +304,20 @@ abstract class AbstractIntegrationTest extends Specification {
             def testDir = file("src/test/swift")
             assert testDir.directory
             assert testDir.list().findAll { it.endsWith(".swift") }
+        }
+
+        void isSwiftApplication() {
+            isSwiftProject()
+            appliesPlugin('swift-executable')
+            doesNotApplyPlugin('swift-library')
+            def srcDir = file("src/main/swift")
+            assert new File(srcDir, "main.swift").file
+        }
+
+        void isSwiftLibrary() {
+            isSwiftProject()
+            appliesPlugin('swift-library')
+            doesNotApplyPlugin('swift-executable')
         }
 
         // TODO - add more checks

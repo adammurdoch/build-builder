@@ -20,16 +20,17 @@ public class SwiftModelAssembler extends AbstractModelAssembler {
             SwiftSourceFile apiSourceFile = library.addSourceFile(fileNameFor(project) + ".swift");
             apiSourceFile.addClass(apiClass);
 
-            addSource(project, library, apiClass, apiSourceFile);
-            addTests(project, library);
-
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("swift-library");
             buildScript.requirePlugin("xctest");
-            addDependencies(project, buildScript, true);
+            addPublishing(project, library, project.getBuildScript());
+            addDependencies(project, library, buildScript, true);
             if (library.isSwiftPm()) {
                 buildScript.block("library").property("source.from", new Scope.Code("rootProject.file('Sources/" + project.getName() + "')"));
             }
+
+            addSource(project, library, apiClass, apiSourceFile);
+            addTests(project, library);
         } else if (project.component(SwiftApplication.class) != null) {
             SwiftApplication application = project.component(SwiftApplication.class);
 
@@ -39,16 +40,27 @@ public class SwiftModelAssembler extends AbstractModelAssembler {
             mainSourceFile.addMainFunction(appClass);
             mainSourceFile.addClass(appClass);
 
-            addSource(project, application, appClass, mainSourceFile);
-            addTests(project, application);
-
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("swift-executable");
             buildScript.requirePlugin("xctest");
-            addDependencies(project, buildScript, false);
+            addDependencies(project, application, buildScript, false);
             if (application.isSwiftPm()) {
                 buildScript.block("executable").property("source.from", new Scope.Code("rootProject.file('Sources/" + project.getName() + "')"));
             }
+
+            addSource(project, application, appClass, mainSourceFile);
+            addTests(project, application);
+        }
+    }
+
+    private void addPublishing(Project project, SwiftLibrary library, BuildScript buildScript) {
+        if (project.getPublicationTarget() != null) {
+            String group = "org.gradle.example";
+            String module = project.getName();
+            String version = "1.2";
+            project.addComponent(new PublishedSwiftLibrary(new ExternalDependencyDeclaration(group, module, version), library.getApi()));
+            buildScript.property("group", group);
+            buildScript.property("version", version);
         }
     }
 
@@ -74,7 +86,7 @@ public class SwiftModelAssembler extends AbstractModelAssembler {
                 swiftSourceFile.addClass(swiftClass);
             }
             if (layer == implLayer) {
-                addReferences(project, swiftClass, swiftSourceFile);
+                addReferences(component, swiftClass, swiftSourceFile);
             }
             for (SwiftClass dep : dependencies) {
                 swiftClass.uses(dep);
@@ -83,21 +95,25 @@ public class SwiftModelAssembler extends AbstractModelAssembler {
         });
     }
 
-    private void addReferences(Project project, SwiftClass swiftClass, SwiftSourceFile sourceFile) {
-        for (Project dep : project.getDependencies()) {
-            SwiftLibrary library = dep.component(SwiftLibrary.class);
+    private void addReferences(HasSwiftSource component, SwiftClass swiftClass, SwiftSourceFile sourceFile) {
+        for (SwiftLibraryApi library : component.getReferencedLibraries()) {
             swiftClass.uses(library.getApiClass());
             sourceFile.addModule(library.getModule());
         }
     }
 
-    private void addDependencies(Project project, BuildScript buildScript, boolean libHack) {
+    private void addDependencies(Project project, HasSwiftSource component, BuildScript buildScript, boolean libHack) {
         // TODO - remove this hack
         buildScript.block("configurations").statement("testImplementation.extendsFrom(implementation)");
         // TODO - remove this hack
         String configuration = libHack ? "api" : "implementation";
         for (Project dep : project.getDependencies()) {
             buildScript.dependsOn(configuration, new ProjectDependencyDeclaration(dep.getPath()));
+            component.uses(dep.component(SwiftLibrary.class).getApi());
+        }
+        for (PublishedSwiftLibrary library : project.getExternalDependencies(PublishedSwiftLibrary.class)) {
+            buildScript.dependsOn(configuration, library.getGav());
+            component.uses(library.getApi());
         }
     }
 
@@ -105,10 +121,9 @@ public class SwiftModelAssembler extends AbstractModelAssembler {
         for (SwiftSourceFile sourceFile : application.getSourceFiles()) {
             for (SwiftClass swiftClass : sourceFile.getClasses()) {
                 String className = swiftClass.getName() + "Test";
-                SwiftSourceFile testSourceFile = application.addTestFile(new SwiftSourceFile(className.toLowerCase() +  ".swift"));
+                SwiftSourceFile testSourceFile = application.addTestFile(new SwiftSourceFile(className.toLowerCase() + ".swift"));
                 testSourceFile.addClass(new SwiftClass(className));
             }
         }
     }
-
 }
