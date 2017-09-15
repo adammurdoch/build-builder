@@ -5,7 +5,15 @@ import org.gradle.builds.model.*;
 public class CppModelAssembler extends AbstractModelAssembler {
     @Override
     protected void rootProject(Project rootProject) {
-        rootProject.getBuildScript().allProjects().requirePlugin("xcode");
+        ProjectScriptBlock allProjects = rootProject.getBuildScript().allProjects();
+        allProjects.requirePlugin("xcode");
+        allProjects.requirePlugin("maven-publish");
+        allProjects.property("group", "test");
+        allProjects.property("version", "1.2");
+        allProjects.block("publishing")
+                .block("repositories")
+                .block("maven")
+                .property("url", new Scope.Code("rootProject.file('repo')"));
     }
 
     @Override
