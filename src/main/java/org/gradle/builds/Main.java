@@ -166,6 +166,8 @@ public class Main {
                             new CppSourceGenerator(),
                             new SwiftPackageManagerManifestGenerator(),
                             new SwiftSourceGenerator(),
+                            // TODO - remove this
+                            new XCTestInfoPlistGenerator(),
                             new HttpServerMainGenerator(),
                             new ScenarioFileGenerator()));
         }

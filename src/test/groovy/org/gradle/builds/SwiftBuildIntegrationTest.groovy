@@ -1,8 +1,10 @@
 package org.gradle.builds
 
+import spock.lang.Unroll
+
 class SwiftBuildIntegrationTest extends AbstractIntegrationTest {
     def setup() {
-        gradleVersion = "4.2-20170821011356+0000"
+        gradleVersion = "4.3-20170914235708+0000"
     }
 
     def "can generate single project build"() {
@@ -20,8 +22,8 @@ class SwiftBuildIntegrationTest extends AbstractIntegrationTest {
 
         build.project(":").file("src/test/swift").list() as Set == ["apptest.swift", "appimpl1_1test.swift", "appnodeps1test.swift"] as Set
 
-        build.buildSucceeds(":installMain")
-        build.app("build/install/testApp/testApp").succeeds()
+        build.buildSucceeds(":installDebug")
+        build.app("build/install/main/debug/testApp").succeeds()
 
         build.buildSucceeds("build")
     }
@@ -44,10 +46,28 @@ class SwiftBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":core1").file("src/main/swift").list() as Set == ["core1.swift", "core1_impl1_1.swift", "core1_nodeps1.swift"] as Set
         build.project(":core1").file("src/test/swift").list() as Set == ["core1test.swift", "core1impl1_1test.swift", "core1nodeps1test.swift"] as Set
 
-        build.buildSucceeds(":installMain")
-        build.app("build/install/testApp/testApp").succeeds()
+        build.buildSucceeds(":installDebug")
+        build.app("build/install/main/debug/testApp").succeeds()
 
         build.buildSucceeds("build")
+    }
+
+    @Unroll
+    def "can generate build with #count projects"() {
+        when:
+        new Main().run("swift", "--dir", projectDir.absolutePath, "--projects", count as String)
+
+        then:
+        build.isBuild()
+        build.project(":").isSwiftProject()
+
+        build.buildSucceeds(":installDebug")
+        build.app("build/install/main/debug/testApp").succeeds()
+
+        build.buildSucceeds("build")
+
+        where:
+        count << [3, 5, 10]
     }
 
     def "can generate using Swift PM layout"() {
@@ -71,8 +91,8 @@ class SwiftBuildIntegrationTest extends AbstractIntegrationTest {
 
         build.file("Tests/core1Tests").list() as Set == ["core1test.swift", "core1impl1_1test.swift", "core1nodeps1test.swift"] as Set
 
-        build.buildSucceeds(":installMain")
-        build.app("build/install/testApp/testApp").succeeds()
+        build.buildSucceeds(":installDebug")
+        build.app("build/install/main/debug/testApp").succeeds()
 
         build.buildSucceeds("build")
     }

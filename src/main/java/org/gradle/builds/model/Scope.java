@@ -15,11 +15,19 @@ public class Scope {
         return blocks.computeIfAbsent(name, k -> new ScriptBlock(name));
     }
 
-    /**
-     *
-     * Property value can either be a {@link CharSequence} or a {@link Number} or a {@link Code} instance.
-     */
-    public void property(String name, Object value) {
+    public void property(String name, CharSequence value) {
+        addProperty(name, value);
+    }
+
+    public void property(String name, Number value) {
+        addProperty(name, value);
+    }
+
+    public void property(String name, Code value) {
+        addProperty(name, value);
+    }
+
+    private void addProperty(String name, Object value) {
         statements.add(new Expression() {
             @Override
             public void appendTo(PrintWriter printWriter) {

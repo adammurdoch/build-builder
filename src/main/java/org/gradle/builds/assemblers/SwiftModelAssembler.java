@@ -25,7 +25,8 @@ public class SwiftModelAssembler extends AbstractModelAssembler {
 
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("swift-library");
-            addDependencies(project, buildScript);
+            buildScript.requirePlugin("xctest");
+            addDependencies(project, buildScript, true);
             if (library.isSwiftPm()) {
                 buildScript.block("library").property("source.from", new Scope.Code("rootProject.file('Sources/" + project.getName() + "')"));
             }
@@ -43,7 +44,8 @@ public class SwiftModelAssembler extends AbstractModelAssembler {
 
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("swift-executable");
-            addDependencies(project, buildScript);
+            buildScript.requirePlugin("xctest");
+            addDependencies(project, buildScript, false);
             if (application.isSwiftPm()) {
                 buildScript.block("executable").property("source.from", new Scope.Code("rootProject.file('Sources/" + project.getName() + "')"));
             }
@@ -89,9 +91,13 @@ public class SwiftModelAssembler extends AbstractModelAssembler {
         }
     }
 
-    private void addDependencies(Project project, BuildScript buildScript) {
+    private void addDependencies(Project project, BuildScript buildScript, boolean libHack) {
+        // TODO - remove this hack
+        buildScript.block("configurations").statement("testImplementation.extendsFrom(implementation)");
+        // TODO - remove this hack
+        String configuration = libHack ? "api" : "implementation";
         for (Project dep : project.getDependencies()) {
-            buildScript.dependsOn("implementation", new ProjectDependencyDeclaration(dep.getPath()));
+            buildScript.dependsOn(configuration, new ProjectDependencyDeclaration(dep.getPath()));
         }
     }
 
