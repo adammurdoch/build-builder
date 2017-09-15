@@ -1,22 +1,25 @@
 ## build builder
 
-Generates various builds that can be used for profiling and benchmarking Gradle.
+Generates various builds that can be used for testing, profiling and benchmarking Gradle.
 
 Supported build types:
 
 - Java application
 - Android application
-- C++ application (Gradle 4.2 and later)
-- Swift application (Gradle 4.2 and later)
+- C++ application (Gradle 4.3 and later)
+- Swift application (Gradle 4.3 and later)
 
 Generates one or more projects with source files. Can also be used to add source files to an existing skeleton build. 
 The source files have dependencies between each other, as described below.
 
-Generates JUnit tests for Java and Android projects, and on-device tests for Android projects.
+Generates JUnit tests for Java and Android projects, plus on-device tests for Android projects.
+Generates XCTest tests for Swift projects.
 
 Can optionally generate a composite build.
 
 Can optionally generate a local HTTP repository and server.
+
+Can optionally generate a Swift Package Manager build for Swift projects.
 
 Generates a [gradle-profiler](https://www.github.com/gradle/gradle-profiler) scenario file for the build.
 
