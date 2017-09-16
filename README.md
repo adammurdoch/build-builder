@@ -23,6 +23,8 @@ Can optionally generate a Swift Package Manager build for Swift projects.
 
 Generates a [gradle-profiler](https://www.github.com/gradle/gradle-profiler) scenario file for the build.
 
+Generates a Graphiz `dot` file that shows the dependencies between projects.
+
 ### Command line usage
 
 #### Installation
