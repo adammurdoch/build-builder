@@ -9,7 +9,7 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class SwiftPackageManagerManifestGenerator implements BuildGenerator {
+public class SwiftPackageManagerManifestGenerator implements Generator<Build> {
     @Override
     public void generate(Build build) throws IOException {
         HasSwiftSource component = build.getRootProject().component(HasSwiftSource.class);

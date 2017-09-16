@@ -75,27 +75,6 @@ public class BuildFileGenerator extends ProjectFileGenerator {
                 printWriter.println("}");
             }
             writeBlockContents(buildScript, "", printWriter);
-            if (!buildScript.getComponentDeclarations().isEmpty()) {
-                printWriter.println();
-                printWriter.println("model {");
-                printWriter.println("    components {");
-                for (SoftwareModelDeclaration component : buildScript.getComponentDeclarations()) {
-                    printWriter.println("        " + component.getName() + "(" + component.getType() + ") {");
-                    printWriter.println("            baseName = project.name");
-                    if (!component.getDependencies().isEmpty()) {
-                        printWriter.println("            sources {");
-                        printWriter.println("                all {");
-                        for (ProjectDependencyDeclaration dep : component.getDependencies()) {
-                            printWriter.println("                    lib project: '" + dep.getProjectPath() + "', library: 'main'");
-                        }
-                        printWriter.println("                }");
-                        printWriter.println("            }");
-                    }
-                    printWriter.println("        }");
-                }
-                printWriter.println("    }");
-                printWriter.println("}");
-            }
             printWriter.println();
         }
     }

@@ -8,7 +8,7 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class ScenarioFileGenerator implements BuildGenerator {
+public class ScenarioFileGenerator implements Generator<Build> {
     public void generate(Build build) throws IOException {
         boolean jvmBuild = build.getRootProject().component(HasJavaSource.class) != null;
 

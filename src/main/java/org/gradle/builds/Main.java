@@ -162,25 +162,27 @@ public class Main {
                                     createModelAssembler())));
         }
 
-        private ModelGenerator createModelGenerator() {
-            return new ModelGenerator(
-                    new CompositeBuildGenerator(
-                            new SettingsFileGenerator(),
-                            new BuildFileGenerator(),
-                            new AndroidManifestGenerator(),
-                            new AndroidLocalPropertiesGenerator(),
-                            new AndroidStringResourcesGenerator(),
-                            new AndroidLayoutGenerator(),
-                            new AndroidImageGenerator(),
-                            new JavaSourceGenerator(),
-                            new JavaResourceGenerator(),
-                            new CppSourceGenerator(),
-                            new SwiftPackageManagerManifestGenerator(),
-                            new SwiftSourceGenerator(),
-                            // TODO - remove this
-                            new XCTestInfoPlistGenerator(),
-                            new HttpServerMainGenerator(),
-                            new ScenarioFileGenerator()));
+        private Generator<Model> createModelGenerator() {
+            return new CompositeGenerator<>(
+                    new ModelGenerator(
+                            new CompositeGenerator<>(
+                                    new SettingsFileGenerator(),
+                                    new BuildFileGenerator(),
+                                    new AndroidManifestGenerator(),
+                                    new AndroidLocalPropertiesGenerator(),
+                                    new AndroidStringResourcesGenerator(),
+                                    new AndroidLayoutGenerator(),
+                                    new AndroidImageGenerator(),
+                                    new JavaSourceGenerator(),
+                                    new JavaResourceGenerator(),
+                                    new CppSourceGenerator(),
+                                    new SwiftPackageManagerManifestGenerator(),
+                                    new SwiftSourceGenerator(),
+                                    // TODO - remove this
+                                    new XCTestInfoPlistGenerator(),
+                                    new HttpServerMainGenerator(),
+                                    new ScenarioFileGenerator())),
+                            new DotGenerator());
         }
 
         private ModelStructureAssembler createModelStructureAssembler() {

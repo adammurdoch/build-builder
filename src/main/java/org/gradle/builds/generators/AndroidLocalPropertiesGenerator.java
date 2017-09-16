@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 
-public class AndroidLocalPropertiesGenerator implements BuildGenerator {
+public class AndroidLocalPropertiesGenerator implements Generator<Build> {
     @Override
     public void generate(Build build) throws IOException {
         for (Project project : build.getProjects()) {

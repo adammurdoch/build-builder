@@ -134,4 +134,8 @@ public class Build {
     public void includeBuild(Build build) {
         childBuilds.add(build);
     }
+
+    public String getName() {
+        return rootProject.getName();
+    }
 }
