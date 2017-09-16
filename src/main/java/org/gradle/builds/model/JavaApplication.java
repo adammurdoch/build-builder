@@ -1,4 +1,4 @@
 package org.gradle.builds.model;
 
-public class JavaApplication extends HasJavaSource {
+public class JavaApplication extends HasJavaSource<JavaLibraryApi> {
 }

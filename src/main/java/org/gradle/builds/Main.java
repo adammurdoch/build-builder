@@ -251,9 +251,17 @@ public class Main {
 
     @Command(name = "cpp", description = "Generates a C++ build with source files")
     public static class InitCppBuild extends InitBuild {
+        @Option(name = "--builds", description = "The number of builds to generate (default: 1)")
+        int builds = 1;
+
         @Override
         protected String getType() {
             return "C++";
+        }
+
+        @Override
+        protected int getBuilds() {
+            return builds;
         }
 
         @Override

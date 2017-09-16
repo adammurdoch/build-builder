@@ -5,7 +5,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class AndroidComponent extends HasJavaSource {
+public class AndroidComponent extends HasJavaSource<JvmLibraryApi> {
     private String packageName;
     private String labelResource;
     private final Map<String, String> stringResources = new LinkedHashMap<>();

@@ -35,11 +35,12 @@ public class CppModelAssembler extends AbstractModelAssembler {
             apiSourceFile.addClass(apiClass);
             apiSourceFile.addHeader(implHeader);
 
-            addSource(project, lib, apiClass, apiSourceFile, implHeader);
-
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("cpp-library");
-            addDependencies(project, buildScript);
+            addPublishing(project, lib, project.getBuildScript());
+            addDependencies(project, lib, buildScript);
+
+            addSource(project, lib, apiClass, apiSourceFile, implHeader);
         } else if (project.component(CppApplication.class) != null) {
             CppApplication app = project.component(CppApplication.class);
 
@@ -53,11 +54,22 @@ public class CppModelAssembler extends AbstractModelAssembler {
             mainSourceFile.addHeader(headerFile);
             mainSourceFile.addClass(appClass);
 
-            addSource(project, app, appClass, mainSourceFile, headerFile);
-
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("cpp-executable");
-            addDependencies(project, buildScript);
+            addDependencies(project, app, buildScript);
+
+            addSource(project, app, appClass, mainSourceFile, headerFile);
+        }
+    }
+
+    private void addPublishing(Project project, CppLibrary library, BuildScript buildScript) {
+        if (project.getPublicationTarget() != null) {
+            String group = "org.gradle.example";
+            String module = project.getName();
+            String version = "1.2";
+            project.addComponent(new PublishedCppLibrary(new ExternalDependencyDeclaration(group, module, version), library.getApi()));
+            buildScript.property("group", group);
+            buildScript.property("version", version);
         }
     }
 
@@ -85,8 +97,7 @@ public class CppModelAssembler extends AbstractModelAssembler {
                 cppSourceFile.addHeader(implHeader);
             }
             if (layer == implLayer) {
-                addReferences(project, cppClass);
-                addLibHeaders(project, cppSourceFile);
+                addReferences(component, cppClass, cppSourceFile);
             }
             for (CppClass dep : dependencies) {
                 cppClass.uses(dep);
@@ -95,21 +106,21 @@ public class CppModelAssembler extends AbstractModelAssembler {
         });
     }
 
-    private void addLibHeaders(Project project, CppSourceFile sourceFile) {
-        for (Project dep : project.getDependencies()) {
-            sourceFile.addHeader(dep.component(CppLibrary.class).getApiHeader());
+    private void addReferences(HasCppSource component, CppClass cppClass, CppSourceFile sourceFile) {
+        for (CppLibraryApi library : component.getReferencedLibraries()) {
+            cppClass.uses(library.getApiClass());
+            sourceFile.addHeader(library.getApiHeader());
         }
     }
 
-    private void addReferences(Project project, CppClass cppClass) {
-        for (Project dep : project.getDependencies()) {
-            cppClass.uses(dep.component(CppLibrary.class).getApiClass());
-        }
-    }
-
-    private void addDependencies(Project project, BuildScript buildScript) {
+    private void addDependencies(Project project, HasCppSource component,  BuildScript buildScript) {
         for (Project dep : project.getDependencies()) {
             buildScript.dependsOn("implementation", new ProjectDependencyDeclaration(dep.getPath()));
+            component.uses(dep.component(CppLibrary.class).getApi());
+        }
+        for (PublishedCppLibrary library : project.getExternalDependencies(PublishedCppLibrary.class)) {
+            buildScript.dependsOn("implementation", library.getGav());
+            component.uses(library.getApi());
         }
     }
 }

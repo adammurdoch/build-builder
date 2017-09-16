@@ -3,7 +3,7 @@ package org.gradle.builds.model;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class HasCppSource extends HasSource<CppSourceFile> {
+public class HasCppSource extends HasSource<CppSourceFile, CppLibraryApi> {
     private final Set<CppHeaderFile> implHeaders = new LinkedHashSet<>();
     private final Set<CppHeaderFile> publicHeaders = new LinkedHashSet<>();
 

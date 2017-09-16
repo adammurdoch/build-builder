@@ -4,6 +4,10 @@ public class CppLibrary extends HasCppSource {
     private CppClass apiClass;
     private CppHeaderFile apiHeader;
 
+    public CppLibraryApi getApi() {
+        return new CppLibraryApi(apiClass, apiHeader);
+    }
+
     public CppClass getApiClass() {
         return apiClass;
     }

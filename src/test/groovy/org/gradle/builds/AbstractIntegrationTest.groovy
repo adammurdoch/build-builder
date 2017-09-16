@@ -293,6 +293,18 @@ abstract class AbstractIntegrationTest extends Specification {
             assert headerDir.list().findAll { it.endsWith(".h") }
         }
 
+        void isCppApplication() {
+            isCppProject()
+            appliesPlugin("cpp-executable")
+            doesNotApplyPlugin("cpp-library")
+        }
+
+        void isCppLibrary() {
+            isCppProject()
+            appliesPlugin("cpp-library")
+            doesNotApplyPlugin("cpp-executable")
+        }
+
         // TODO - add more checks
         void isSwiftProject() {
             isProject()

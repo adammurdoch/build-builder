@@ -15,14 +15,14 @@ public abstract class JvmModelAssembler extends AbstractModelAssembler {
         allProjects.block("tasks.withType(JavaCompile)").property("options.incremental", "true");
     }
 
-    protected void addTests(Project project, HasJavaSource application) {
+    protected void addTests(Project project, HasJavaSource<?> application) {
         for (JavaClass javaClass : application.getSourceFiles()) {
             JavaClass testClass = application.addTest(javaClass.getName() + "Test");
             testClass.addRole(new UnitTest(javaClass));
         }
     }
 
-    protected void addSource(Project project, HasJavaSource component, JavaClass apiClass, Consumer<JavaClass> implClass) {
+    protected void addSource(Project project, HasJavaSource<?> component, JavaClass apiClass, Consumer<JavaClass> implClass) {
         int implLayer = Math.max(0, project.getClassGraph().getLayers().size() - 2);
         String className = javaPackageFor(project) + "." + classNameFor(project);
         project.getClassGraph().visit((Graph.Visitor<JavaClass>) (nodeDetails, dependencies) -> {
