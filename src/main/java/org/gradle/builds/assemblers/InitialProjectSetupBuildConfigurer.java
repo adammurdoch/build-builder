@@ -38,9 +38,8 @@ public class InitialProjectSetupBuildConfigurer implements ModelAssembler {
         // Collect published libraries
         if (build.getPublicationTarget() != null) {
             for (Project project : build.getProjects()) {
-                PublishedLibrary library = project.component(PublishedLibrary.class);
-                if (library != null) {
-                    build.publishLibrary(library);
+                for (PublishedLibrary<?> publishedLibrary : project.getPublishedLibraries()) {
+                    build.publishLibrary(publishedLibrary);
                 }
             }
         }

@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 
 public abstract class JvmModelAssembler extends AbstractModelAssembler {
     private static final JavaLibraryApi slf4jApi = new JavaLibraryApi("slf4j", Collections.singletonList(JavaClassApi.method("org.slf4j.LoggerFactory", "getLogger(\"abc\")")));
-    protected static final PublishedLibrary<JavaLibraryApi> slfj4 = new PublishedLibrary<>(new ExternalDependencyDeclaration("org.slf4j:slf4j-api:1.7.25"), slf4jApi);
+    protected static final PublishedLibrary<JavaLibraryApi> slfj4 = new PublishedLibrary<>("slf4j", new ExternalDependencyDeclaration("org.slf4j:slf4j-api:1.7.25"), slf4jApi);
 
     @Override
     protected void rootProject(Project rootProject) {

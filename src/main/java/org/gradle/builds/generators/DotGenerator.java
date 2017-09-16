@@ -19,13 +19,18 @@ public class DotGenerator implements Generator<Model> {
             writer.println("digraph builds {");
             writer.println("  graph [rankdir=\"LR\"]");
             for (Build build : model.getBuilds()) {
+                writer.println("  subgraph cluster_build_" + build.getName() + " {");
+                writer.println("    color = \"blue\"");
                 for (Project project : build.getProjects()) {
-                    writer.println("  " + project.getName());
+                    writer.println("    " + project.getName());
+                }
+                writer.println("  }");
+                for (Project project : build.getProjects()) {
                     for (Project dep : project.getDependencies()) {
-                        writer.println("    " + project.getName() + " -> " + dep.getName());
+                        writer.println("  " + project.getName() + " -> " + dep.getName());
                     }
                     for (PublishedLibrary<?> library : project.getExternalDependencies(Object.class)) {
-                        writer.println("    " + project.getName() + " -> " + library.getGav().getGav().replace(':', '_').replace('.', '_'));
+                        writer.println("  " + project.getName() + " -> " + library.getDisplayName());
                     }
                 }
             }

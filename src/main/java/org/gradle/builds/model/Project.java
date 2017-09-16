@@ -16,7 +16,8 @@ public class Project {
     private final BuildScript buildScript = new BuildScript();
     private final Set<Project> dependencies = new LinkedHashSet<>();
     private final Set<Component> components = new LinkedHashSet<>();
-    private final List<PublishedLibrary> externalDependencies = new ArrayList<>();
+    private final List<LocalLibrary<?>> exportedLibraries = new ArrayList<>();
+    private final List<PublishedLibrary<?>> externalDependencies = new ArrayList<>();
     private Graph classGraph;
     private PublicationTarget publicationTarget;
 
@@ -96,15 +97,27 @@ public class Project {
         this.publicationTarget = publicationTarget;
     }
 
+    public List<PublishedLibrary<?>> getPublishedLibraries() {
+        return exportedLibraries.stream().filter(d -> d.getPublished() != null).map(d -> d.getPublished()).collect(Collectors.toList());
+    }
+
+    public <T> List<LocalLibrary<? extends T>> getExportedLibraries(Class<T> type) {
+        return exportedLibraries.stream().filter(d -> type.isInstance(d.getApi())).map(d -> (LocalLibrary<T>)d).collect(Collectors.toList());
+    }
+
+    public void export(LocalLibrary<?> library) {
+        exportedLibraries.add(library);
+    }
+
     public <T> List<PublishedLibrary<? extends T>> getExternalDependencies(Class<T> type) {
         return externalDependencies.stream().filter(d -> type.isInstance(d.getApi())).map(d -> (PublishedLibrary<T>)d).collect(Collectors.toList());
     }
 
-    public void dependsOn(PublishedLibrary library) {
+    public void dependsOn(PublishedLibrary<?> library) {
         this.externalDependencies.add(library);
     }
 
-    public void dependsOn(List<? extends PublishedLibrary> libraries) {
+    public void dependsOn(List<? extends PublishedLibrary<?>> libraries) {
         this.externalDependencies.addAll(libraries);
     }
 }

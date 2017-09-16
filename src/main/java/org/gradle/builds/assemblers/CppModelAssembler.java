@@ -67,13 +67,15 @@ public class CppModelAssembler extends AbstractModelAssembler {
             String group = "org.gradle.example";
             String module = project.getName();
             String version = "1.2";
-            project.addComponent(new PublishedLibrary<>(new ExternalDependencyDeclaration(group, module, version), library.getApi()));
+            project.export(new LocalLibrary<>(project, new ExternalDependencyDeclaration(group, module, version), library.getApi()));
             buildScript.property("group", group);
             buildScript.property("version", version);
             if (project.getPublicationTarget().getHttpRepository() != null) {
                 buildScript.requirePlugin("maven-publish");
                 buildScript.block("publishing").block("repositories").block("maven").property("url", new Scope.Code("uri('" + project.getPublicationTarget().getHttpRepository().getRootDir().toUri() + "')"));
             }
+        } else {
+            project.export(new LocalLibrary<>(project, null, library.getApi()));
         }
     }
 
@@ -120,10 +122,12 @@ public class CppModelAssembler extends AbstractModelAssembler {
     private void addDependencies(Project project, HasCppSource component,  BuildScript buildScript) {
         for (Project dep : project.getDependencies()) {
             buildScript.dependsOn("implementation", new ProjectDependencyDeclaration(dep.getPath()));
-            component.uses(dep.component(CppLibrary.class).getApi());
+            for (LocalLibrary<? extends CppLibraryApi> library : dep.getExportedLibraries(CppLibraryApi.class)) {
+                component.uses(library.getApi());
+            }
         }
         for (PublishedLibrary<? extends CppLibraryApi> library : project.getExternalDependencies(CppLibraryApi.class)) {
-            buildScript.dependsOn("implementation", library.getGav());
+            buildScript.dependsOn("implementation", library.getDependency());
             component.uses(library.getApi());
         }
     }

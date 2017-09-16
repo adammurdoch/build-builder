@@ -45,7 +45,7 @@ public class JavaModelAssembler extends JvmModelAssembler {
             String group = "org.gradle.example";
             String module = project.getName();
             String version = "1.2";
-            project.addComponent(new PublishedLibrary<>(new ExternalDependencyDeclaration(group, module, version), api));
+            project.export(new LocalLibrary<>(project, new ExternalDependencyDeclaration(group, module, version), api));
             buildScript.property("group", group);
             buildScript.property("version", version);
             if (project.getPublicationTarget().getHttpRepository() != null) {
@@ -53,6 +53,8 @@ public class JavaModelAssembler extends JvmModelAssembler {
                 ScriptBlock deployerBlock = buildScript.block("uploadArchives").block("repositories").block("mavenDeployer");
                 deployerBlock.statement("repository(url: new URI('" + project.getPublicationTarget().getHttpRepository().getRootDir().toUri() + "'))");
             }
+        } else {
+            project.export(new LocalLibrary<>(project, null, api));
         }
     }
 
@@ -69,12 +71,14 @@ public class JavaModelAssembler extends JvmModelAssembler {
                 continue;
             }
             buildScript.dependsOnProject("compile", dep.getPath());
-            component.uses(dep.component(JavaLibrary.class).getApi());
+            for (LocalLibrary<? extends JavaLibraryApi> library : dep.getExportedLibraries(JavaLibraryApi.class)) {
+                component.uses(library.getApi());
+            }
         }
 
         // Don't use Android libraries, only java libraries
         for (PublishedLibrary<? extends JavaLibraryApi> library : project.getExternalDependencies(JavaLibraryApi.class)) {
-            buildScript.dependsOn("compile", library.getGav());
+            buildScript.dependsOn("compile", library.getDependency());
             component.uses(library.getApi());
         }
 
