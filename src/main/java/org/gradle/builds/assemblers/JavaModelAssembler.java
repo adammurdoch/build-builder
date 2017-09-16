@@ -8,7 +8,7 @@ public class JavaModelAssembler extends JvmModelAssembler {
         if (project.component(JavaLibrary.class) != null) {
             JavaLibrary library = project.component(JavaLibrary.class);
 
-            project.dependsOn(slfj4);
+            project.requires(slfj4);
 
             JavaClass apiClass = library.addClass(javaPackageFor(project) + "." + classNameFor(project));
             library.setApiClass(apiClass);
@@ -24,7 +24,7 @@ public class JavaModelAssembler extends JvmModelAssembler {
         } else if (project.component(JavaApplication.class) != null) {
             JavaApplication application = project.component(JavaApplication.class);
 
-            project.dependsOn(slfj4);
+            project.requires(slfj4);
 
             JavaClass mainClass = application.addClass(javaPackageFor(project) + "." + classNameFor(project));
             mainClass.addRole(new AppEntryPoint());
@@ -65,19 +65,8 @@ public class JavaModelAssembler extends JvmModelAssembler {
     }
 
     private void addDependencies(Project project, HasJavaSource<JavaLibraryApi> component, BuildScript buildScript) {
-        for (Project dep : project.getDependencies()) {
-            if (dep.component(AndroidComponent.class) != null) {
-                // Don't use Android libraries
-                continue;
-            }
-            buildScript.dependsOnProject("compile", dep.getPath());
-            for (LocalLibrary<? extends JavaLibraryApi> library : dep.getExportedLibraries(JavaLibraryApi.class)) {
-                component.uses(library.getApi());
-            }
-        }
-
         // Don't use Android libraries, only java libraries
-        for (PublishedLibrary<? extends JavaLibraryApi> library : project.getExternalDependencies(JavaLibraryApi.class)) {
+        for (Library<? extends JavaLibraryApi> library : project.getRequiredLibraries(JavaLibraryApi.class)) {
             buildScript.dependsOn("compile", library.getDependency());
             component.uses(library.getApi());
         }

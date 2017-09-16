@@ -6,11 +6,10 @@ public class AllTypesProjectDecorator implements ModelAssembler {
     private final JavaModelAssembler javaModelAssembler = new JavaModelAssembler();
     private final AndroidModelAssembler androidModelAssembler = new AndroidModelAssembler(AndroidModelAssembler.defaultVersion);
     private final CppModelAssembler cppModelAssembler = new CppModelAssembler();
+    private final ProjectDepOrderBuildConfigurer buildConfigurer = new ProjectDepOrderBuildConfigurer(new CompositeProjectConfigurer(javaModelAssembler, androidModelAssembler, cppModelAssembler));
 
     @Override
     public void populate(Build build) {
-        javaModelAssembler.populate(build);
-        androidModelAssembler.populate(build);
-        cppModelAssembler.populate(build);
+        buildConfigurer.populate(build);
     }
 }

@@ -157,9 +157,11 @@ public class Main {
         private ModelConfigurer createModelConfigurer() {
             return new ModelConfigurer(
                     new InitialProjectSetupBuildConfigurer(
-                            new CompositeModelAssembler(
-                                    new HttpServerModelAssembler(),
-                                    createModelAssembler())));
+                            new ProjectDepOrderBuildConfigurer(
+                                    new CompositeProjectConfigurer(
+                                            new AttachDependenciesConfigurer(),
+                                            new HttpServerModelAssembler(),
+                                            createModelAssembler()))));
         }
 
         private Generator<Model> createModelGenerator() {
@@ -212,7 +214,7 @@ public class Main {
 
         protected abstract ProjectInitializer createProjectInitializer();
 
-        protected abstract ModelAssembler createModelAssembler();
+        protected abstract ProjectConfigurer createModelAssembler();
     }
 
     public static abstract class InitJvmBuild extends InitBuild {
@@ -246,7 +248,7 @@ public class Main {
         }
 
         @Override
-        protected ModelAssembler createModelAssembler() {
+        protected ProjectConfigurer createModelAssembler() {
             return new JavaModelAssembler();
         }
     }
@@ -280,7 +282,7 @@ public class Main {
         }
 
         @Override
-        protected ModelAssembler createModelAssembler() {
+        protected ProjectConfigurer createModelAssembler() {
             return new CppModelAssembler();
         }
     }
@@ -309,7 +311,7 @@ public class Main {
         }
 
         @Override
-        protected ModelAssembler createModelAssembler() {
+        protected ProjectConfigurer createModelAssembler() {
             return new SwiftModelAssembler();
         }
     }
@@ -340,12 +342,12 @@ public class Main {
         }
 
         @Override
-        protected ModelAssembler createModelAssembler() {
-            AndroidModelAssembler modelAssembler = new AndroidModelAssembler(androidVersion);
+        protected ProjectConfigurer createModelAssembler() {
+            AndroidModelAssembler projectConfigurer = new AndroidModelAssembler(androidVersion);
             if (includeJavaLibraries) {
-                return new CompositeModelAssembler(new JavaModelAssembler(), modelAssembler);
+                return new CompositeProjectConfigurer(new JavaModelAssembler(), projectConfigurer);
             }
-            return modelAssembler;
+            return projectConfigurer;
         }
     }
 }

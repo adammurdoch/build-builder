@@ -1,14 +1,15 @@
 package org.gradle.builds.assemblers;
 
 import org.gradle.builds.model.Build;
+import org.gradle.builds.model.LocalLibrary;
 import org.gradle.builds.model.Project;
 import org.gradle.builds.model.PublishedLibrary;
 
-public class InitialProjectSetupBuildConfigurer implements ModelAssembler {
-    private final ModelAssembler modelAssembler;
+public class InitialProjectSetupBuildConfigurer implements BuildConfigurer {
+    private final BuildConfigurer configurer;
 
-    public InitialProjectSetupBuildConfigurer(ModelAssembler modelAssembler) {
-        this.modelAssembler = modelAssembler;
+    public InitialProjectSetupBuildConfigurer(BuildConfigurer configurer) {
+        this.configurer = configurer;
     }
 
     @Override
@@ -29,11 +30,11 @@ public class InitialProjectSetupBuildConfigurer implements ModelAssembler {
                 build.getRootProject().getBuildScript().allProjects().maven(other.getPublicationTarget().getHttpRepository());
             }
             for (Project project : build.getProjects()) {
-                project.dependsOn(other.getPublishedLibraries());
+                project.requires(other.getPublishedLibraries());
             }
         }
 
-        modelAssembler.populate(build);
+        configurer.populate(build);
 
         // Collect published libraries
         if (build.getPublicationTarget() != null) {

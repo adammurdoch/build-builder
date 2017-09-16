@@ -6,7 +6,7 @@ public class LocalLibrary<T> implements Library<T> {
     private final ExternalDependencyDeclaration gav;
 
     public LocalLibrary(Project project, ExternalDependencyDeclaration gav, T api) {
-        this.project = project.getName();
+        this.project = project.getPath();
         this.api = api;
         this.gav = gav;
     }

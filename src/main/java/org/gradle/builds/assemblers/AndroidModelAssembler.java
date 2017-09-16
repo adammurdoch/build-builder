@@ -34,8 +34,8 @@ public class AndroidModelAssembler extends JvmModelAssembler {
             if (androidApplication.getPackageName() == null) {
                 androidApplication.setPackageName(javaPackageFor(project));
             }
-            project.dependsOn(slfj4);
-            project.dependsOn(supportUtils);
+            project.requires(slfj4);
+            project.requires(supportUtils);
             JavaClassApi rClass = JavaClassApi.field(androidApplication.getPackageName() + ".R.string", project.getName().toLowerCase() + "_string");
 
             JavaClass appActivity = androidApplication.addClass(androidApplication.getPackageName() + "." + classNameFor(project) + "MainActivity");
@@ -65,7 +65,7 @@ public class AndroidModelAssembler extends JvmModelAssembler {
             if (androidLibrary.getPackageName() == null) {
                 androidLibrary.setPackageName(javaPackageFor(project));
             }
-            project.dependsOn(slfj4);
+            project.requires(slfj4);
             JavaClassApi rClass = JavaClassApi.field(androidLibrary.getPackageName() + ".R.string", project.getName().toLowerCase() + "_string");
 
             JavaClass libraryActivity = androidLibrary.addClass(androidLibrary.getPackageName() + "." + classNameFor(project) + "Activity");
@@ -119,13 +119,7 @@ public class AndroidModelAssembler extends JvmModelAssembler {
     }
 
     private void addDependencies(Project project, AndroidComponent component, BuildScript buildScript) {
-        for (Project dep : project.getDependencies()) {
-            buildScript.dependsOnProject("compile", dep.getPath());
-            for (LocalLibrary<? extends JvmLibraryApi> library : dep.getExportedLibraries(JvmLibraryApi.class)) {
-                component.uses(library.getApi());
-            }
-        }
-        for (PublishedLibrary<? extends JvmLibraryApi> library : project.getExternalDependencies(JvmLibraryApi.class)) {
+        for (Library<? extends JvmLibraryApi> library : project.getRequiredLibraries(JvmLibraryApi.class)) {
             buildScript.dependsOn("compile", library.getDependency());
             component.uses(library.getApi());
         }

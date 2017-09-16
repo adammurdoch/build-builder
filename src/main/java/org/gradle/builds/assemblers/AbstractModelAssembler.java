@@ -1,30 +1,13 @@
 package org.gradle.builds.assemblers;
 
-import org.gradle.builds.model.Build;
 import org.gradle.builds.model.Project;
 
-import java.util.HashSet;
-import java.util.Set;
-
-public abstract class AbstractModelAssembler implements ModelAssembler {
+public abstract class AbstractModelAssembler implements ProjectConfigurer {
     @Override
-    public void populate(Build build) {
-        rootProject(build.getRootProject());
-        Set<Project> seen = new HashSet<>();
-        for (Project project : build.getProjects()) {
-            populate(build.getSettings(), project, seen);
+    public void configure(Settings settings, Project project) {
+        if (project.getParent() == null) {
+            rootProject(project);
         }
-    }
-
-    private void populate(Settings settings, Project project, Set<Project> seen) {
-        if (!seen.add(project)) {
-            return;
-        }
-
-        for (Project dep : project.getDependencies()) {
-            populate(settings, dep, seen);
-        }
-
         populate(settings, project);
     }
 

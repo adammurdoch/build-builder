@@ -120,13 +120,7 @@ public class CppModelAssembler extends AbstractModelAssembler {
     }
 
     private void addDependencies(Project project, HasCppSource component,  BuildScript buildScript) {
-        for (Project dep : project.getDependencies()) {
-            buildScript.dependsOn("implementation", new ProjectDependencyDeclaration(dep.getPath()));
-            for (LocalLibrary<? extends CppLibraryApi> library : dep.getExportedLibraries(CppLibraryApi.class)) {
-                component.uses(library.getApi());
-            }
-        }
-        for (PublishedLibrary<? extends CppLibraryApi> library : project.getExternalDependencies(CppLibraryApi.class)) {
+        for (Library<? extends CppLibraryApi> library : project.getRequiredLibraries(CppLibraryApi.class)) {
             buildScript.dependsOn("implementation", library.getDependency());
             component.uses(library.getApi());
         }

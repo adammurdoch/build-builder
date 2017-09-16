@@ -1,9 +1,9 @@
 package org.gradle.builds.generators;
 
 import org.gradle.builds.model.Build;
+import org.gradle.builds.model.Library;
 import org.gradle.builds.model.Model;
 import org.gradle.builds.model.Project;
-import org.gradle.builds.model.PublishedLibrary;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -26,10 +26,7 @@ public class DotGenerator implements Generator<Model> {
                 }
                 writer.println("  }");
                 for (Project project : build.getProjects()) {
-                    for (Project dep : project.getDependencies()) {
-                        writer.println("  " + project.getName() + " -> " + dep.getName());
-                    }
-                    for (PublishedLibrary<?> library : project.getExternalDependencies(Object.class)) {
+                    for (Library<?> library : project.getRequiredLibraries(Object.class)) {
                         writer.println("  " + project.getName() + " -> " + library.getDisplayName());
                     }
                 }

@@ -109,13 +109,7 @@ public class SwiftModelAssembler extends AbstractModelAssembler {
         buildScript.block("configurations").statement("testImplementation.extendsFrom(implementation)");
         // TODO - remove this hack
         String configuration = libHack ? "api" : "implementation";
-        for (Project dep : project.getDependencies()) {
-            buildScript.dependsOn(configuration, new ProjectDependencyDeclaration(dep.getPath()));
-            for (LocalLibrary<? extends SwiftLibraryApi> library : dep.getExportedLibraries(SwiftLibraryApi.class)) {
-                component.uses(library.getApi());
-            }
-        }
-        for (PublishedLibrary<? extends SwiftLibraryApi> library : project.getExternalDependencies(SwiftLibraryApi.class)) {
+        for (Library<? extends SwiftLibraryApi> library : project.getRequiredLibraries(SwiftLibraryApi.class)) {
             buildScript.dependsOn(configuration, library.getDependency());
             component.uses(library.getApi());
         }

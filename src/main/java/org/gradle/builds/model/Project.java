@@ -17,7 +17,7 @@ public class Project {
     private final Set<Project> dependencies = new LinkedHashSet<>();
     private final Set<Component> components = new LinkedHashSet<>();
     private final List<LocalLibrary<?>> exportedLibraries = new ArrayList<>();
-    private final List<PublishedLibrary<?>> externalDependencies = new ArrayList<>();
+    private final List<Library<?>> requiredLibraries = new ArrayList<>();
     private Graph classGraph;
     private PublicationTarget publicationTarget;
 
@@ -63,7 +63,7 @@ public class Project {
         return dependencies;
     }
 
-    public void dependsOn(Project project) {
+    public void requires(Project project) {
         this.dependencies.add(project);
     }
 
@@ -97,10 +97,16 @@ public class Project {
         this.publicationTarget = publicationTarget;
     }
 
+    /**
+     * Returns the libraries published by this project, if any.
+     */
     public List<PublishedLibrary<?>> getPublishedLibraries() {
-        return exportedLibraries.stream().filter(d -> d.getPublished() != null).map(d -> d.getPublished()).collect(Collectors.toList());
+        return exportedLibraries.stream().filter(d -> d.getPublished() != null).map(LocalLibrary::getPublished).collect(Collectors.toList());
     }
 
+    /**
+     * Returns the local libraries provided by this project, if any.
+     */
     public <T> List<LocalLibrary<? extends T>> getExportedLibraries(Class<T> type) {
         return exportedLibraries.stream().filter(d -> type.isInstance(d.getApi())).map(d -> (LocalLibrary<T>)d).collect(Collectors.toList());
     }
@@ -109,15 +115,18 @@ public class Project {
         exportedLibraries.add(library);
     }
 
-    public <T> List<PublishedLibrary<? extends T>> getExternalDependencies(Class<T> type) {
-        return externalDependencies.stream().filter(d -> type.isInstance(d.getApi())).map(d -> (PublishedLibrary<T>)d).collect(Collectors.toList());
+    /**
+     * Returns the libraries required by this project, if any.
+     */
+    public <T> List<Library<? extends T>> getRequiredLibraries(Class<T> type) {
+        return requiredLibraries.stream().filter(d -> type.isInstance(d.getApi())).map(d -> (Library<T>)d).collect(Collectors.toList());
     }
 
-    public void dependsOn(PublishedLibrary<?> library) {
-        this.externalDependencies.add(library);
+    public void requires(Library<?> library) {
+        this.requiredLibraries.add(library);
     }
 
-    public void dependsOn(List<? extends PublishedLibrary<?>> libraries) {
-        this.externalDependencies.addAll(libraries);
+    public void requires(List<? extends Library<?>> libraries) {
+        this.requiredLibraries.addAll(libraries);
     }
 }
