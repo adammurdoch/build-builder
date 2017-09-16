@@ -70,6 +70,10 @@ public class CppModelAssembler extends AbstractModelAssembler {
             project.addComponent(new PublishedCppLibrary(new ExternalDependencyDeclaration(group, module, version), library.getApi()));
             buildScript.property("group", group);
             buildScript.property("version", version);
+            if (project.getPublicationTarget().getHttpRepository() != null) {
+                buildScript.requirePlugin("maven-publish");
+                buildScript.block("publishing").block("repositories").block("maven").property("url", new Scope.Code("uri('" + project.getPublicationTarget().getHttpRepository().getRootDir().toUri() + "')"));
+            }
         }
     }
 

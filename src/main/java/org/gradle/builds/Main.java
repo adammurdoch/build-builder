@@ -254,6 +254,9 @@ public class Main {
         @Option(name = "--builds", description = "The number of builds to generate (default: 1)")
         int builds = 1;
 
+        @Option(name = "--http-repo", description = "Generate an HTTP repository (default: false)")
+        boolean httpRepo = false;
+
         @Override
         protected String getType() {
             return "C++";
@@ -262,6 +265,11 @@ public class Main {
         @Override
         protected int getBuilds() {
             return builds;
+        }
+
+        @Override
+        protected boolean isHttpRepo() {
+            return httpRepo;
         }
 
         @Override

@@ -156,4 +156,45 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
 
         build.buildSucceeds("build")
     }
+
+    def "can generate single project build with http repo"() {
+        given:
+        useIsolatedUserHome()
+
+        when:
+        new Main().run("cpp", "--http-repo", "--dir", projectDir.absolutePath)
+
+        then:
+        build.isBuild()
+        build.project(":").isCppApplication()
+
+        def srcDir = build.project(":").file("src/main/cpp")
+        new File(srcDir, "app_impl1_1.cpp").text.contains("Repo_core1")
+        new File(srcDir, "app_impl1_1.cpp").text.contains("Repo_lib1_1")
+        new File(srcDir, "app_impl1_1.cpp").text.contains("Repo_lib1_2")
+
+        def repoBuild = build(file('repo'))
+        repoBuild.isBuild()
+        repoBuild.project(':').isEmptyProject()
+        repoBuild.project(':repo_lib1_1').isCppLibrary()
+        repoBuild.project(':repo_lib1_2').isCppLibrary()
+        repoBuild.project(':repo_core1').isCppLibrary()
+
+        repoBuild.buildSucceeds("installDist")
+        new File(repoBuild.rootDir, "build/repo/org/gradle/example/repo_core1/1.2/repo_core1-1.2.pom").file
+        new File(repoBuild.rootDir, "build/repo/org/gradle/example/repo_core1/1.2/repo_core1-1.2-cpp-api-headers.zip").file
+
+        def server = repoBuild.app("build/install/repo/bin/repo").start()
+        waitFor(new URI("http://localhost:5005"))
+
+        build.buildSucceeds(":installDebug")
+
+        def app = build.app("build/install/main/debug/testApp")
+        app.succeeds()
+
+        build.buildSucceeds("build")
+
+        cleanup:
+        server?.kill()
+    }
 }

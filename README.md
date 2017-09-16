@@ -12,8 +12,8 @@ Supported build types:
 Generates one or more projects with source files. Can also be used to add source files to an existing skeleton build. 
 The source files have dependencies between each other, as described below.
 
-Generates JUnit tests for Java and Android projects, plus on-device tests for Android projects.
-Generates XCTest tests for Swift projects.
+Generates JUnit unit tests for Java and Android projects, plus on-device tests for Android projects.
+Generates XCTest unit tests for Swift projects.
 
 Can optionally generate a composite build.
 
@@ -39,7 +39,7 @@ The `--projects` option specifies the number of projects. Default is 1.
 
 The `--source-files` option specifies the number of source files per project. Default is 3.
 
-The `--http-repo` option generates an additional build that produces an HTTP repository that provides external libraries. This repository and its classes are referenced by the generated build. Use `gradle -p repo run` to build and start the HTTP server and libraries. Only available for Java and Android builds.
+The `--http-repo` option generates an additional build that produces an HTTP repository that provides external libraries. This repository and its classes are referenced by the generated build. Use `gradle -p repo run` to build and start the HTTP server and libraries. Not available for Swift builds.
 
 The `--builds` option specifies the number of builds to generate. Set to greater than 1 to generate a composite build. Default is 1. Not available for Android builds.
 
@@ -100,8 +100,9 @@ Here's an example:
 - No annotation processors are used.
 - External HTTP repo
     - Has fixed size and structure, only a small number of libraries.
-    - Not available for C++ or Swift
+    - Not available for Swift
     - Dependencies used by 'impl' class only, and this project uses all libraries from the repo directly rather than some set of API libraries
+    - Coordinates collide with previous generated libraries, should generate unique-ish coordinates
 - Composite builds
     - Doesn't generate a library project with `--projects 1` (the default)
     - Not available for Android
