@@ -2,9 +2,11 @@ package org.gradle.builds.assemblers;
 
 import org.gradle.builds.model.*;
 
+import java.util.Collections;
+
 public class AndroidModelAssembler extends JvmModelAssembler {
     public static final String defaultVersion = "2.3.2";
-    private static final PublishedJvmLibrary supportUtils = new PublishedJavaLibrary(new ExternalDependencyDeclaration("com.android.support:support-core-utils:25.1.0"), JavaClassApi.field("android.support.v4.app.NavUtils", "PARENT_ACTIVITY"));
+    private static final PublishedLibrary<JavaLibraryApi> supportUtils = new PublishedLibrary<>(new ExternalDependencyDeclaration("com.android.support:support-core-utils:25.1.0"), new JavaLibraryApi("support-core-utils", Collections.singletonList(JavaClassApi.field("android.support.v4.app.NavUtils", "PARENT_ACTIVITY"))));
     private final String pluginVersion;
 
     public AndroidModelAssembler(String pluginVersion) {
@@ -103,7 +105,7 @@ public class AndroidModelAssembler extends JvmModelAssembler {
             String group = "org.gradle.example";
             String module = project.getName();
             String version = "1.2";
-            project.addComponent(new PublishedAndroidLibrary(new ExternalDependencyDeclaration(group, module, version), api));
+            project.addComponent(new PublishedLibrary<>(new ExternalDependencyDeclaration(group, module, version), api));
             buildScript.property("group", group);
             buildScript.property("version", version);
             if (project.getPublicationTarget().getHttpRepository() != null) {
@@ -114,12 +116,12 @@ public class AndroidModelAssembler extends JvmModelAssembler {
         }
     }
 
-    private void addDependencies(Project project, HasJavaSource component, BuildScript buildScript) {
+    private void addDependencies(Project project, AndroidComponent component, BuildScript buildScript) {
         for (Project dep : project.getDependencies()) {
             buildScript.dependsOnProject("compile", dep.getPath());
             component.uses(dep.component(JvmLibrary.class).getApi());
         }
-        for (PublishedJvmLibrary library : project.getExternalDependencies(PublishedJvmLibrary.class)) {
+        for (PublishedLibrary<? extends JvmLibraryApi> library : project.getExternalDependencies(JvmLibraryApi.class)) {
             buildScript.dependsOn("compile", library.getGav());
             component.uses(library.getApi());
         }

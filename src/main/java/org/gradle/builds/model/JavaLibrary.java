@@ -2,7 +2,7 @@ package org.gradle.builds.model;
 
 import java.util.Collections;
 
-public class JavaLibrary extends HasJavaSource<JvmLibraryApi> implements JvmLibrary {
+public class JavaLibrary extends HasJavaSource<JavaLibraryApi> implements JvmLibrary {
     private final String projectName;
     private String targetJavaVersion;
     private JavaClass apiClass;

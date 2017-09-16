@@ -1,10 +1,16 @@
 package org.gradle.builds.model;
 
-public abstract class PublishedLibrary implements Component {
+public class PublishedLibrary<T> implements Component {
     private final ExternalDependencyDeclaration gav;
+    private final T api;
 
-    protected PublishedLibrary(ExternalDependencyDeclaration gav) {
+    public PublishedLibrary(ExternalDependencyDeclaration gav, T api) {
         this.gav = gav;
+        this.api = api;
+    }
+
+    public T getApi() {
+        return api;
     }
 
     public ExternalDependencyDeclaration getGav() {

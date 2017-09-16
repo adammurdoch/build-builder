@@ -1,6 +1,6 @@
 package org.gradle.builds.model;
 
-public class CppLibrary extends HasCppSource {
+public class CppLibrary extends HasCppSource implements Library<CppLibraryApi> {
     private CppClass apiClass;
     private CppHeaderFile apiHeader;
 

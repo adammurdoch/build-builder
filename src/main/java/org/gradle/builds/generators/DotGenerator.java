@@ -24,7 +24,7 @@ public class DotGenerator implements Generator<Model> {
                     for (Project dep : project.getDependencies()) {
                         writer.println("    " + project.getName() + " -> " + dep.getName());
                     }
-                    for (PublishedLibrary library : project.getExternalDependencies(PublishedLibrary.class)) {
+                    for (PublishedLibrary<?> library : project.getExternalDependencies(Object.class)) {
                         writer.println("    " + project.getName() + " -> " + library.getGav().getGav().replace(':', '_').replace('.', '_'));
                     }
                 }

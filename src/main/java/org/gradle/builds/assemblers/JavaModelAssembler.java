@@ -45,7 +45,7 @@ public class JavaModelAssembler extends JvmModelAssembler {
             String group = "org.gradle.example";
             String module = project.getName();
             String version = "1.2";
-            project.addComponent(new PublishedJavaLibrary(new ExternalDependencyDeclaration(group, module, version), api));
+            project.addComponent(new PublishedLibrary<>(new ExternalDependencyDeclaration(group, module, version), api));
             buildScript.property("group", group);
             buildScript.property("version", version);
             if (project.getPublicationTarget().getHttpRepository() != null) {
@@ -62,18 +62,18 @@ public class JavaModelAssembler extends JvmModelAssembler {
         }
     }
 
-    private void addDependencies(Project project, HasJavaSource component, BuildScript buildScript) {
+    private void addDependencies(Project project, HasJavaSource<JavaLibraryApi> component, BuildScript buildScript) {
         for (Project dep : project.getDependencies()) {
             if (dep.component(AndroidComponent.class) != null) {
                 // Don't use Android libraries
                 continue;
             }
             buildScript.dependsOnProject("compile", dep.getPath());
-            component.uses(dep.component(JvmLibrary.class).getApi());
+            component.uses(dep.component(JavaLibrary.class).getApi());
         }
 
         // Don't use Android libraries, only java libraries
-        for (PublishedJavaLibrary library : project.getExternalDependencies(PublishedJavaLibrary.class)) {
+        for (PublishedLibrary<? extends JavaLibraryApi> library : project.getExternalDependencies(JavaLibraryApi.class)) {
             buildScript.dependsOn("compile", library.getGav());
             component.uses(library.getApi());
         }

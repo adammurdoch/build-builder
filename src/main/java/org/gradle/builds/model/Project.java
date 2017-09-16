@@ -96,8 +96,8 @@ public class Project {
         this.publicationTarget = publicationTarget;
     }
 
-    public <T extends PublishedLibrary> List<T> getExternalDependencies(Class<T> type) {
-        return externalDependencies.stream().filter(d -> type.isInstance(d)).map(d -> type.cast(d)).collect(Collectors.toList());
+    public <T> List<PublishedLibrary<? extends T>> getExternalDependencies(Class<T> type) {
+        return externalDependencies.stream().filter(d -> type.isInstance(d.getApi())).map(d -> (PublishedLibrary<T>)d).collect(Collectors.toList());
     }
 
     public void dependsOn(PublishedLibrary library) {

@@ -1,4 +1,5 @@
 package org.gradle.builds.model;
 
-public interface Library extends Component {
+public interface Library<T> extends Component {
+    T getApi();
 }

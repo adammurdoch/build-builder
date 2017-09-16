@@ -67,7 +67,7 @@ public class CppModelAssembler extends AbstractModelAssembler {
             String group = "org.gradle.example";
             String module = project.getName();
             String version = "1.2";
-            project.addComponent(new PublishedCppLibrary(new ExternalDependencyDeclaration(group, module, version), library.getApi()));
+            project.addComponent(new PublishedLibrary<>(new ExternalDependencyDeclaration(group, module, version), library.getApi()));
             buildScript.property("group", group);
             buildScript.property("version", version);
             if (project.getPublicationTarget().getHttpRepository() != null) {
@@ -122,7 +122,7 @@ public class CppModelAssembler extends AbstractModelAssembler {
             buildScript.dependsOn("implementation", new ProjectDependencyDeclaration(dep.getPath()));
             component.uses(dep.component(CppLibrary.class).getApi());
         }
-        for (PublishedCppLibrary library : project.getExternalDependencies(PublishedCppLibrary.class)) {
+        for (PublishedLibrary<? extends CppLibraryApi> library : project.getExternalDependencies(CppLibraryApi.class)) {
             buildScript.dependsOn("implementation", library.getGav());
             component.uses(library.getApi());
         }

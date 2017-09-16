@@ -58,7 +58,7 @@ public class SwiftModelAssembler extends AbstractModelAssembler {
             String group = "org.gradle.example";
             String module = project.getName();
             String version = "1.2";
-            project.addComponent(new PublishedSwiftLibrary(new ExternalDependencyDeclaration(group, module, version), library.getApi()));
+            project.addComponent(new PublishedLibrary<>(new ExternalDependencyDeclaration(group, module, version), library.getApi()));
             buildScript.property("group", group);
             buildScript.property("version", version);
         }
@@ -111,7 +111,7 @@ public class SwiftModelAssembler extends AbstractModelAssembler {
             buildScript.dependsOn(configuration, new ProjectDependencyDeclaration(dep.getPath()));
             component.uses(dep.component(SwiftLibrary.class).getApi());
         }
-        for (PublishedSwiftLibrary library : project.getExternalDependencies(PublishedSwiftLibrary.class)) {
+        for (PublishedLibrary<? extends SwiftLibraryApi> library : project.getExternalDependencies(SwiftLibraryApi.class)) {
             buildScript.dependsOn(configuration, library.getGav());
             component.uses(library.getApi());
         }

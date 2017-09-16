@@ -2,7 +2,6 @@ package org.gradle.builds.assemblers;
 
 import org.gradle.builds.model.Build;
 import org.gradle.builds.model.Project;
-import org.gradle.builds.model.PublishedJvmLibrary;
 import org.gradle.builds.model.PublishedLibrary;
 
 public class InitialProjectSetupBuildConfigurer implements ModelAssembler {
