@@ -13,11 +13,11 @@ public class SwiftModelAssembler extends AbstractModelAssembler {
         if (project.component(SwiftLibrary.class) != null) {
             SwiftLibrary library = project.component(SwiftLibrary.class);
 
-            SwiftClass apiClass = new SwiftClass(classNameFor(project));
+            SwiftClass apiClass = new SwiftClass(project.getTypeNameFor());
             library.setApiClass(apiClass);
             library.setModule(capitalize(project.getName()));
 
-            SwiftSourceFile apiSourceFile = library.addSourceFile(fileNameFor(project) + ".swift");
+            SwiftSourceFile apiSourceFile = library.addSourceFile(project.getFileNameFor() + ".swift");
             apiSourceFile.addClass(apiClass);
 
             BuildScript buildScript = project.getBuildScript();
@@ -34,7 +34,7 @@ public class SwiftModelAssembler extends AbstractModelAssembler {
         } else if (project.component(SwiftApplication.class) != null) {
             SwiftApplication application = project.component(SwiftApplication.class);
 
-            SwiftClass appClass = new SwiftClass(classNameFor(project));
+            SwiftClass appClass = new SwiftClass(project.getTypeNameFor());
 
             SwiftSourceFile mainSourceFile = application.addSourceFile("main.swift");
             mainSourceFile.addMainFunction(appClass);
@@ -84,7 +84,7 @@ public class SwiftModelAssembler extends AbstractModelAssembler {
                     name = "Impl" + (layer) + "_" + (item + 1);
                 }
                 swiftClass = new SwiftClass(entryPoint.getName() + name);
-                swiftSourceFile = component.addSourceFile(fileNameFor(project) + "_" + name.toLowerCase() + ".swift");
+                swiftSourceFile = component.addSourceFile(project.getFileNameFor() + "_" + name.toLowerCase() + ".swift");
                 swiftSourceFile.addClass(swiftClass);
             }
             if (layer == implLayer) {

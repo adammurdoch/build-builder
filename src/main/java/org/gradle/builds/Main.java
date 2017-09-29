@@ -107,6 +107,9 @@ public class Main {
         @Option(name = "--projects", description = "The number of projects to include in the build (default: 1)")
         int projects = 1;
 
+        @Option(name = "--builds", description = "The number of builds to generate (default: 1)")
+        int builds = 1;
+
         @Override
         public Void call() throws Exception {
             validate();
@@ -135,7 +138,7 @@ public class Main {
         }
 
         protected int getBuilds() {
-            return 1;
+            return builds;
         }
 
         protected boolean isHttpRepo() {
@@ -229,17 +232,9 @@ public class Main {
 
     @Command(name = "java", description = "Generates a Java build with source files")
     public static class InitJavaBuild extends InitJvmBuild {
-        @Option(name = "--builds", description = "The number of builds to generate (default: 1)")
-        int builds = 1;
-
         @Override
         protected String getType() {
             return "Java";
-        }
-
-        @Override
-        protected int getBuilds() {
-            return builds;
         }
 
         @Override
@@ -255,20 +250,12 @@ public class Main {
 
     @Command(name = "cpp", description = "Generates a C++ build with source files")
     public static class InitCppBuild extends InitBuild {
-        @Option(name = "--builds", description = "The number of builds to generate (default: 1)")
-        int builds = 1;
-
         @Option(name = "--http-repo", description = "Generate an HTTP repository (default: false)")
         boolean httpRepo = false;
 
         @Override
         protected String getType() {
             return "C++";
-        }
-
-        @Override
-        protected int getBuilds() {
-            return builds;
         }
 
         @Override
@@ -292,17 +279,9 @@ public class Main {
         @Option(name = "--swift-pm", description = "Use the Swift package manager source layout (default: false)")
         boolean swiftPm = false;
 
-        @Option(name = "--builds", description = "The number of builds to generate (default: 1)")
-        int builds = 1;
-
         @Override
         protected String getType() {
             return "Swift";
-        }
-
-        @Override
-        protected int getBuilds() {
-            return builds;
         }
 
         @Override

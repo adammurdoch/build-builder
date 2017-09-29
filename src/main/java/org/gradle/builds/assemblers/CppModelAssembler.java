@@ -21,17 +21,17 @@ public class CppModelAssembler extends AbstractModelAssembler {
         if (project.component(CppLibrary.class) != null) {
             CppLibrary lib = project.component(CppLibrary.class);
 
-            CppClass apiClass = new CppClass(classNameFor(project));
+            CppClass apiClass = new CppClass(project.getTypeNameFor());
             lib.setApiClass(apiClass);
 
-            CppHeaderFile apiHeader = lib.addPublicHeaderFile(fileNameFor(project) + ".h");
+            CppHeaderFile apiHeader = lib.addPublicHeaderFile(project.getFileNameFor() + ".h");
             apiHeader.addClass(apiClass);
             lib.setApiHeader(apiHeader);
 
-            CppHeaderFile implHeader = lib.addImplementationHeaderFile(fileNameFor(project) + "_impl.h");
+            CppHeaderFile implHeader = lib.addImplementationHeaderFile(project.getFileNameFor() + "_impl.h");
             implHeader.addHeader(apiHeader);
 
-            CppSourceFile apiSourceFile = lib.addSourceFile(fileNameFor(project) + ".cpp");
+            CppSourceFile apiSourceFile = lib.addSourceFile(project.getFileNameFor() + ".cpp");
             apiSourceFile.addClass(apiClass);
             apiSourceFile.addHeader(implHeader);
 
@@ -44,12 +44,12 @@ public class CppModelAssembler extends AbstractModelAssembler {
         } else if (project.component(CppApplication.class) != null) {
             CppApplication app = project.component(CppApplication.class);
 
-            CppClass appClass = new CppClass(classNameFor(project));
+            CppClass appClass = new CppClass(project.getTypeNameFor());
 
-            CppHeaderFile headerFile = app.addImplementationHeaderFile(fileNameFor(project) + ".h");
+            CppHeaderFile headerFile = app.addImplementationHeaderFile(project.getFileNameFor() + ".h");
             headerFile.addClass(appClass);
 
-            CppSourceFile mainSourceFile = app.addSourceFile(fileNameFor(project) + ".cpp");
+            CppSourceFile mainSourceFile = app.addSourceFile(project.getFileNameFor() + ".cpp");
             mainSourceFile.addMainFunction(appClass);
             mainSourceFile.addHeader(headerFile);
             mainSourceFile.addClass(appClass);
@@ -98,7 +98,7 @@ public class CppModelAssembler extends AbstractModelAssembler {
                 }
                 cppClass = new CppClass(entryPoint.getName() + name);
                 implHeader.addClass(cppClass);
-                cppSourceFile = component.addSourceFile(fileNameFor(project) + "_" + name.toLowerCase() + ".cpp");
+                cppSourceFile = component.addSourceFile(project.getFileNameFor() + "_" + name.toLowerCase() + ".cpp");
                 cppSourceFile.addClass(cppClass);
                 cppSourceFile.addHeader(implHeader);
             }

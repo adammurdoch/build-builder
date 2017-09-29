@@ -25,7 +25,7 @@ public abstract class JvmModelAssembler extends AbstractModelAssembler {
 
     protected void addSource(Project project, HasJavaSource<?> component, JavaClass apiClass, Consumer<JavaClass> implClass) {
         int implLayer = Math.max(0, project.getClassGraph().getLayers().size() - 2);
-        String className = javaPackageFor(project) + "." + classNameFor(project);
+        String className = project.getQualifiedNamespaceFor() + "." + project.getTypeNameFor();
         project.getClassGraph().visit((Graph.Visitor<JavaClass>) (nodeDetails, dependencies) -> {
             JavaClass javaClass;
             int layer = nodeDetails.getLayer();

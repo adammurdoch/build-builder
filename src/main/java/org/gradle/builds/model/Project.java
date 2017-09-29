@@ -47,6 +47,49 @@ public class Project {
         return parentPath + ":" + name;
     }
 
+    /**
+     * Returns lower case '.' separated namespace for this project.
+     */
+    public String getQualifiedNamespaceFor() {
+        if (parent == null) {
+            return "org.gradle.example";
+        }
+        return "org.gradle.example." + name.toLowerCase();
+    }
+
+    /**
+     * Returns a capital-cased identifier that can be used as a type name for this project.
+     */
+    public String getTypeNameFor() {
+        if (parent == null) {
+            return "App";
+        }
+        StringBuilder builder = new StringBuilder();
+        int pos = 0;
+        while (pos < name.length()) {
+            int sep = name.indexOf('_', pos);
+            if (sep < 0) {
+                builder.append(Character.toUpperCase(name.charAt(pos)));
+                builder.append(name.substring(pos + 1));
+                break;
+            }
+            builder.append(Character.toUpperCase(name.charAt(pos)));
+            builder.append(name.substring(pos + 1, sep));
+            pos = sep + 1;
+        }
+        return builder.toString();
+    }
+
+    /**
+     * Returns a base name that can be used as a file name for this project.
+     */
+    public String getFileNameFor() {
+        if (parent == null) {
+            return "app";
+        }
+        return name.toLowerCase();
+    }
+
     public Path getProjectDir() {
         return projectDir;
     }

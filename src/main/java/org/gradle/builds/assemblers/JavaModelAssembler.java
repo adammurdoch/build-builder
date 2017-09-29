@@ -10,7 +10,7 @@ public class JavaModelAssembler extends JvmModelAssembler {
 
             project.requires(slfj4);
 
-            JavaClass apiClass = library.addClass(javaPackageFor(project) + "." + classNameFor(project));
+            JavaClass apiClass = library.addClass(project.getQualifiedNamespaceFor() + "." + project.getTypeNameFor());
             library.setApiClass(apiClass);
 
             BuildScript buildScript = project.getBuildScript();
@@ -26,7 +26,7 @@ public class JavaModelAssembler extends JvmModelAssembler {
 
             project.requires(slfj4);
 
-            JavaClass mainClass = application.addClass(javaPackageFor(project) + "." + classNameFor(project));
+            JavaClass mainClass = application.addClass(project.getQualifiedNamespaceFor() + "." + project.getTypeNameFor());
             mainClass.addRole(new AppEntryPoint());
 
             BuildScript buildScript = project.getBuildScript();

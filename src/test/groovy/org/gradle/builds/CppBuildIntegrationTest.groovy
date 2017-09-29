@@ -139,10 +139,10 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":").isCppApplication()
         build.project(":core1").isCppLibrary()
         def srcDir = build.project(":").file("src/main/cpp")
-        new File(srcDir, "app_impl1_1.cpp").text.contains("Child1_core1")
+        new File(srcDir, "app_impl1_1.cpp").text.contains("Child1Core1")
 
         def coreSrcDir = build.project(":core1").file("src/main/cpp")
-        new File(coreSrcDir, "core1_impl1_1.cpp").text.contains("Child1_core1")
+        new File(coreSrcDir, "core1_impl1_1.cpp").text.contains("Child1Core1")
 
         def child = build(file("child1"))
         child.isBuild()
@@ -169,9 +169,9 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":").isCppApplication()
 
         def srcDir = build.project(":").file("src/main/cpp")
-        new File(srcDir, "app_impl1_1.cpp").text.contains("Repo_core1")
-        new File(srcDir, "app_impl1_1.cpp").text.contains("Repo_lib1_1")
-        new File(srcDir, "app_impl1_1.cpp").text.contains("Repo_lib1_2")
+        new File(srcDir, "app_impl1_1.cpp").text.contains("RepoCore1")
+        new File(srcDir, "app_impl1_1.cpp").text.contains("RepoLib11")
+        new File(srcDir, "app_impl1_1.cpp").text.contains("RepoLib12")
 
         def repoBuild = build(file('repo'))
         repoBuild.isBuild()

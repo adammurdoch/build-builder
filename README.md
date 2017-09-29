@@ -43,7 +43,7 @@ The `--source-files` option specifies the number of source files per project. De
 
 The `--http-repo` option generates an additional build that produces an HTTP repository that provides external libraries. This repository and its classes are referenced by the generated build. Use `gradle -p repo run` to build and start the HTTP server and libraries. Not available for Swift builds.
 
-The `--builds` option specifies the number of builds to generate. Set to greater than 1 to generate a composite build. Default is 1. Not available for Android builds.
+The `--builds` option specifies the number of builds to generate. Set to greater than 1 to generate a composite build. Default is 1.
 
 ### Android specific options
 
@@ -107,7 +107,6 @@ Here's an example:
     - Coordinates collide with previous generated libraries, should generate unique-ish coordinates
 - Composite builds
     - Doesn't generate a library project with `--projects 1` (the default)
-    - Not available for Android
     - Dependencies used by 'impl' class only, and this project uses all libraries from the repo directly rather than some set of API libraries
 - External dependencies are the same for all projects.
     - Only a small number of external dependencies

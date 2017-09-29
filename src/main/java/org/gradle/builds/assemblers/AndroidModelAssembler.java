@@ -32,13 +32,13 @@ public class AndroidModelAssembler extends JvmModelAssembler {
         if (project.component(AndroidApplication.class) != null) {
             AndroidApplication androidApplication = project.component(AndroidApplication.class);
             if (androidApplication.getPackageName() == null) {
-                androidApplication.setPackageName(javaPackageFor(project));
+                androidApplication.setPackageName(project.getQualifiedNamespaceFor());
             }
             project.requires(slfj4);
             project.requires(supportUtils);
             JavaClassApi rClass = JavaClassApi.field(androidApplication.getPackageName() + ".R.string", project.getName().toLowerCase() + "_string");
 
-            JavaClass appActivity = androidApplication.addClass(androidApplication.getPackageName() + "." + classNameFor(project) + "MainActivity");
+            JavaClass appActivity = androidApplication.addClass(androidApplication.getPackageName() + "." + project.getTypeNameFor() + "MainActivity");
             appActivity.addRole(new AndroidActivity());
             androidApplication.activity(appActivity);
 
@@ -63,12 +63,12 @@ public class AndroidModelAssembler extends JvmModelAssembler {
         } else if (project.component(AndroidLibrary.class) != null) {
             AndroidLibrary androidLibrary = project.component(AndroidLibrary.class);
             if (androidLibrary.getPackageName() == null) {
-                androidLibrary.setPackageName(javaPackageFor(project));
+                androidLibrary.setPackageName(project.getQualifiedNamespaceFor());
             }
             project.requires(slfj4);
             JavaClassApi rClass = JavaClassApi.field(androidLibrary.getPackageName() + ".R.string", project.getName().toLowerCase() + "_string");
 
-            JavaClass libraryActivity = androidLibrary.addClass(androidLibrary.getPackageName() + "." + classNameFor(project) + "Activity");
+            JavaClass libraryActivity = androidLibrary.addClass(androidLibrary.getPackageName() + "." + project.getTypeNameFor() + "Activity");
             libraryActivity.addRole(new AndroidActivity());
             androidLibrary.setActivity(libraryActivity);
             androidLibrary.setRClass(rClass);
@@ -131,7 +131,7 @@ public class AndroidModelAssembler extends JvmModelAssembler {
     @Override
     protected void addTests(Project project, HasJavaSource application) {
         super.addTests(project, application);
-        application.addTest(javaPackageFor(project) + "." + classNameFor(project) + "InstrumentedTest").addRole(new InstrumentedTest());
+        application.addTest(project.getQualifiedNamespaceFor() + "." + project.getTypeNameFor() + "InstrumentedTest").addRole(new InstrumentedTest());
     }
 
     private void addSourceFiles(Project project, AndroidComponent androidComponent, JavaClass activity, JavaClassApi rClass) {
