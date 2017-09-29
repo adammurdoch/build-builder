@@ -52,9 +52,15 @@ public class Project {
      */
     public String getQualifiedNamespaceFor() {
         if (parent == null) {
-            return "org.gradle.example";
+            return "org.gradle.example.app";
         }
-        return "org.gradle.example." + name.toLowerCase();
+        return "org.gradle.example" + mapName(name, (src, startOffset, endOffset, dest) -> {
+            String element = src.substring(startOffset, endOffset).toLowerCase();
+            if (Character.isJavaIdentifierStart(element.charAt(0))) {
+                dest.append(".");
+            }
+            dest.append(element);
+        });
     }
 
     /**
@@ -64,20 +70,10 @@ public class Project {
         if (parent == null) {
             return "App";
         }
-        StringBuilder builder = new StringBuilder();
-        int pos = 0;
-        while (pos < name.length()) {
-            int sep = name.indexOf('_', pos);
-            if (sep < 0) {
-                builder.append(Character.toUpperCase(name.charAt(pos)));
-                builder.append(name.substring(pos + 1));
-                break;
-            }
-            builder.append(Character.toUpperCase(name.charAt(pos)));
-            builder.append(name.substring(pos + 1, sep));
-            pos = sep + 1;
-        }
-        return builder.toString();
+        return mapName(name, (src, startOffset, endOffset, dest) -> {
+            dest.append(Character.toUpperCase(src.charAt(startOffset)));
+            dest.append(src.substring(startOffset + 1, endOffset));
+        });
     }
 
     /**
@@ -88,6 +84,25 @@ public class Project {
             return "app";
         }
         return name.toLowerCase();
+    }
+
+    private interface NameCollector {
+        void append(String src, int startOffset, int endOffset, StringBuilder dest);
+    }
+
+    private String mapName(String name, NameCollector collector) {
+        StringBuilder builder = new StringBuilder();
+        int pos = 0;
+        while (pos < name.length()) {
+            int sep = name.indexOf('_', pos);
+            if (sep < 0) {
+                collector.append(name, pos, name.length(), builder);
+                break;
+            }
+            collector.append(name, pos, sep, builder);
+            pos = sep + 1;
+        }
+        return builder.toString();
     }
 
     public Path getProjectDir() {

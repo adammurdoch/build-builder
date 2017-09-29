@@ -204,25 +204,29 @@ abstract class AbstractIntegrationTest extends Specification {
 
         String getPackagePath() {
             if (path == ':') {
-                return ''
+                return 'app'
             } else {
-                return path.replace(':', '/')
+                return path.replace(':', '/').replace('_', '/')
             }
+        }
+
+        void containsFilesWithExtension(File dir, String extension) {
+            assert dir.directory
+            List<File> found = []
+            dir.eachFileRecurse { f -> if (f.name.endsWith("." + extension)) { found.add(f) } }
+            assert !found.empty
         }
 
         // TODO - add more checks
         void hasJavaSource() {
-            def srcDir = file("src/main/java/org/gradle/example/${packagePath}")
-            assert srcDir.directory
-            assert srcDir.list().findAll { it.endsWith(".java") }
+            def srcDir = file("src/main/java")
+            containsFilesWithExtension(srcDir, "java")
 
             def resourceDir = file("src/main/resources")
-            assert resourceDir.directory
-            assert resourceDir.list().findAll { it.endsWith(".properties") }
+            containsFilesWithExtension(resourceDir, "properties")
 
-            def testSrcDir = file("src/test/java/org/gradle/example/${packagePath}")
-            assert testSrcDir.directory
-            assert testSrcDir.list().findAll { it.endsWith(".java") }
+            def testSrcDir = file("src/test/java")
+            containsFilesWithExtension(testSrcDir, "java")
         }
 
         void appliesPlugin(String plugin) {
@@ -262,9 +266,8 @@ abstract class AbstractIntegrationTest extends Specification {
             assert layoutDir.directory
             assert layoutDir.list().findAll { it.endsWith(".xml") }
 
-            def testSrcDir = file("src/androidTest/java/org/gradle/example/${packagePath}")
-            assert testSrcDir.directory
-            assert testSrcDir.list().findAll { it.endsWith(".java") }
+            def testSrcDir = file("src/androidTest/java")
+            containsFilesWithExtension(testSrcDir, "java")
         }
 
         // TODO - add more checks

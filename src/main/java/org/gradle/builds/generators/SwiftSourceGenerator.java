@@ -69,10 +69,17 @@ public class SwiftSourceGenerator extends ProjectComponentSpecificGenerator<HasS
         try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(sourceFile))) {
             printWriter.println("// GENERATED SOURCE FILE");
             printWriter.println("import XCTest");
+            for (String module : swiftSource.getModules()) {
+                printWriter.println("import " + module);
+            }
             printWriter.println();
             for (SwiftClass swiftClass : swiftSource.getClasses()) {
                 printWriter.println("class " + swiftClass.getName() + ": XCTestCase {");
                 printWriter.println("    func testOk() {");
+                XCUnitTest unitTest = swiftClass.role(XCUnitTest.class);
+                if (unitTest != null) {
+                    printWriter.println("        let " + unitTest.getClassUnderTest().getName().toLowerCase() + " = " + unitTest.getClassUnderTest().getName() + "()");
+                }
                 printWriter.println("        XCTAssertEqual(1, 1)");
                 printWriter.println("    }");
                 printWriter.println("}");

@@ -16,11 +16,14 @@ class SwiftBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":").isSwiftApplication()
 
         def srcDir = build.project(":").file("src/main/swift")
-        srcDir.list() as Set == ["main.swift", "app_impl1_1.swift", "app_nodeps1.swift"] as Set
-        new File(srcDir, "main.swift").text.contains("AppImpl1_1")
-        new File(srcDir, "app_impl1_1.swift").text.contains("AppNoDeps1")
+        srcDir.list() as Set == ["main.swift", "AppImpl1_1.swift", "AppNoDeps1.swift"] as Set
+        new File(srcDir, "main.swift").text.contains("AppImpl1_1()")
+        new File(srcDir, "AppImpl1_1.swift").text.contains("let appnodeps1 = AppNoDeps1()")
 
-        build.project(":").file("src/test/swift").list() as Set == ["apptest.swift", "appimpl1_1test.swift", "appnodeps1test.swift"] as Set
+        def testDir = build.project(":").file("src/test/swift")
+        testDir.list() as Set == ["AppTest.swift", "AppImpl1_1Test.swift", "AppNoDeps1Test.swift"] as Set
+        new File(testDir, "AppTest.swift").text.contains("import TestApp")
+        new File(testDir, "AppTest.swift").text.contains("let app = App()")
 
         build.buildSucceeds(":installDebug")
         build.app("build/install/main/debug/testApp").succeeds()
@@ -37,14 +40,15 @@ class SwiftBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":").isSwiftApplication()
 
         def srcDir = build.project(":").file("src/main/swift")
-        srcDir.list() as Set == ["main.swift", "app_impl1_1.swift", "app_nodeps1.swift"] as Set
-        new File(srcDir, "app_impl1_1.swift").text.contains("Core1")
+        srcDir.list() as Set == ["main.swift", "AppImpl1_1.swift", "AppNoDeps1.swift"] as Set
+        new File(srcDir, "AppImpl1_1.swift").text.contains("import Core1")
+        new File(srcDir, "AppImpl1_1.swift").text.contains("let core1 = Core1()")
 
-        build.project(":").file("src/test/swift").list() as Set == ["apptest.swift", "appimpl1_1test.swift", "appnodeps1test.swift"] as Set
+        build.project(":").file("src/test/swift").list() as Set == ["AppTest.swift", "AppImpl1_1Test.swift", "AppNoDeps1Test.swift"] as Set
 
         build.project(":core1").isSwiftLibrary()
-        build.project(":core1").file("src/main/swift").list() as Set == ["core1.swift", "core1_impl1_1.swift", "core1_nodeps1.swift"] as Set
-        build.project(":core1").file("src/test/swift").list() as Set == ["core1test.swift", "core1impl1_1test.swift", "core1nodeps1test.swift"] as Set
+        build.project(":core1").file("src/main/swift").list() as Set == ["Core1.swift", "Core1Impl1_1.swift", "Core1NoDeps1.swift"] as Set
+        build.project(":core1").file("src/test/swift").list() as Set == ["Core1Test.swift", "Core1Impl1_1Test.swift", "Core1NoDeps1Test.swift"] as Set
 
         build.buildSucceeds(":installDebug")
         build.app("build/install/main/debug/testApp").succeeds()
@@ -82,15 +86,16 @@ class SwiftBuildIntegrationTest extends AbstractIntegrationTest {
         build.file("Package.swift").file
 
         def srcDir = build.file("Sources/testApp")
-        srcDir.list() as Set == ["main.swift", "app_impl1_1.swift", "app_nodeps1.swift"] as Set
-        new File(srcDir, "app_impl1_1.swift").text.contains("Core1")
+        srcDir.list() as Set == ["main.swift", "AppImpl1_1.swift", "AppNoDeps1.swift"] as Set
+        new File(srcDir, "AppImpl1_1.swift").text.contains("import Core1")
+        new File(srcDir, "AppImpl1_1.swift").text.contains("let core1 = Core1()")
 
-        build.file("Tests/testAppTests").list() as Set == ["apptest.swift", "appimpl1_1test.swift", "appnodeps1test.swift"] as Set
+        build.file("Tests/testAppTests").list() as Set == ["AppTest.swift", "AppImpl1_1Test.swift", "AppNoDeps1Test.swift"] as Set
 
         build.project(":core1").isSwiftPMProject()
-        build.file("Sources/core1").list() as Set == ["core1.swift", "core1_impl1_1.swift", "core1_nodeps1.swift"] as Set
+        build.file("Sources/core1").list() as Set == ["Core1.swift", "Core1Impl1_1.swift", "Core1NoDeps1.swift"] as Set
 
-        build.file("Tests/core1Tests").list() as Set == ["core1test.swift", "core1impl1_1test.swift", "core1nodeps1test.swift"] as Set
+        build.file("Tests/core1Tests").list() as Set == ["Core1Test.swift", "Core1Impl1_1Test.swift", "Core1NoDeps1Test.swift"] as Set
 
         build.buildSucceeds(":installDebug")
         build.app("build/install/main/debug/testApp").succeeds()
@@ -108,10 +113,12 @@ class SwiftBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":").isSwiftApplication()
         build.project(":core1").isSwiftLibrary()
         def srcDir = build.project(":").file("src/main/swift")
-        new File(srcDir, "app_impl1_1.swift").text.contains("Child1_core1")
+        new File(srcDir, "AppImpl1_1.swift").text.contains("import Child1_core1")
+        new File(srcDir, "AppImpl1_1.swift").text.contains("let child1core1 = Child1Core1()")
 
         def coreSrcDir = build.project(":core1").file("src/main/swift")
-        new File(coreSrcDir, "core1_impl1_1.swift").text.contains("Child1_core1")
+        new File(coreSrcDir, "Core1Impl1_1.swift").text.contains("import Child1_core1")
+        new File(coreSrcDir, "Core1Impl1_1.swift").text.contains("let child1core1 = Child1Core1()")
 
         def child = build(file("child1"))
         child.isBuild()

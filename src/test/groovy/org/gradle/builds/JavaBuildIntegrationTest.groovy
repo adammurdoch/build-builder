@@ -11,12 +11,12 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         build.isBuild()
 
         build.project(":").isJavaApplication()
-        def srcDir = build.project(":").file("src/main/java/org/gradle/example")
+        def srcDir = build.project(":").file("src/main/java/org/gradle/example/app")
         srcDir.list() as Set == ["App.java", "AppImpl1_1.java", "AppNoDeps1.java"] as Set
-        new File(srcDir, "App.java").text.contains("org.gradle.example.AppImpl1_1.getSomeValue()")
-        new File(srcDir, "App.java").text.contains("org.gradle.example.AppImpl1_1.INT_CONST")
-        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.AppNoDeps1.getSomeValue()")
-        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.AppNoDeps1.INT_CONST")
+        new File(srcDir, "App.java").text.contains("org.gradle.example.app.AppImpl1_1.getSomeValue()")
+        new File(srcDir, "App.java").text.contains("org.gradle.example.app.AppImpl1_1.INT_CONST")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.app.AppNoDeps1.getSomeValue()")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.app.AppNoDeps1.INT_CONST")
         new File(srcDir, "AppImpl1_1.java").text.contains("org.slf4j.LoggerFactory.getLogger(\"abc\")")
 
         build.buildSucceeds(":installDist")
@@ -55,7 +55,7 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
         build.project(":").isJavaApplication()
-        def srcDir = build.project(":").file("src/main/java/org/gradle/example")
+        def srcDir = build.project(":").file("src/main/java/org/gradle/example/app")
         srcDir.list() as Set == ["App.java", "AppImpl1_1.java", "AppNoDeps1.java"] as Set
         new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.core1.Core1.getSomeValue()")
         new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.core1.Core1.INT_CONST")
@@ -82,10 +82,10 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         build.isBuild()
 
         build.project(":").isJavaApplication()
-        build.project(":").file("src/main/java/org/gradle/example").list() as Set == ["App.java", "AppImpl1_1.java", "AppNoDeps1.java"] as Set
+        build.project(":").file("src/main/java/org/gradle/example/app").list() as Set == ["App.java", "AppImpl1_1.java", "AppNoDeps1.java"] as Set
 
         build.project(":lib1_1").isJavaLibrary()
-        build.project(":lib1_1").file("src/main/java/org/gradle/example/lib1_1").list() as Set == ["Lib11.java", "Lib11Impl1_1.java", "Lib11NoDeps1.java"] as Set
+        build.project(":lib1_1").file("src/main/java/org/gradle/example/lib11").list() as Set == ["Lib11.java", "Lib11Impl1_1.java", "Lib11NoDeps1.java"] as Set
 
         build.project(":core1").isJavaLibrary()
         build.project(":core1").file("src/main/java/org/gradle/example/core1").list() as Set == ["Core1.java", "Core1Impl1_1.java", "Core1NoDeps1.java"] as Set
@@ -130,13 +130,13 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
 
         build.project(":").isJavaApplication()
         build.project(":core1").isJavaLibrary()
-        def srcDir = build.project(":").file("src/main/java/org/gradle/example")
-        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.child1_core1.Child1Core1.getSomeValue()")
-        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.child1_core1.Child1Core1.INT_CONST")
+        def srcDir = build.project(":").file("src/main/java/org/gradle/example/app")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.child1.core1.Child1Core1.getSomeValue()")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.child1.core1.Child1Core1.INT_CONST")
 
         def coreSrcDir = build.project(":core1").file("src/main/java/org/gradle/example/core1")
-        new File(coreSrcDir, "Core1Impl1_1.java").text.contains("org.gradle.example.child1_core1.Child1Core1.getSomeValue()")
-        new File(coreSrcDir, "Core1Impl1_1.java").text.contains("org.gradle.example.child1_core1.Child1Core1.INT_CONST")
+        new File(coreSrcDir, "Core1Impl1_1.java").text.contains("org.gradle.example.child1.core1.Child1Core1.getSomeValue()")
+        new File(coreSrcDir, "Core1Impl1_1.java").text.contains("org.gradle.example.child1.core1.Child1Core1.INT_CONST")
 
         def child = build(file("child1"))
         child.isBuild()
@@ -164,13 +164,13 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         build.isBuild()
         build.project(":").isJavaApplication()
 
-        def srcDir = build.project(":").file("src/main/java/org/gradle/example")
-        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo_core1.RepoCore1.getSomeValue()")
-        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo_core1.RepoCore1.INT_CONST")
-        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo_lib1_1.RepoLib11.getSomeValue()")
-        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo_lib1_1.RepoLib11.INT_CONST")
-        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo_lib1_2.RepoLib12.getSomeValue()")
-        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo_lib1_2.RepoLib12.INT_CONST")
+        def srcDir = build.project(":").file("src/main/java/org/gradle/example/app")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo.core1.RepoCore1.getSomeValue()")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo.core1.RepoCore1.INT_CONST")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo.lib11.RepoLib11.getSomeValue()")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo.lib11.RepoLib11.INT_CONST")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo.lib12.RepoLib12.getSomeValue()")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo.lib12.RepoLib12.INT_CONST")
 
         def repoBuild = build(file('repo'))
         repoBuild.isBuild()
@@ -212,15 +212,15 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":lib1_1").isJavaLibrary()
         build.project(":core1").isJavaLibrary()
 
-        def srcDir = build.project(":").file("src/main/java/org/gradle/example")
-        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo_core1.RepoCore1.getSomeValue()")
-        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo_core1.RepoCore1.INT_CONST")
-        def libSrcDir = build.project(":lib1_1").file("src/main/java/org/gradle/example/lib1_1")
-        new File(libSrcDir, "Lib11Impl1_1.java").text.contains("org.gradle.example.repo_core1.RepoCore1.getSomeValue()")
-        new File(libSrcDir, "Lib11Impl1_1.java").text.contains("org.gradle.example.repo_core1.RepoCore1.INT_CONST")
+        def srcDir = build.project(":").file("src/main/java/org/gradle/example/app")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo.core1.RepoCore1.getSomeValue()")
+        new File(srcDir, "AppImpl1_1.java").text.contains("org.gradle.example.repo.core1.RepoCore1.INT_CONST")
+        def libSrcDir = build.project(":lib1_1").file("src/main/java/org/gradle/example/lib11")
+        new File(libSrcDir, "Lib11Impl1_1.java").text.contains("org.gradle.example.repo.core1.RepoCore1.getSomeValue()")
+        new File(libSrcDir, "Lib11Impl1_1.java").text.contains("org.gradle.example.repo.core1.RepoCore1.INT_CONST")
         def coreSrcDir = build.project(":core1").file("src/main/java/org/gradle/example/core1")
-        new File(coreSrcDir, "Core1Impl1_1.java").text.contains("org.gradle.example.repo_core1.RepoCore1.getSomeValue()")
-        new File(coreSrcDir, "Core1Impl1_1.java").text.contains("org.gradle.example.repo_core1.RepoCore1.INT_CONST")
+        new File(coreSrcDir, "Core1Impl1_1.java").text.contains("org.gradle.example.repo.core1.RepoCore1.getSomeValue()")
+        new File(coreSrcDir, "Core1Impl1_1.java").text.contains("org.gradle.example.repo.core1.RepoCore1.INT_CONST")
 
         def repoBuild = build(file('repo'))
         repoBuild.isBuild()

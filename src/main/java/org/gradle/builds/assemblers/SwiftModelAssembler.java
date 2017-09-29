@@ -17,7 +17,7 @@ public class SwiftModelAssembler extends AbstractModelAssembler {
             library.setApiClass(apiClass);
             library.setModule(capitalize(project.getName()));
 
-            SwiftSourceFile apiSourceFile = library.addSourceFile(project.getFileNameFor() + ".swift");
+            SwiftSourceFile apiSourceFile = library.addSourceFile(apiClass.getName() + ".swift");
             apiSourceFile.addClass(apiClass);
 
             BuildScript buildScript = project.getBuildScript();
@@ -30,9 +30,10 @@ public class SwiftModelAssembler extends AbstractModelAssembler {
             }
 
             addSource(project, library, apiClass, apiSourceFile);
-            addTests(project, library);
+            addTests(library);
         } else if (project.component(SwiftApplication.class) != null) {
             SwiftApplication application = project.component(SwiftApplication.class);
+            application.setModule(capitalize(project.getName()));
 
             SwiftClass appClass = new SwiftClass(project.getTypeNameFor());
 
@@ -49,7 +50,7 @@ public class SwiftModelAssembler extends AbstractModelAssembler {
             }
 
             addSource(project, application, appClass, mainSourceFile);
-            addTests(project, application);
+            addTests(application);
         }
     }
 
@@ -84,7 +85,7 @@ public class SwiftModelAssembler extends AbstractModelAssembler {
                     name = "Impl" + (layer) + "_" + (item + 1);
                 }
                 swiftClass = new SwiftClass(entryPoint.getName() + name);
-                swiftSourceFile = component.addSourceFile(project.getFileNameFor() + "_" + name.toLowerCase() + ".swift");
+                swiftSourceFile = component.addSourceFile(swiftClass.getName() + ".swift");
                 swiftSourceFile.addClass(swiftClass);
             }
             if (layer == implLayer) {
@@ -115,12 +116,15 @@ public class SwiftModelAssembler extends AbstractModelAssembler {
         }
     }
 
-    private void addTests(Project project, HasSwiftSource application) {
-        for (SwiftSourceFile sourceFile : application.getSourceFiles()) {
+    private void addTests(HasSwiftSource component) {
+        for (SwiftSourceFile sourceFile : component.getSourceFiles()) {
             for (SwiftClass swiftClass : sourceFile.getClasses()) {
                 String className = swiftClass.getName() + "Test";
-                SwiftSourceFile testSourceFile = application.addTestFile(new SwiftSourceFile(className.toLowerCase() + ".swift"));
-                testSourceFile.addClass(new SwiftClass(className));
+                SwiftSourceFile testSourceFile = component.addTestFile(new SwiftSourceFile(className + ".swift"));
+                testSourceFile.addModule(component.getModule());
+                SwiftClass testClass = new SwiftClass(className);
+                testClass.addRole(new XCUnitTest(swiftClass));
+                testSourceFile.addClass(testClass);
             }
         }
     }

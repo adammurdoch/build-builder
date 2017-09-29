@@ -4,16 +4,18 @@ public class LocalLibrary<T> implements Library<T> {
     private final String project;
     private final T api;
     private final ExternalDependencyDeclaration gav;
+    private final String name;
 
     public LocalLibrary(Project project, ExternalDependencyDeclaration gav, T api) {
         this.project = project.getPath();
+        name = project.getName();
         this.api = api;
         this.gav = gav;
     }
 
     @Override
     public String getDisplayName() {
-        return project;
+        return name;
     }
 
     @Override
@@ -28,7 +30,7 @@ public class LocalLibrary<T> implements Library<T> {
 
     public PublishedLibrary<T> getPublished() {
         if (gav != null) {
-            return new PublishedLibrary<>(project, gav, api);
+            return new PublishedLibrary<>(name, gav, api);
         }
         return null;
     }
