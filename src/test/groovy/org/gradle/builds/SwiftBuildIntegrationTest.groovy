@@ -4,7 +4,7 @@ import spock.lang.Unroll
 
 class SwiftBuildIntegrationTest extends AbstractIntegrationTest {
     def setup() {
-        gradleVersion = "4.3-20170914235708+0000"
+        gradleVersion = "4.4-20171102235952+0000"
     }
 
     def "can generate single project build"() {

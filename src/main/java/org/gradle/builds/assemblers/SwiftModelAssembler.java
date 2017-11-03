@@ -107,8 +107,6 @@ public class SwiftModelAssembler extends AbstractModelAssembler {
 
     private void addDependencies(Project project, HasSwiftSource component, BuildScript buildScript, boolean libHack) {
         // TODO - remove this hack
-        buildScript.block("configurations").statement("testImplementation.extendsFrom(implementation)");
-        // TODO - remove this hack
         String configuration = libHack ? "api" : "implementation";
         for (Library<? extends SwiftLibraryApi> library : project.getRequiredLibraries(SwiftLibraryApi.class)) {
             buildScript.dependsOn(configuration, library.getDependency());
