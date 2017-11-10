@@ -24,21 +24,23 @@ public class Graph {
         return nodes;
     }
 
-    void addNode(int layer, int item, boolean useAlternate) {
+    void addNode(NodeDetails nodeDetails) {
         Node node;
-        if (layer == 0 && nodes.isEmpty()) {
+        int layer = nodeDetails.getLayer();
+        int item = nodeDetails.getItem();
+        if (nodeDetails.getLayer() == 0 && nodes.isEmpty()) {
             node = root;
             nodes.add(root);
         } else {
-            node = new Node(layer, item, useAlternate) {
+            node = new Node(layer, item, nodeDetails.isUseAlternate()) {
                 @Override
                 public String toString() {
-                    return "{layer: " + (layer + 1) + ", item: " + (item + 1) + "}";
+                    return "{layer: " + (nodeDetails.getLayer() + 1) + ", item: " + (item + 1) + "}";
                 }
             };
             nodes.add(node);
         }
-        while (layers.size() <= layer) {
+        while (layers.size() <= nodeDetails.getLayer()) {
             layers.add(new ArrayList<>());
         }
         layers.get(layer).add(node);
@@ -107,7 +109,7 @@ public class Graph {
         }
 
         public List<Node> getDependsOn() {
-            if (layer < layers.size()-1) {
+            if (layer < layers.size() - 1) {
                 return layers.get(layer + 1);
             }
             return Collections.emptyList();
