@@ -9,9 +9,9 @@ public class GraphAssembler {
      * A node depends on every node in the next layer.
      */
     public Graph arrange(int nodes) {
-        int remaining = nodes - 1;
         List<Layer> layers = new ArrayList<>();
         layers.add(new Layer(layers.size(), 1));
+        int remaining = nodes - 1;
         while (remaining > 0) {
             if (remaining > 8) {
                 layers.add(new Layer(layers.size(), 6));
@@ -55,13 +55,15 @@ public class GraphAssembler {
         }
 
         Graph graph = new Graph();
+        if (nodes == 2) {
+            layers.get(1).noAlternate = true;
+        }
         for (Layer layer : layers) {
             if (layer.id < layers.size() - 1) {
                 layer.next = layers.get(layer.id + 1);
             }
-            int itemsInLayer = layer.nodes;
-            for (int item = 0; item < itemsInLayer; item++) {
-                graph.addNode(new NodeImpl(layer, item, nodes > 3 && item == itemsInLayer - 1 || nodes == 3 && layer.isLast()));
+            for (NodeImpl node : layer.getNodes()) {
+                graph.addNode(node);
             }
         }
         return graph;
@@ -101,16 +103,28 @@ public class GraphAssembler {
 
     private static class Layer {
         final int id;
-        final int nodes;
+        final int size;
+        final List<NodeImpl> nodes;
         Layer next;
+        boolean noAlternate;
 
-        Layer(int id, int nodes) {
+        Layer(int id, int size) {
             this.id = id;
-            this.nodes = nodes;
+            this.size = size;
+            this.nodes = new ArrayList<>(size);
         }
 
         boolean isLast() {
             return next == null;
+        }
+
+        List<NodeImpl> getNodes() {
+            if (nodes.size() != size) {
+                for (int item = 0; item < size; item++) {
+                    nodes.add(new NodeImpl(this, item, size > 1 && item == size - 1 || !noAlternate && size == 1 && isLast()));
+                }
+            }
+            return nodes;
         }
     }
 }
