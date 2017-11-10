@@ -7,10 +7,8 @@ class GraphAssemblerTest extends Specification {
 
     def "arranges 1 node"() {
         // <root>
-        def graph = new Graph()
-
         when:
-        assembler.arrange(1, graph)
+        def graph = assembler.arrange(1)
 
         then:
         graph.nodes.size() == 1
@@ -25,10 +23,8 @@ class GraphAssemblerTest extends Specification {
 
     def "arranges 2 nodes"() {
         // <root> -> <node>
-        def graph = new Graph()
-
         when:
-        assembler.arrange(2, graph)
+        def graph = assembler.arrange(2)
 
         then:
         def nodes = graph.nodes as List
@@ -52,10 +48,8 @@ class GraphAssemblerTest extends Specification {
 
     def "arranges 3 nodes"() {
         // <root> -> <node1> -> <node2>
-        def graph = new Graph()
-
         when:
-        assembler.arrange(3, graph)
+        def graph = assembler.arrange(3)
 
         then:
         def nodes = graph.nodes as List
@@ -87,10 +81,8 @@ class GraphAssemblerTest extends Specification {
     def "arranges 4 nodes"() {
         // <root> -> <node1> -> <node3>
         //        -> <node2> ->
-        def graph = new Graph()
-
         when:
-        assembler.arrange(4, graph)
+        def graph = assembler.arrange(4)
 
         then:
         def nodes = graph.nodes as List
@@ -130,10 +122,8 @@ class GraphAssemblerTest extends Specification {
         // <root> -> <node1> -> <node4>
         //        -> <node2> ->
         //        -> <node3> ->
-        def graph = new Graph()
-
         when:
-        assembler.arrange(5, graph)
+        def graph = assembler.arrange(5)
 
         then:
         def nodes = graph.nodes as List
@@ -180,10 +170,8 @@ class GraphAssemblerTest extends Specification {
         // <root> -> <node1> -> <node4> (no-deps)
         //        -> <node2> -> <node5> (no-deps
         //        -> <node3> ->
-        def graph = new Graph()
-
         when:
-        assembler.arrange(6, graph)
+        def graph = assembler.arrange(6)
 
         then:
         def nodes = graph.nodes as List
@@ -220,10 +208,8 @@ class GraphAssemblerTest extends Specification {
         //        -> <node2> -> <node6> (no-deps)
         //        -> <node3> ->
         //        -> <node4> ->
-        def graph = new Graph()
-
         when:
-        assembler.arrange(7, graph)
+        def graph = assembler.arrange(7)
 
         then:
         def nodes = graph.nodes as List
@@ -245,10 +231,8 @@ class GraphAssemblerTest extends Specification {
         //        -> <node3> ->
         //        -> <node4> ->
         //        -> <node5> ->
-        def graph = new Graph()
-
         when:
-        assembler.arrange(8, graph)
+        def graph = assembler.arrange(8)
 
         then:
         def nodes = graph.nodes as List
@@ -272,10 +256,8 @@ class GraphAssemblerTest extends Specification {
         //        -> <node4> ->
         //        -> <node5> ->
         //        -> <node6> ->
-        def graph = new Graph()
-
         when:
-        assembler.arrange(9, graph)
+        def graph = assembler.arrange(9)
 
         then:
         def nodes = graph.nodes as List
@@ -300,10 +282,8 @@ class GraphAssemblerTest extends Specification {
         //        -> <node4> ->
         //        -> <node5> ->
         //        -> <node6> ->
-        def graph = new Graph()
-
         when:
-        assembler.arrange(10, graph)
+        def graph = assembler.arrange(10)
 
         then:
         def nodes = graph.nodes as List
@@ -329,10 +309,8 @@ class GraphAssemblerTest extends Specification {
         //        -> <node4> ->
         //        -> <node5> ->
         //        -> <node6> ->
-        def graph = new Graph()
-
         when:
-        assembler.arrange(11, graph)
+        def graph = assembler.arrange(11)
 
         then:
         def nodes = graph.nodes as List
@@ -359,10 +337,8 @@ class GraphAssemblerTest extends Specification {
         //        -> <node4> ->
         //        -> <node5> ->
         //        -> <node6> ->
-        def graph = new Graph()
-
         when:
-        assembler.arrange(12, graph)
+        def graph = assembler.arrange(12)
 
         then:
         def nodes = graph.nodes as List
@@ -390,10 +366,8 @@ class GraphAssemblerTest extends Specification {
         //        -> <node4> -> <node10> ->
         //        -> <node5> -> <node11> ->
         //        -> <node6> -> <node12> ->
-        def graph = new Graph()
-
         when:
-        assembler.arrange(17, graph)
+        def graph = assembler.arrange(17)
 
         then:
         def nodes = graph.nodes as List

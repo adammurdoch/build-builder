@@ -5,9 +5,8 @@ import org.gradle.builds.model.Project;
 
 public class StructureAssembler {
     public void arrangeClasses(Build build) {
-        Graph classGraph = new Graph();
         Settings settings = build.getSettings();
-        new GraphAssembler().arrange(settings.getSourceFileCount(), classGraph);
+        Graph classGraph = new GraphAssembler().arrange(settings.getSourceFileCount());
         System.out.println("* Arranging source files in " + classGraph.getLayers().size() + " layers per project.");
         for (Project project : build.getProjects()) {
             project.setClassGraph(classGraph);
@@ -15,9 +14,8 @@ public class StructureAssembler {
     }
 
     public void arrangeProjects(Build build, ProjectInitializer projectInitializer) {
-        Graph projectGraph = new Graph();
         Settings settings = build.getSettings();
-        new GraphAssembler().arrange(settings.getProjectCount(), projectGraph);
+        Graph projectGraph = new GraphAssembler().arrange(settings.getProjectCount());
         System.out.println("* Arranging projects in " + projectGraph.getLayers().size() + " layers.");
 
         projectGraph.visit((Graph.Visitor<Project>) (nodeDetails, dependencies) -> {
