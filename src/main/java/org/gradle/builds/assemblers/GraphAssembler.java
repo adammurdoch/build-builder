@@ -1,6 +1,7 @@
 package org.gradle.builds.assemblers;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class GraphAssembler {
@@ -55,6 +56,7 @@ public class GraphAssembler {
         }
 
         Graph graph = new Graph();
+        layers.get(0).noAlternate = true;
         if (nodes == 2) {
             layers.get(1).noAlternate = true;
         }
@@ -62,6 +64,8 @@ public class GraphAssembler {
             if (layer.id < layers.size() - 1) {
                 layer.next = layers.get(layer.id + 1);
             }
+        }
+        for (Layer layer : layers) {
             for (NodeImpl node : layer.getNodes()) {
                 graph.addNode(node);
             }
@@ -73,11 +77,18 @@ public class GraphAssembler {
         final Layer layer;
         final int item;
         final boolean useAlternate;
+        final List<NodeImpl> dependencies;
 
-        NodeImpl(Layer layer, int item, boolean useAlternate) {
+        NodeImpl(Layer layer, int item, List<NodeImpl> dependencies, boolean useAlternate) {
             this.layer = layer;
             this.item = item;
+            this.dependencies = dependencies;
             this.useAlternate = useAlternate;
+        }
+
+        @Override
+        public String toString() {
+            return "{layer: " + (layer.id + 1) + ", item: " + (item + 1) + "}";
         }
 
         @Override
@@ -99,6 +110,11 @@ public class GraphAssembler {
         public boolean isLastLayer() {
             return layer.isLast();
         }
+
+        @Override
+        public List<? extends Graph.NodeDetails> getDependencies() {
+            return dependencies;
+        }
     }
 
     private static class Layer {
@@ -119,12 +135,13 @@ public class GraphAssembler {
         }
 
         List<NodeImpl> getNodes() {
-            if (nodes.size() != size) {
+            List<NodeImpl> deps = next == null ? Collections.emptyList() : next.getNodes();
+            if (this.nodes.size() != size) {
                 for (int item = 0; item < size; item++) {
-                    nodes.add(new NodeImpl(this, item, size > 1 && item == size - 1 || !noAlternate && size == 1 && isLast()));
+                    this.nodes.add(new NodeImpl(this, item, deps, size > 1 && item == size - 1 || !noAlternate && size == 1 && isLast()));
                 }
             }
-            return nodes;
+            return this.nodes;
         }
     }
 }

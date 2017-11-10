@@ -3,58 +3,42 @@ package org.gradle.builds.assemblers;
 import java.util.*;
 
 public class Graph {
-    private final List<Node> nodes = new ArrayList<>();
-    private final List<List<Node>> layers = new ArrayList<>();
-    private final Node root = new Node(0, 0, false) {
-        @Override
-        public String toString() {
-            return "<root>";
-        }
-    };
+    private final List<NodeDetails> nodes = new ArrayList<>();
+    private final List<List<NodeDetails>> layers = new ArrayList<>();
+    private NodeDetails root;
 
-    public List<List<Node>> getLayers() {
+    public List<List<NodeDetails>> getLayers() {
         return layers;
     }
 
-    public Node getRoot() {
+    public NodeDetails getRoot() {
         return root;
     }
 
-    public List<Node> getNodes() {
+    public List<NodeDetails> getNodes() {
         return nodes;
     }
 
-    void addNode(NodeDetails nodeDetails) {
-        Node node;
-        int layer = nodeDetails.getLayer();
-        int item = nodeDetails.getItem();
-        if (nodeDetails.getLayer() == 0 && nodes.isEmpty()) {
-            node = root;
-            nodes.add(root);
-        } else {
-            node = new Node(layer, item, nodeDetails.isUseAlternate()) {
-                @Override
-                public String toString() {
-                    return "{layer: " + (nodeDetails.getLayer() + 1) + ", item: " + (item + 1) + "}";
-                }
-            };
-            nodes.add(node);
+    void addNode(NodeDetails node) {
+        int layer = node.getLayer();
+        if (layer == 0 && nodes.isEmpty()) {
+            root = node;
         }
-        while (layers.size() <= nodeDetails.getLayer()) {
+        nodes.add(node);
+        while (layers.size() <= node.getLayer()) {
             layers.add(new ArrayList<>());
         }
         layers.get(layer).add(node);
     }
 
     public <T> void visit(Visitor<T> visitor) {
-        Map<Graph.Node, T> values = new HashMap<>();
+        Map<NodeDetails, T> values = new HashMap<>();
         int lastLayer = getLayers().size() - 1;
         for (int layer = lastLayer; layer >= 0; layer--) {
-            List<Graph.Node> nodes = getLayers().get(layer);
-            for (int item = 0; item < nodes.size(); item++) {
-                Graph.Node node = nodes.get(item);
-                Set<T> deps = new LinkedHashSet<T>();
-                for (Node dep : node.getDependsOn()) {
+            List<? extends NodeDetails> nodes = getLayers().get(layer);
+            for (NodeDetails node : nodes) {
+                Set<T> deps = new LinkedHashSet<>();
+                for (NodeDetails dep : node.getDependencies()) {
                     deps.add(values.get(dep));
                 }
                 T value = visitor.visitNode(node, deps);
@@ -71,48 +55,11 @@ public class Graph {
         boolean isUseAlternate();
 
         boolean isLastLayer();
+
+        List<? extends NodeDetails> getDependencies();
     }
 
     public interface Visitor<T> {
         T visitNode(NodeDetails node, Set<T> dependencies);
-    }
-
-    private class Node implements NodeDetails {
-        private final int layer;
-        private final int item;
-        private final boolean useAlternate;
-
-        Node(int layer, int item, boolean useAlternate) {
-            this.layer = layer;
-            this.item = item;
-            this.useAlternate = useAlternate;
-        }
-
-        @Override
-        public int getLayer() {
-            return layer;
-        }
-
-        @Override
-        public int getItem() {
-            return item;
-        }
-
-        @Override
-        public boolean isLastLayer() {
-            return layer == getLayers().size() - 1;
-        }
-
-        @Override
-        public boolean isUseAlternate() {
-            return useAlternate;
-        }
-
-        public List<Node> getDependsOn() {
-            if (layer < layers.size() - 1) {
-                return layers.get(layer + 1);
-            }
-            return Collections.emptyList();
-        }
     }
 }
