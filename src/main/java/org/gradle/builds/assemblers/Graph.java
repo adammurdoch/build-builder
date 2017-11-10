@@ -3,27 +3,19 @@ package org.gradle.builds.assemblers;
 import java.util.*;
 
 public class Graph {
-    private final List<NodeDetails> nodes = new ArrayList<>();
-    private final List<List<NodeDetails>> layers = new ArrayList<>();
-    private NodeDetails root;
+    private final List<Node> nodes = new ArrayList<>();
+    private final List<List<Node>> layers = new ArrayList<>();
 
-    public List<List<NodeDetails>> getLayers() {
+    public List<List<Node>> getLayers() {
         return layers;
     }
 
-    public NodeDetails getRoot() {
-        return root;
-    }
-
-    public List<NodeDetails> getNodes() {
+    public List<Node> getNodes() {
         return nodes;
     }
 
-    void addNode(NodeDetails node) {
+    void addNode(Node node) {
         int layer = node.getLayer();
-        if (layer == 0 && nodes.isEmpty()) {
-            root = node;
-        }
         nodes.add(node);
         while (layers.size() <= node.getLayer()) {
             layers.add(new ArrayList<>());
@@ -32,13 +24,13 @@ public class Graph {
     }
 
     public <T> void visit(Visitor<T> visitor) {
-        Map<NodeDetails, T> values = new HashMap<>();
+        Map<Node, T> values = new HashMap<>();
         int lastLayer = getLayers().size() - 1;
         for (int layer = lastLayer; layer >= 0; layer--) {
-            List<? extends NodeDetails> nodes = getLayers().get(layer);
-            for (NodeDetails node : nodes) {
+            List<? extends Node> nodes = getLayers().get(layer);
+            for (Node node : nodes) {
                 Set<T> deps = new LinkedHashSet<>();
-                for (NodeDetails dep : node.getDependencies()) {
+                for (Node dep : node.getDependencies()) {
                     deps.add(values.get(dep));
                 }
                 T value = visitor.visitNode(node, deps);
@@ -47,7 +39,7 @@ public class Graph {
         }
     }
 
-    public interface NodeDetails {
+    public interface Node {
         int getLayer();
 
         int getItem();
@@ -56,10 +48,10 @@ public class Graph {
 
         boolean isLastLayer();
 
-        List<? extends NodeDetails> getDependencies();
+        List<? extends Node> getDependencies();
     }
 
     public interface Visitor<T> {
-        T visitNode(NodeDetails node, Set<T> dependencies);
+        T visitNode(Node node, Set<T> dependencies);
     }
 }

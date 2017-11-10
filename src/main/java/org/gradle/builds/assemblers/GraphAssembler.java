@@ -73,7 +73,7 @@ public class GraphAssembler {
         return graph;
     }
 
-    private static class NodeImpl implements Graph.NodeDetails {
+    private static class NodeImpl implements Graph.Node {
         final Layer layer;
         final int item;
         final boolean useAlternate;
@@ -112,7 +112,7 @@ public class GraphAssembler {
         }
 
         @Override
-        public List<? extends Graph.NodeDetails> getDependencies() {
+        public List<? extends Graph.Node> getDependencies() {
             return dependencies;
         }
     }

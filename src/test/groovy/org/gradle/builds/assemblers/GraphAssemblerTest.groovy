@@ -14,11 +14,12 @@ class GraphAssemblerTest extends Specification {
         graph.nodes.size() == 1
         graph.layers.size() == 1
 
-        graph.root.dependencies.empty
-        graph.root.layer == 0
-        graph.root.item == 0
-        graph.root.lastLayer
-        !graph.root.useAlternate
+        def root = graph.nodes[0]
+        root.dependencies.empty
+        root.layer == 0
+        root.item == 0
+        root.lastLayer
+        !root.useAlternate
     }
 
     def "arranges 2 nodes"() {
@@ -27,17 +28,18 @@ class GraphAssemblerTest extends Specification {
         def graph = assembler.arrange(2)
 
         then:
-        def nodes = graph.nodes as List
+        def nodes = graph.nodes
         graph.nodes.size() == 2
         graph.layers.size() == 2
 
+        def root = nodes[0]
         def n1 = nodes[1]
 
-        graph.root.dependencies == [n1]
-        graph.root.layer == 0
-        graph.root.item == 0
-        !graph.root.lastLayer
-        !graph.root.useAlternate
+        root.dependencies == [n1]
+        root.layer == 0
+        root.item == 0
+        !root.lastLayer
+        !root.useAlternate
 
         n1.dependencies.empty
         n1.layer == 1
@@ -52,18 +54,19 @@ class GraphAssemblerTest extends Specification {
         def graph = assembler.arrange(3)
 
         then:
-        def nodes = graph.nodes as List
+        def nodes = graph.nodes
         graph.nodes.size() == 3
         graph.layers.size() == 3
 
+        def root = nodes[0]
         def n1 = nodes[1]
         def n2 = nodes[2]
 
-        graph.root.dependencies == [n1]
-        graph.root.layer == 0
-        graph.root.item == 0
-        !graph.root.lastLayer
-        !graph.root.useAlternate
+        root.dependencies == [n1]
+        root.layer == 0
+        root.item == 0
+        !root.lastLayer
+        !root.useAlternate
 
         n1.dependencies == [n2]
         n1.layer == 1
@@ -89,15 +92,16 @@ class GraphAssemblerTest extends Specification {
         graph.nodes.size() == 4
         graph.layers.size() == 3
 
+        def root = nodes[0]
         def n1 = nodes[1]
         def n2 = nodes[2]
         def n3 = nodes[3]
 
-        graph.root.dependencies == [n1, n2]
-        graph.root.layer == 0
-        graph.root.item == 0
-        !graph.root.lastLayer
-        !graph.root.useAlternate
+        root.dependencies == [n1, n2]
+        root.layer == 0
+        root.item == 0
+        !root.lastLayer
+        !root.useAlternate
 
         n1.dependencies == [n3]
         n1.layer == 1
@@ -126,20 +130,21 @@ class GraphAssemblerTest extends Specification {
         def graph = assembler.arrange(5)
 
         then:
-        def nodes = graph.nodes as List
+        def nodes = graph.nodes
         graph.nodes.size() == 5
         graph.layers.size() == 3
 
+        def root = nodes[0]
         def n1 = nodes[1]
         def n2 = nodes[2]
         def n3 = nodes[3]
         def n4 = nodes[4]
 
-        graph.root.dependencies == [n1, n2, n3]
-        graph.root.layer == 0
-        graph.root.item == 0
-        !graph.root.lastLayer
-        !graph.root.useAlternate
+        root.dependencies == [n1, n2, n3]
+        root.layer == 0
+        root.item == 0
+        !root.lastLayer
+        !root.useAlternate
 
         n1.dependencies == [n4]
         n1.layer == 1
@@ -178,14 +183,15 @@ class GraphAssemblerTest extends Specification {
         graph.nodes.size() == 6
         graph.layers.size() == 3
 
+        def root = nodes[0]
         def n1 = nodes[1]
         def n2 = nodes[2]
         def n3 = nodes[3]
         def n4 = nodes[4]
         def n5 = nodes[5]
 
-        graph.root.dependencies == [n1, n2, n3]
-        !graph.root.useAlternate
+        root.dependencies == [n1, n2, n3]
+        !root.useAlternate
 
         n1.dependencies == [n4, n5]
         !n1.useAlternate
@@ -216,7 +222,7 @@ class GraphAssemblerTest extends Specification {
         graph.nodes.size() == 7
         graph.layers.size() == 3
 
-        graph.root.dependencies == [nodes[1], nodes[2], nodes[3], nodes[4]]
+        nodes[0].dependencies == [nodes[1], nodes[2], nodes[3], nodes[4]]
         nodes[1].dependencies == [nodes[5], nodes[6]]
         nodes[2].dependencies == [nodes[5], nodes[6]]
         nodes[3].dependencies == [nodes[5], nodes[6]]
@@ -239,7 +245,7 @@ class GraphAssemblerTest extends Specification {
         graph.nodes.size() == 8
         graph.layers.size() == 3
 
-        graph.root.dependencies == [nodes[1], nodes[2], nodes[3], nodes[4], nodes[5]]
+        nodes[0].dependencies == [nodes[1], nodes[2], nodes[3], nodes[4], nodes[5]]
         nodes[1].dependencies == [nodes[6], nodes[7]]
         nodes[2].dependencies == [nodes[6], nodes[7]]
         nodes[3].dependencies == [nodes[6], nodes[7]]
@@ -264,7 +270,7 @@ class GraphAssemblerTest extends Specification {
         graph.nodes.size() == 9
         graph.layers.size() == 3
 
-        graph.root.dependencies == [nodes[1], nodes[2], nodes[3], nodes[4], nodes[5], nodes[6]]
+        nodes[0].dependencies == [nodes[1], nodes[2], nodes[3], nodes[4], nodes[5], nodes[6]]
         nodes[1].dependencies == [nodes[7], nodes[8]]
         nodes[2].dependencies == [nodes[7], nodes[8]]
         nodes[3].dependencies == [nodes[7], nodes[8]]
@@ -290,7 +296,7 @@ class GraphAssemblerTest extends Specification {
         graph.nodes.size() == 10
         graph.layers.size() == 4
 
-        graph.root.dependencies == [nodes[1], nodes[2], nodes[3], nodes[4], nodes[5], nodes[6]]
+        nodes[0].dependencies == [nodes[1], nodes[2], nodes[3], nodes[4], nodes[5], nodes[6]]
         nodes[1].dependencies == [nodes[7], nodes[8]]
         nodes[2].dependencies == [nodes[7], nodes[8]]
         nodes[3].dependencies == [nodes[7], nodes[8]]
@@ -317,7 +323,7 @@ class GraphAssemblerTest extends Specification {
         graph.nodes.size() == 11
         graph.layers.size() == 4
 
-        graph.root.dependencies == [nodes[1], nodes[2], nodes[3], nodes[4], nodes[5], nodes[6]]
+        nodes[0].dependencies == [nodes[1], nodes[2], nodes[3], nodes[4], nodes[5], nodes[6]]
         nodes[1].dependencies == [nodes[7], nodes[8], nodes[9]]
         nodes[2].dependencies == [nodes[7], nodes[8], nodes[9]]
         nodes[3].dependencies == [nodes[7], nodes[8], nodes[9]]
@@ -345,7 +351,7 @@ class GraphAssemblerTest extends Specification {
         graph.nodes.size() == 12
         graph.layers.size() == 4
 
-        graph.root.dependencies == [nodes[1], nodes[2], nodes[3], nodes[4], nodes[5], nodes[6]]
+        nodes[0].dependencies == [nodes[1], nodes[2], nodes[3], nodes[4], nodes[5], nodes[6]]
         nodes[1].dependencies == [nodes[7], nodes[8], nodes[9]]
         nodes[2].dependencies == [nodes[7], nodes[8], nodes[9]]
         nodes[3].dependencies == [nodes[7], nodes[8], nodes[9]]
@@ -374,7 +380,7 @@ class GraphAssemblerTest extends Specification {
         graph.nodes.size() == 17
         graph.layers.size() == 5
 
-        graph.root.dependencies == [nodes[1], nodes[2], nodes[3], nodes[4], nodes[5], nodes[6]]
+        nodes[0].dependencies == [nodes[1], nodes[2], nodes[3], nodes[4], nodes[5], nodes[6]]
         nodes[1].dependencies == [nodes[7], nodes[8], nodes[9], nodes[10], nodes[11], nodes[12]]
         nodes[2].dependencies == [nodes[7], nodes[8], nodes[9], nodes[10], nodes[11], nodes[12]]
         nodes[3].dependencies == [nodes[7], nodes[8], nodes[9], nodes[10], nodes[11], nodes[12]]
