@@ -84,11 +84,11 @@ class StructureAssemblerTest extends Specification {
         build.subprojects.size() == 4
 
         def subprojects = build.subprojects as List
-        build.rootProject.dependencies as List == [subprojects[1], subprojects[2], subprojects[3]]
-        subprojects[1].dependencies as List == [subprojects[0]]
-        subprojects[2].dependencies as List == [subprojects[0]]
-        subprojects[3].dependencies as List == [subprojects[0]]
+        build.rootProject.dependencies as List == [subprojects[2], subprojects[3]]
         subprojects[0].dependencies.empty
+        subprojects[1].dependencies.empty
+        subprojects[2].dependencies as List == [subprojects[0], subprojects[1]]
+        subprojects[3].dependencies as List == [subprojects[0], subprojects[1]]
     }
 
     def projects(int p) {

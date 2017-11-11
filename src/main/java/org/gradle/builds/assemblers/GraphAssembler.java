@@ -1,12 +1,13 @@
 package org.gradle.builds.assemblers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 public class GraphAssembler {
     /**
-     * Attempts to create 3 layers, then attempts to keep between 3 and 6 nodes in each layer
+     * Attempts to create 3 layers, then attempts to keep between 3 and 6 nodes in each layer.
      * A node depends on every node in the next layer.
      */
     public Graph arrange(int nodes) {
@@ -74,10 +75,10 @@ public class GraphAssembler {
     }
 
     private static class NodeImpl implements Graph.Node {
-        final Layer layer;
-        final int item;
+        private final Layer layer;
+        private final int item;
         final boolean useAlternate;
-        final List<NodeImpl> dependencies;
+        private final List<NodeImpl> dependencies;
 
         NodeImpl(Layer layer, int item, List<NodeImpl> dependencies, boolean useAlternate) {
             this.layer = layer;
@@ -117,31 +118,109 @@ public class GraphAssembler {
         }
     }
 
-    private static class Layer {
+    private interface Module {
+        List<NodeImpl> getProtectedApi();
+        List<NodeImpl> getNodes();
+    }
+
+    private static class Empty implements Module {
+        static final Empty INSTANCE = new Empty();
+
+        @Override
+        public List<NodeImpl> getProtectedApi() {
+            return Collections.emptyList();
+        }
+
+        @Override
+        public List<NodeImpl> getNodes() {
+            return Collections.emptyList();
+        }
+    }
+
+    private static class Group implements Module {
+        private final Layer layer;
+        private final int size;
+        private final int startOffset;
+        private final List<? extends Module> implementation;
+        private List<NodeImpl> nodes;
+
+        Group(Layer layer, int size, int startOffset, List<? extends Module> implementation) {
+            this.layer = layer;
+            this.size = size;
+            this.startOffset = startOffset;
+            this.implementation = implementation;
+        }
+
+        @Override
+        public List<NodeImpl> getNodes() {
+            if (nodes == null) {
+                List<NodeImpl> deps = new ArrayList<>();
+                for (Module module : implementation) {
+                    deps.addAll(module.getProtectedApi());
+                }
+                nodes = new ArrayList<>(size);
+                for (int i = 0; i < size; i++) {
+                    int item = i + startOffset;
+                    this.nodes.add(new NodeImpl(layer, item, deps, layer.itemShouldUseAlternate(item)));
+                }
+            }
+            return nodes;
+        }
+
+        @Override
+        public List<NodeImpl> getProtectedApi() {
+            return getNodes();
+        }
+    }
+
+    private static class Layer implements Module {
         final int id;
         final int size;
-        final List<NodeImpl> nodes;
         Layer next;
         boolean noAlternate;
+        private List<NodeImpl> nodes;
+        private List<NodeImpl> api;
 
         Layer(int id, int size) {
             this.id = id;
             this.size = size;
-            this.nodes = new ArrayList<>(size);
         }
 
         boolean isLast() {
             return next == null;
         }
 
-        List<NodeImpl> getNodes() {
-            List<NodeImpl> deps = next == null ? Collections.emptyList() : next.getNodes();
-            if (this.nodes.size() != size) {
-                for (int item = 0; item < size; item++) {
-                    this.nodes.add(new NodeImpl(this, item, deps, size > 1 && item == size - 1 || !noAlternate && size == 1 && isLast()));
-                }
-            }
+        boolean itemShouldUseAlternate(int item) {
+            return size > 1 && item == size - 1 || !noAlternate && size == 1 && isLast();
+        }
+
+        @Override
+        public List<NodeImpl> getProtectedApi() {
+            maybeBuildNodes();
+            return api;
+        }
+
+        @Override
+        public List<NodeImpl> getNodes() {
+            maybeBuildNodes();
             return this.nodes;
+        }
+
+        private void maybeBuildNodes() {
+            if (this.nodes == null) {
+                Module nextLayer = next == null ? Empty.INSTANCE : next;
+                this.nodes = new ArrayList<>(size);
+                int apiSize = size < 3 ? size : (size + 1) / 2;
+                int noDepsSize = (size - apiSize + 1) / 2;
+                int implSize = size - apiSize - noDepsSize;
+                Module noDeps = new Group(this, noDepsSize, apiSize + implSize, Collections.emptyList());
+                Module impl = new Group(this, implSize, apiSize, Arrays.asList(noDeps, nextLayer));
+                Module api = new Group(this, apiSize, 0, Arrays.asList(impl.getNodes().isEmpty() ? noDeps : impl, nextLayer));
+                nodes.addAll(api.getNodes());
+                nodes.addAll(impl.getNodes());
+                nodes.addAll(noDeps.getNodes());
+                this.api = api.getProtectedApi();
+            }
         }
     }
 }

@@ -98,8 +98,18 @@ Here's an example:
 - Android application 
     - Only a single Java project per layer.
     - Only a single instrumented test per project, doesn't do anything.
-    - No multi-dex, multi-apk splits, instant app
-- No annotation processors are used.
+    - No multi-dex, multi-apk splits, instant app, etc
+- C++ application    
+    - There are no external dependencies
+    - There are no tests
+    - There are no private headers
+    - Very simple header dependency graph
+- Swift application    
+    - There are no external dependencies
+- JVM applications
+    - No annotation processors are used.
+    - No Java 8 or 9 source.
+    - Only a single Java resource is generated for each project.
 - External HTTP repo
     - Has fixed size and structure, only a small number of libraries.
     - Not available for Swift
@@ -113,17 +123,13 @@ Here's an example:
     - Only a small number of external dependencies
     - slf4j
     - support-core-utils (Android builds only)
-- There are no external dependencies for C++ or Swift
-- There are no tests for C++
-- There are no private headers for C++ libraries
 - Only a basic dependency graph is available, between projects and between source files and external libraries
     - Arranged in layers 
     - Only one layer of a project references classes from other projects
+    - Generates a deep and narrow graph
 - Generated classes are small.
 - There are no transitive API classes. 
 - There are no type hierarchies.
-- No Java 8 source for Android or Java builds.
-- Only a single Java resource is generated for each project.
 - Implementation classes are public.
 - Improve project and source file names, particularly test files.
 

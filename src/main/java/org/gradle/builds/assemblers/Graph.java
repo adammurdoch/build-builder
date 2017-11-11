@@ -23,20 +23,27 @@ public class Graph {
         layers.get(layer).add(node);
     }
 
+    /**
+     * Visits the nodes of this graph, in dependency-first order.
+     */
     public <T> void visit(Visitor<T> visitor) {
         Map<Node, T> values = new HashMap<>();
-        int lastLayer = getLayers().size() - 1;
-        for (int layer = lastLayer; layer >= 0; layer--) {
-            List<? extends Node> nodes = getLayers().get(layer);
-            for (Node node : nodes) {
-                Set<T> deps = new LinkedHashSet<>();
-                for (Node dep : node.getDependencies()) {
-                    deps.add(values.get(dep));
-                }
-                T value = visitor.visitNode(node, deps);
-                values.put(node, value);
-            }
+        for (Node node : nodes) {
+            visitNode(node, visitor, values);
         }
+    }
+
+    private <T> void visitNode(Node node, Visitor<T> visitor, Map<Node, T> values) {
+        if (values.containsKey(node)) {
+            return;
+        }
+        Set<T> deps = new LinkedHashSet<>();
+        for (Node dep : node.getDependencies()) {
+            visitNode(dep, visitor, values);
+            deps.add(values.get(dep));
+        }
+        T value = visitor.visitNode(node, deps);
+        values.put(node, value);
     }
 
     public interface Node {
