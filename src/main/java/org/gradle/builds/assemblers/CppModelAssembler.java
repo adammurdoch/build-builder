@@ -85,20 +85,13 @@ public class CppModelAssembler extends AbstractModelAssembler {
             CppClass cppClass;
             CppSourceFile cppSourceFile;
             int layer = nodeDetails.getLayer();
-            int item = nodeDetails.getItem();
             if (layer == 0) {
                 cppClass = entryPoint;
                 cppSourceFile = entryPointSourceFile;
             } else {
-                String name;
-                if (nodeDetails.isLastLayer()) {
-                    name = "NoDeps" + (item + 1);
-                } else {
-                    name = "Impl" + (layer) + "_" + (item + 1);
-                }
-                cppClass = new CppClass(entryPoint.getName() + name);
+                cppClass = new CppClass(entryPoint.getName() + "Impl" + nodeDetails.getNameSuffix());
                 implHeader.addClass(cppClass);
-                cppSourceFile = component.addSourceFile(project.getFileNameFor() + "_" + name.toLowerCase() + ".cpp");
+                cppSourceFile = component.addSourceFile(cppClass.getName().toLowerCase() + ".cpp");
                 cppSourceFile.addClass(cppClass);
                 cppSourceFile.addHeader(implHeader);
             }

@@ -16,9 +16,9 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":").isCppApplication()
         build.project(":").file("src/main/headers").list() as Set == ["app.h"] as Set
         def srcDir = build.project(":").file("src/main/cpp")
-        srcDir.list() as Set == ["app.cpp", "app_impl1_1.cpp", "app_nodeps1.cpp"] as Set
-        new File(srcDir, "app.cpp").text.contains("AppImpl1_1")
-        new File(srcDir, "app_impl1_1.cpp").text.contains("AppNoDeps1")
+        srcDir.list() as Set == ["app.cpp", "appimpl1api.cpp", "appimpl2api.cpp"] as Set
+        new File(srcDir, "app.cpp").text.contains("AppImpl1Api")
+        new File(srcDir, "appimpl1api.cpp").text.contains("AppImpl2Api")
 
         build.buildSucceeds(":installDebug")
         build.app("build/install/main/debug/testApp").succeeds()
@@ -44,7 +44,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         build.buildSucceeds("build")
 
         where:
-        sourceFiles << ["1", "2", "5"]
+        sourceFiles << ["1", "2", "5", "10", "20"]
     }
 
     def "can generate 2 project build"() {
@@ -56,13 +56,13 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":").isCppApplication()
         build.project(":").file("src/main/headers").list() as Set == ["app.h"] as Set
         def srcDir = build.project(":").file("src/main/cpp")
-        srcDir.list() as Set == ["app.cpp", "app_impl1_1.cpp", "app_nodeps1.cpp"] as Set
-        new File(srcDir, "app_impl1_1.cpp").text.contains("Core1")
+        srcDir.list() as Set == ["app.cpp", "appimpl1api.cpp", "appimpl2api.cpp"] as Set
+        new File(srcDir, "appimpl1api.cpp").text.contains("Lib1Api")
 
-        build.project(":core1").isCppLibrary()
-        build.project(":core1").file("src/main/public").list() as Set == ["core1.h"] as Set
-        build.project(":core1").file("src/main/headers").list() as Set == ["core1_impl.h"] as Set
-        build.project(":core1").file("src/main/cpp").list() as Set == ["core1.cpp", "core1_impl1_1.cpp", "core1_nodeps1.cpp"] as Set
+        build.project(":lib1api").isCppLibrary()
+        build.project(":lib1api").file("src/main/public").list() as Set == ["lib1api.h"] as Set
+        build.project(":lib1api").file("src/main/headers").list() as Set == ["lib1api_impl.h"] as Set
+        build.project(":lib1api").file("src/main/cpp").list() as Set == ["lib1api.cpp", "lib1apiimpl1api.cpp", "lib1apiimpl2api.cpp"] as Set
 
         build.buildSucceeds(":installDebug")
         build.app("build/install/main/debug/testApp").succeeds()
@@ -71,7 +71,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
 
         build.buildSucceeds("publish")
         file("repo/test/testApp/1.2/testApp-1.2.pom").file
-        file("repo/test/core1/1.2/core1-1.2.pom").file
+        file("repo/test/lib1api/1.2/lib1api-1.2.pom").file
     }
 
     @Unroll
@@ -83,17 +83,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         build.isBuild()
         build.project(":").isCppApplication()
         build.project(":").file("src/main/headers").list() as Set == ["app.h"] as Set
-        build.project(":").file("src/main/cpp").list() as Set == ["app.cpp", "app_impl1_1.cpp", "app_nodeps1.cpp"] as Set
-
-        build.project(":lib1_1").isCppLibrary()
-        build.project(":lib1_1").file("src/main/public").list() as Set == ["lib1_1.h"] as Set
-        build.project(":lib1_1").file("src/main/headers").list() as Set == ["lib1_1_impl.h"] as Set
-        build.project(":lib1_1").file("src/main/cpp").list() as Set == ["lib1_1.cpp", "lib1_1_impl1_1.cpp", "lib1_1_nodeps1.cpp"] as Set
-
-        build.project(":core1").isCppLibrary()
-        build.project(":core1").file("src/main/public").list() as Set == ["core1.h"] as Set
-        build.project(":core1").file("src/main/headers").list() as Set == ["core1_impl.h"] as Set
-        build.project(":core1").file("src/main/cpp").list() as Set == ["core1.cpp", "core1_impl1_1.cpp", "core1_nodeps1.cpp"] as Set
+        build.project(":").file("src/main/cpp").list() as Set == ["app.cpp", "appimpl1api.cpp", "appimpl2api.cpp"] as Set
 
         build.buildSucceeds(":installDebug")
         build.app("build/install/main/debug/testApp").succeeds()
@@ -102,10 +92,9 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
 
         build.buildSucceeds("publish")
         file("repo/test/testApp/1.2/testApp-1.2.pom").file
-        file("repo/test/core1/1.2/core1-1.2.pom").file
 
         where:
-        projects << ["3", "4", "5"]
+        projects << ["3", "4", "5", "10", "20"]
     }
 
     @Unroll
@@ -116,9 +105,9 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
         build.project(":").isCppApplication()
-        build.project(":lib1_1").isCppLibrary()
-        build.project(":lib1_2").isCppLibrary()
-        build.project(":core1").isCppLibrary()
+        build.project(":lib1api1").isCppLibrary()
+        build.project(":lib1api2").isCppLibrary()
+        build.project(":lib2api").isCppLibrary()
 
         build.buildSucceeds(":installDebug")
         build.app("build/install/main/debug/testApp").succeeds()
@@ -126,7 +115,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         build.buildSucceeds("build")
 
         where:
-        sourceFiles << ["1", "2", "5"]
+        sourceFiles << ["1", "2", "5", "10", "20"]
     }
 
     def "can generate composite build"() {
@@ -137,17 +126,17 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         build.isBuild()
 
         build.project(":").isCppApplication()
-        build.project(":core1").isCppLibrary()
+        build.project(":lib1api").isCppLibrary()
         def srcDir = build.project(":").file("src/main/cpp")
-        new File(srcDir, "app_impl1_1.cpp").text.contains("Child1Core1")
+        new File(srcDir, "appimpl1api.cpp").text.contains("Child1Lib1Api")
 
-        def coreSrcDir = build.project(":core1").file("src/main/cpp")
-        new File(coreSrcDir, "core1_impl1_1.cpp").text.contains("Child1Core1")
+        def coreSrcDir = build.project(":lib1api").file("src/main/cpp")
+        new File(coreSrcDir, "lib1apiimpl1api.cpp").text.contains("Child1Lib1Api")
 
         def child = build(file("child1"))
         child.isBuild()
         child.project(":").isEmptyProject()
-        child.project(":child1_core1").isCppLibrary()
+        child.project(":child1lib1api").isCppLibrary()
 
         build.buildSucceeds(":installDebug")
 
@@ -169,20 +158,20 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":").isCppApplication()
 
         def srcDir = build.project(":").file("src/main/cpp")
-        new File(srcDir, "app_impl1_1.cpp").text.contains("RepoCore1")
-        new File(srcDir, "app_impl1_1.cpp").text.contains("RepoLib11")
-        new File(srcDir, "app_impl1_1.cpp").text.contains("RepoLib12")
+        new File(srcDir, "appimpl1api.cpp").text.contains("RepoLib1Api1")
+        new File(srcDir, "appimpl1api.cpp").text.contains("RepoLib1Api2")
+        new File(srcDir, "appimpl1api.cpp").text.contains("RepoLib2Api")
 
         def repoBuild = build(file('repo'))
         repoBuild.isBuild()
         repoBuild.project(':').isEmptyProject()
-        repoBuild.project(':repo_lib1_1').isCppLibrary()
-        repoBuild.project(':repo_lib1_2').isCppLibrary()
-        repoBuild.project(':repo_core1').isCppLibrary()
+        repoBuild.project(':repolib1api1').isCppLibrary()
+        repoBuild.project(':repolib1api2').isCppLibrary()
+        repoBuild.project(':repolib2api').isCppLibrary()
 
         repoBuild.buildSucceeds("installDist")
-        new File(repoBuild.rootDir, "build/repo/org/gradle/example/repo_core1/1.2/repo_core1-1.2.pom").file
-        new File(repoBuild.rootDir, "build/repo/org/gradle/example/repo_core1/1.2/repo_core1-1.2-cpp-api-headers.zip").file
+        new File(repoBuild.rootDir, "build/repo/org/gradle/example/repolib2api/1.2/repolib2api-1.2.pom").file
+        new File(repoBuild.rootDir, "build/repo/org/gradle/example/repolib2api/1.2/repolib2api-1.2-cpp-api-headers.zip").file
 
         def server = repoBuild.app("build/install/repo/bin/repo").start()
         waitFor(new URI("http://localhost:5005"))

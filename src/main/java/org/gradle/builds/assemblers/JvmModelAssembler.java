@@ -29,17 +29,10 @@ public abstract class JvmModelAssembler extends AbstractModelAssembler {
         project.getClassGraph().visit((Graph.Visitor<JavaClass>) (nodeDetails, dependencies) -> {
             JavaClass javaClass;
             int layer = nodeDetails.getLayer();
-            int item = nodeDetails.getItem();
             if (layer == 0) {
                 javaClass = apiClass;
             } else {
-                String name;
-                if (nodeDetails.isLastLayer()) {
-                    name = "NoDeps" + (item + 1);
-                } else {
-                    name = "Impl" + (layer) + "_" + (item + 1);
-                }
-                javaClass = component.addClass(className + name);
+                javaClass = component.addClass(className + "Impl" + nodeDetails.getNameSuffix());
             }
             if (layer == implLayer) {
                 for (JvmLibraryApi library : component.getReferencedLibraries()) {

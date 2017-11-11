@@ -20,7 +20,7 @@ public class IncludedBuildAssembler implements ModelStructureAssembler {
             Build childBuild = new Build(model.getBuild().getRootDir().resolve(name), name);
             childBuild.setSettings(settings);
             childBuild.setProjectInitializer(initializer);
-            childBuild.setProjectNamePrefix(name + "_");
+            childBuild.setTypeNamePrefix("Child" + i);
             childBuild.publishAs(new PublicationTarget(null));
             model.addBuild(childBuild);
             model.getBuild().includeBuild(childBuild);

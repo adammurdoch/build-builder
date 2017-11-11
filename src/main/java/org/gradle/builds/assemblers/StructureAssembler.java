@@ -21,18 +21,14 @@ public class StructureAssembler {
         projectGraph.visit((Graph.Visitor<Project>) (nodeDetails, dependencies) -> {
             Project project;
             int layer = nodeDetails.getLayer();
-            int item = nodeDetails.getItem();
             if (layer == 0) {
                 project = build.getRootProject();
+                project.setTypeName("App");
                 projectInitializer.initRootProject(project);
             } else {
-                String name;
-                if (nodeDetails.isLastLayer()) {
-                    name = build.getProjectNamePrefix() + "core" + (item + 1);
-                } else {
-                    name = build.getProjectNamePrefix() + "lib" + layer + "_" + (item + 1);
-                }
-                project = build.addProject(name);
+                String typeName = build.getTypeNamePrefix() + "Lib" + nodeDetails.getNameSuffix();
+                project = build.addProject(typeName.toLowerCase());
+                project.setTypeName(typeName);
                 if (nodeDetails.isUseAlternate()) {
                     projectInitializer.initAlternateLibraryProject(project);
                 } else {

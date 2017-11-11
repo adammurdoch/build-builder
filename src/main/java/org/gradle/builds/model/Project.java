@@ -18,6 +18,7 @@ public class Project {
     private final Set<Component> components = new LinkedHashSet<>();
     private final List<LocalLibrary<?>> exportedLibraries = new ArrayList<>();
     private final List<Library<?>> requiredLibraries = new ArrayList<>();
+    private String typeName;
     private Graph classGraph;
     private PublicationTarget publicationTarget;
 
@@ -67,13 +68,17 @@ public class Project {
      * Returns a capital-cased identifier that can be used as a type name for this project.
      */
     public String getTypeNameFor() {
-        if (parent == null) {
-            return "App";
+        if (typeName != null) {
+            return typeName;
         }
         return mapName(name, (src, startOffset, endOffset, dest) -> {
             dest.append(Character.toUpperCase(src.charAt(startOffset)));
             dest.append(src.substring(startOffset + 1, endOffset));
         });
+    }
+
+    public void setTypeName(String typeName) {
+        this.typeName = typeName;
     }
 
     /**

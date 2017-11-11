@@ -75,13 +75,13 @@ public class GraphAssembler {
     }
 
     private static class NodeImpl implements Graph.Node {
-        private final Layer layer;
+        private final Group group;
         private final int item;
         final boolean useAlternate;
         private final List<NodeImpl> dependencies;
 
-        NodeImpl(Layer layer, int item, List<NodeImpl> dependencies, boolean useAlternate) {
-            this.layer = layer;
+        NodeImpl(Group group, int item, List<NodeImpl> dependencies, boolean useAlternate) {
+            this.group = group;
             this.item = item;
             this.dependencies = dependencies;
             this.useAlternate = useAlternate;
@@ -89,17 +89,12 @@ public class GraphAssembler {
 
         @Override
         public String toString() {
-            return "{layer: " + (layer.id + 1) + ", item: " + (item + 1) + "}";
+            return "{group: " + group + ", item: " + (item + 1) + "}";
         }
 
         @Override
         public int getLayer() {
-            return layer.id;
-        }
-
-        @Override
-        public int getItem() {
-            return item;
+            return group.layer.id;
         }
 
         @Override
@@ -108,8 +103,8 @@ public class GraphAssembler {
         }
 
         @Override
-        public boolean isLastLayer() {
-            return layer.isLast();
+        public String getNameSuffix() {
+            return group.size == 1 ? group.toString() : group.toString() + (item + 1);
         }
 
         @Override
@@ -139,16 +134,21 @@ public class GraphAssembler {
 
     private static class Group implements Module {
         private final Layer layer;
+        private final String name;
         private final int size;
-        private final int startOffset;
         private final List<? extends Module> implementation;
         private List<NodeImpl> nodes;
 
-        Group(Layer layer, int size, int startOffset, List<? extends Module> implementation) {
+        Group(Layer layer, String name, int size, List<? extends Module> implementation) {
             this.layer = layer;
+            this.name = name;
             this.size = size;
-            this.startOffset = startOffset;
             this.implementation = implementation;
+        }
+
+        @Override
+        public String toString() {
+            return layer.id + name;
         }
 
         @Override
@@ -160,8 +160,7 @@ public class GraphAssembler {
                 }
                 nodes = new ArrayList<>(size);
                 for (int i = 0; i < size; i++) {
-                    int item = i + startOffset;
-                    this.nodes.add(new NodeImpl(layer, item, deps, layer.itemShouldUseAlternate(item)));
+                    this.nodes.add(new NodeImpl(this, i, deps, false));
                 }
             }
             return nodes;
@@ -213,9 +212,9 @@ public class GraphAssembler {
                 int apiSize = size < 3 ? size : (size + 1) / 2;
                 int noDepsSize = (size - apiSize + 1) / 2;
                 int implSize = size - apiSize - noDepsSize;
-                Module noDeps = new Group(this, noDepsSize, apiSize + implSize, Collections.emptyList());
-                Module impl = new Group(this, implSize, apiSize, Arrays.asList(noDeps, nextLayer));
-                Module api = new Group(this, apiSize, 0, Arrays.asList(impl.getNodes().isEmpty() ? noDeps : impl, nextLayer));
+                Module noDeps = new Group(this, "Core", noDepsSize, Collections.emptyList());
+                Module impl = new Group(this, "Impl", implSize, Arrays.asList(noDeps, nextLayer));
+                Module api = new Group(this, "Api", apiSize, Arrays.asList(impl.getNodes().isEmpty() ? noDeps : impl, nextLayer));
                 nodes.addAll(api.getNodes());
                 nodes.addAll(impl.getNodes());
                 nodes.addAll(noDeps.getNodes());

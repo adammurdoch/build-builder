@@ -73,18 +73,11 @@ public class SwiftModelAssembler extends AbstractModelAssembler {
             SwiftClass swiftClass;
             SwiftSourceFile swiftSourceFile;
             int layer = nodeDetails.getLayer();
-            int item = nodeDetails.getItem();
             if (layer == 0) {
                 swiftClass = entryPoint;
                 swiftSourceFile = sourceFile;
             } else {
-                String name;
-                if (nodeDetails.isLastLayer()) {
-                    name = "NoDeps" + (item + 1);
-                } else {
-                    name = "Impl" + (layer) + "_" + (item + 1);
-                }
-                swiftClass = new SwiftClass(entryPoint.getName() + name);
+                swiftClass = new SwiftClass(entryPoint.getName() + "Impl" + nodeDetails.getNameSuffix());
                 swiftSourceFile = component.addSourceFile(swiftClass.getName() + ".swift");
                 swiftSourceFile.addClass(swiftClass);
             }

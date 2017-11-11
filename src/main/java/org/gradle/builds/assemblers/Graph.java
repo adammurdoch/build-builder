@@ -49,11 +49,12 @@ public class Graph {
     public interface Node {
         int getLayer();
 
-        int getItem();
-
         boolean isUseAlternate();
 
-        boolean isLastLayer();
+        /**
+         * A unique name for this node in the graph.
+         */
+        String getNameSuffix();
 
         List<? extends Node> getDependencies();
     }

@@ -16,7 +16,7 @@ public class Build {
     private final List<Build> childBuilds = new ArrayList<>();
     private final List<PublishedLibrary<?>> publishedLibraries = new ArrayList<>();
     private PublicationTarget publicationTarget;
-    private String projectNamePrefix = "";
+    private String typeNamePrefix = "";
     private ProjectInitializer projectInitializer;
 
     public Build(Path rootDir, String rootProjectName) {
@@ -119,12 +119,12 @@ public class Build {
         this.dependsOn.add(build);
     }
 
-    public void setProjectNamePrefix(String projectNamePrefix) {
-        this.projectNamePrefix = projectNamePrefix;
+    public void setTypeNamePrefix(String projectNamePrefix) {
+        this.typeNamePrefix = projectNamePrefix;
     }
 
-    public String getProjectNamePrefix() {
-        return projectNamePrefix;
+    public String getTypeNamePrefix() {
+        return typeNamePrefix;
     }
 
     public List<Build> getChildBuilds() {

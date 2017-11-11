@@ -17,8 +17,7 @@ class GraphAssemblerTest extends Specification {
         def root = graph.nodes[0]
         root.dependencies.empty
         root.layer == 0
-        root.item == 0
-        root.lastLayer
+        root.nameSuffix == '0Api'
         !root.useAlternate
     }
 
@@ -37,14 +36,12 @@ class GraphAssemblerTest extends Specification {
 
         root.dependencies == [n1]
         root.layer == 0
-        root.item == 0
-        !root.lastLayer
+        root.nameSuffix == '0Api'
         !root.useAlternate
 
         n1.dependencies.empty
         n1.layer == 1
-        n1.item == 0
-        n1.lastLayer
+        n1.nameSuffix == '1Api'
         !n1.useAlternate
     }
 
@@ -64,20 +61,17 @@ class GraphAssemblerTest extends Specification {
 
         root.dependencies == [n1]
         root.layer == 0
-        root.item == 0
-        !root.lastLayer
+        root.nameSuffix == '0Api'
         !root.useAlternate
 
         n1.dependencies == [n2]
         n1.layer == 1
-        n1.item == 0
-        !n1.lastLayer
+        n1.nameSuffix == '1Api'
         !n1.useAlternate
 
         n2.dependencies.empty
         n2.layer == 2
-        n2.item == 0
-        n2.lastLayer
+        n2.nameSuffix == '2Api'
         n2.useAlternate
     }
 
@@ -99,26 +93,22 @@ class GraphAssemblerTest extends Specification {
 
         root.dependencies == [n1, n2]
         root.layer == 0
-        root.item == 0
-        !root.lastLayer
+        root.nameSuffix == '0Api'
         !root.useAlternate
 
         n1.dependencies == [n3]
         n1.layer == 1
-        n1.item == 0
-        !n1.lastLayer
+        n1.nameSuffix == '1Api1'
         !n1.useAlternate
 
         n2.dependencies == [n3]
         n2.layer == 1
-        n2.item == 1
-        !n2.lastLayer
+        n2.nameSuffix == '1Api2'
         n2.useAlternate
 
         n3.dependencies.empty
         n3.layer == 2
-        n3.item == 0
-        n3.lastLayer
+        n3.nameSuffix == '2Api'
         n3.useAlternate
     }
 
@@ -141,32 +131,27 @@ class GraphAssemblerTest extends Specification {
 
         root.dependencies == [n1, n2]
         root.layer == 0
-        root.item == 0
-        !root.lastLayer
+        root.nameSuffix == '0Api'
         !root.useAlternate
 
         n1.dependencies == [n3, n4]
         n1.layer == 1
-        n1.item == 0
-        !n1.lastLayer
+        n1.nameSuffix == '1Api1'
         !n1.useAlternate
 
         n2.dependencies == [n3, n4]
         n2.layer == 1
-        n2.item == 1
-        !n2.lastLayer
+        n2.nameSuffix == '1Api2'
         !n2.useAlternate
 
         n3.dependencies.empty
         n3.layer == 1
-        n3.item == 2
-        !n3.lastLayer
+        n3.nameSuffix == '1Core'
         n3.useAlternate
 
         n4.dependencies.empty
         n4.layer == 2
-        n4.item == 0
-        n4.lastLayer
+        n4.nameSuffix == '2Api'
         n4.useAlternate
     }
 
@@ -190,21 +175,27 @@ class GraphAssemblerTest extends Specification {
         def n5 = nodes[5]
 
         root.dependencies == [n1, n2]
+        root.nameSuffix == '0Api'
         !root.useAlternate
 
         n1.dependencies == [n3, n4, n5]
+        n1.nameSuffix == '1Api1'
         !n1.useAlternate
 
         n2.dependencies == [n3, n4, n5]
+        n2.nameSuffix == '1Api2'
         !n2.useAlternate
 
         n3.dependencies.empty
+        n3.nameSuffix == '1Core'
         n3.useAlternate
 
         n4.dependencies.empty
+        n4.nameSuffix == '2Api1'
         !n4.useAlternate
 
         n5.dependencies.empty
+        n5.nameSuffix == '2Api2'
         n5.useAlternate
     }
 
@@ -221,13 +212,34 @@ class GraphAssemblerTest extends Specification {
         graph.nodes.size() == 7
         graph.layers.size() == 3
 
-        nodes[0].dependencies == [nodes[1], nodes[2]]
-        nodes[1].dependencies == [nodes[3], nodes[5], nodes[6]]
-        nodes[2].dependencies == [nodes[3], nodes[5], nodes[6]]
-        nodes[3].dependencies == [nodes[4], nodes[5], nodes[6]]
-        nodes[4].dependencies.empty
-        nodes[5].dependencies.empty
-        nodes[6].dependencies.empty
+        def root = nodes[0]
+        def n1 = nodes[1]
+        def n2 = nodes[2]
+        def n3 = nodes[3]
+        def n4 = nodes[4]
+        def n5 = nodes[5]
+        def n6 = nodes[6]
+
+        root.dependencies == [n1, n2]
+        root.nameSuffix == '0Api'
+
+        n1.dependencies == [n3, n5, n6]
+        n1.nameSuffix == '1Api1'
+
+        n2.dependencies == [n3, n5, n6]
+        n2.nameSuffix == '1Api2'
+
+        n3.dependencies == [n4, n5, n6]
+        n3.nameSuffix == '1Impl'
+
+        n4.dependencies.empty
+        n4.nameSuffix == '1Core'
+
+        n5.dependencies.empty
+        n5.nameSuffix == '2Api1'
+
+        n6.dependencies.empty
+        n6.nameSuffix == '2Api2'
     }
 
     def "arranges 8 nodes"() {
@@ -244,14 +256,38 @@ class GraphAssemblerTest extends Specification {
         graph.nodes.size() == 8
         graph.layers.size() == 3
 
-        nodes[0].dependencies == [nodes[1], nodes[2], nodes[3]]
-        nodes[1].dependencies == [nodes[4], nodes[6], nodes[7]]
-        nodes[2].dependencies == [nodes[4], nodes[6], nodes[7]]
-        nodes[3].dependencies == [nodes[4], nodes[6], nodes[7]]
-        nodes[4].dependencies == [nodes[5], nodes[6], nodes[7]]
-        nodes[5].dependencies.empty
-        nodes[6].dependencies.empty
-        nodes[7].dependencies.empty
+        def root = nodes[0]
+        def n1 = nodes[1]
+        def n2 = nodes[2]
+        def n3 = nodes[3]
+        def n4 = nodes[4]
+        def n5 = nodes[5]
+        def n6 = nodes[6]
+        def n7 = nodes[7]
+
+        root.dependencies == [n1, n2, n3]
+        root.nameSuffix == '0Api'
+
+        n1.dependencies == [n4, n6, n7]
+        n1.nameSuffix == '1Api1'
+
+        n2.dependencies == [n4, n6, n7]
+        n2.nameSuffix == '1Api2'
+
+        n3.dependencies == [n4, n6, n7]
+        n3.nameSuffix == '1Api3'
+
+        n4.dependencies == [n5, n6, n7]
+        n4.nameSuffix == '1Impl'
+
+        n5.dependencies.empty
+        n5.nameSuffix == '1Core'
+
+        n6.dependencies.empty
+        n6.nameSuffix == '2Api1'
+
+        n7.dependencies.empty
+        n7.nameSuffix == '2Api2'
     }
 
     def "arranges 9 nodes"() {
@@ -275,7 +311,9 @@ class GraphAssemblerTest extends Specification {
         nodes[3].dependencies == [nodes[4], nodes[7], nodes[8]]
         nodes[4].dependencies == [nodes[5], nodes[6], nodes[7], nodes[8]]
         nodes[5].dependencies.empty
+        nodes[5].nameSuffix == '1Core1'
         nodes[6].dependencies.empty
+        nodes[6].nameSuffix == '1Core2'
         nodes[7].dependencies.empty
         nodes[8].dependencies.empty
     }
@@ -356,10 +394,13 @@ class GraphAssemblerTest extends Specification {
         nodes[3].dependencies == [nodes[4], nodes[7], nodes[8]]
         nodes[4].dependencies == [nodes[5], nodes[6], nodes[7], nodes[8]]
         nodes[5].dependencies.empty
+        nodes[5].nameSuffix == '1Core1'
         nodes[6].dependencies.empty
+        nodes[6].nameSuffix == '1Core2'
         nodes[7].dependencies == [nodes[9], nodes[10], nodes[11]]
         nodes[8].dependencies == [nodes[9], nodes[10], nodes[11]]
         nodes[9].dependencies.empty
+        nodes[9].nameSuffix == '2Core'
         nodes[10].dependencies.empty
         nodes[11].dependencies.empty
     }
