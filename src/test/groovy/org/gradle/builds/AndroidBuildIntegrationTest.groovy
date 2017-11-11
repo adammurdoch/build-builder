@@ -32,12 +32,14 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
     @Unroll
     def "can generate single project build with #sourceFiles source files"() {
         when:
-        new Main().run("android", "--dir", projectDir.absolutePath, "--source-files", sourceFiles)
+        new Main().run("android", "--dir", projectDir.absolutePath, "--source-files", sourceFiles as String)
 
         then:
         build.isBuild()
 
         build.project(":").isAndroidApplication()
+        build.project(":").file("src/main/java/org/gradle/example/app").list().size() == sourceFiles
+        build.project(":").file("src/test/java/org/gradle/example/app").list().size() == sourceFiles
 
         build.buildSucceeds(":assembleDebug")
         file("build/outputs/apk/testApp-debug.apk").exists()
@@ -45,7 +47,7 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
         build.buildSucceeds("build")
 
         where:
-        sourceFiles << ["1", "2", "5", "10"]
+        sourceFiles << [1, 2, 5, 10]
     }
 
     def "can generate 2 project build"() {
@@ -147,13 +149,19 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
     @Unroll
     def "can generate multi-project build with #sourceFiles source files"() {
         when:
-        new Main().run("android", "--dir", projectDir.absolutePath, "--projects", "4", "--source-files", sourceFiles)
+        new Main().run("android", "--dir", projectDir.absolutePath, "--projects", "4", "--source-files", sourceFiles as String)
 
         then:
         build.isBuild()
 
         build.project(":").isAndroidApplication()
+        build.project(":").file("src/main/java/org/gradle/example/app").list().size() == sourceFiles
+        build.project(":").file("src/test/java/org/gradle/example/app").list().size() == sourceFiles
+
         build.project(":lib1api1").isAndroidLibrary()
+        build.project(":lib1api1").file("src/main/java/org/gradle/example/lib1api1").list().size() == sourceFiles
+        build.project(":lib1api1").file("src/test/java/org/gradle/example/lib1api1").list().size() == sourceFiles
+
         build.project(":lib1api2").isAndroidLibrary()
         build.project(":lib2api").isAndroidLibrary()
 
@@ -163,7 +171,7 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
         build.buildSucceeds("build")
 
         where:
-        sourceFiles << ["1", "2", "5", "10"]
+        sourceFiles << [1, 2, 5, 10]
     }
 
     def "can generate composite build"() {
@@ -275,11 +283,11 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
 
         repoBuild.buildSucceeds("installDist")
 
-        new File(repoBuild.rootDir, "build/repo/org/gradle/example/repolib1api1/1.2/repolib1api1-1.2.jar").file
+        new File(repoBuild.rootDir, "build/repo/org/gradle/example/repolib1api1/1.2/repolib1api1-1.2.aar").file
         new File(repoBuild.rootDir, "build/repo/org/gradle/example/repolib1api1/1.2/repolib1api1-1.2.pom").file
-        new File(repoBuild.rootDir, "build/repo/org/gradle/example/repolib1api2/1.2/repolib1api2-1.2.aar").file
+        new File(repoBuild.rootDir, "build/repo/org/gradle/example/repolib1api2/1.2/repolib1api2-1.2.jar").file
         new File(repoBuild.rootDir, "build/repo/org/gradle/example/repolib1api2/1.2/repolib1api2-1.2.pom").file
-        new File(repoBuild.rootDir, "build/repo/org/gradle/example/repolib2api/1.2/repolib2api-1.2.aar").file
+        new File(repoBuild.rootDir, "build/repo/org/gradle/example/repolib2api/1.2/repolib2api-1.2.jar").file
         new File(repoBuild.rootDir, "build/repo/org/gradle/example/repolib2api/1.2/repolib2api-1.2.pom").file
 
         def server = repoBuild.app("build/install/repo/bin/repo").start()

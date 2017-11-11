@@ -14,7 +14,7 @@ public abstract class CppFile extends SourceFile<CppClass> {
         return headers;
     }
 
-    public void addHeader(CppHeaderFile header) {
+    public void includeHeader(CppHeaderFile header) {
         headers.add(header);
     }
 }

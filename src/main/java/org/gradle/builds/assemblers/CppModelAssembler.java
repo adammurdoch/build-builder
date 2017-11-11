@@ -3,6 +3,20 @@ package org.gradle.builds.assemblers;
 import org.gradle.builds.model.*;
 
 public class CppModelAssembler extends AbstractModelAssembler {
+    private final int appImplHeaders;
+    private final int appPrivateHeaders;
+    private final int libPublicHeaders;
+    private final int libImplHeaders;
+    private final int libPrivateHeaders;
+
+    public CppModelAssembler(int headers) {
+        appImplHeaders = (headers - 1) / 2;
+        appPrivateHeaders = headers - appImplHeaders - 2;
+        libPublicHeaders = (headers - 3) / 3;
+        libImplHeaders = (headers - libPublicHeaders - 2) / 2;
+        libPrivateHeaders = headers - libPublicHeaders - libImplHeaders - 3;
+    }
+
     @Override
     protected void rootProject(Project rootProject) {
         ProjectScriptBlock allProjects = rootProject.getBuildScript().allProjects();
@@ -10,10 +24,7 @@ public class CppModelAssembler extends AbstractModelAssembler {
         allProjects.requirePlugin("maven-publish");
         allProjects.property("group", "test");
         allProjects.property("version", "1.2");
-        allProjects.block("publishing")
-                .block("repositories")
-                .block("maven")
-                .property("url", new Scope.Code("rootProject.file('repo')"));
+        allProjects.block("publishing").block("repositories").block("maven").property("url", new Scope.Code("rootProject.file('repo')"));
     }
 
     @Override
@@ -28,37 +39,64 @@ public class CppModelAssembler extends AbstractModelAssembler {
             apiHeader.addClass(apiClass);
             lib.setApiHeader(apiHeader);
 
+            for (int i = 0; i < libPublicHeaders; i++) {
+                CppHeaderFile headerFile = lib.addPublicHeaderFile(project.getFileNameFor() + "_defs" + (i + 1) + ".h");
+                apiHeader.includeHeader(headerFile);
+            }
+
             CppHeaderFile implHeader = lib.addImplementationHeaderFile(project.getFileNameFor() + "_impl.h");
-            implHeader.addHeader(apiHeader);
+            implHeader.includeHeader(apiHeader);
+            for (int i = 0; i < libImplHeaders; i++) {
+                CppHeaderFile headerFile = lib.addImplementationHeaderFile(project.getFileNameFor() + "_impl_defs" + (i + 1) + ".h");
+                implHeader.includeHeader(headerFile);
+            }
+
+            CppHeaderFile privateHeader = lib.addPrivateHeaderFile(project.getFileNameFor() + "_private.h");
+            for (int i = 0; i < libPrivateHeaders; i++) {
+                CppHeaderFile headerFile = lib.addPrivateHeaderFile(project.getFileNameFor() + "_private_defs" + (i + 1) + ".h");
+                privateHeader.includeHeader(headerFile);
+            }
 
             CppSourceFile apiSourceFile = lib.addSourceFile(project.getFileNameFor() + ".cpp");
+            apiSourceFile.includeHeader(implHeader);
+            apiSourceFile.includeHeader(privateHeader);
             apiSourceFile.addClass(apiClass);
-            apiSourceFile.addHeader(implHeader);
 
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("cpp-library");
             addPublishing(project, lib, project.getBuildScript());
             addDependencies(project, lib, buildScript);
 
-            addSource(project, lib, apiClass, apiSourceFile, implHeader);
+            addSource(project, lib, apiClass, apiSourceFile, implHeader, privateHeader);
         } else if (project.component(CppApplication.class) != null) {
             CppApplication app = project.component(CppApplication.class);
 
             CppClass appClass = new CppClass(project.getTypeNameFor());
 
-            CppHeaderFile headerFile = app.addImplementationHeaderFile(project.getFileNameFor() + ".h");
-            headerFile.addClass(appClass);
+            CppHeaderFile implHeader = app.addImplementationHeaderFile(project.getFileNameFor() + ".h");
+            implHeader.addClass(appClass);
+            for (int i = 0; i < appImplHeaders; i++) {
+                CppHeaderFile headerFile = app.addImplementationHeaderFile(project.getFileNameFor() + "_defs" + (i + 1) + ".h");
+                implHeader.includeHeader(headerFile);
+            }
+
+            CppHeaderFile privateHeader = app.addPrivateHeaderFile(project.getFileNameFor() + "_private.h");
+            for (int i = 0; i < appPrivateHeaders; i++) {
+                CppHeaderFile headerFile = app.addPrivateHeaderFile(project.getFileNameFor() + "_private_defs" + (i + 1) + ".h");
+                privateHeader.includeHeader(headerFile);
+            }
 
             CppSourceFile mainSourceFile = app.addSourceFile(project.getFileNameFor() + ".cpp");
+            mainSourceFile.includeHeader(implHeader);
+            mainSourceFile.includeHeader(privateHeader);
             mainSourceFile.addMainFunction(appClass);
-            mainSourceFile.addHeader(headerFile);
             mainSourceFile.addClass(appClass);
 
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("cpp-executable");
             addDependencies(project, app, buildScript);
 
-            addSource(project, app, appClass, mainSourceFile, headerFile);
+            addSource(project, app, appClass, mainSourceFile, implHeader, privateHeader);
         }
     }
 
@@ -72,14 +110,16 @@ public class CppModelAssembler extends AbstractModelAssembler {
             buildScript.property("version", version);
             if (project.getPublicationTarget().getHttpRepository() != null) {
                 buildScript.requirePlugin("maven-publish");
-                buildScript.block("publishing").block("repositories").block("maven").property("url", new Scope.Code("uri('" + project.getPublicationTarget().getHttpRepository().getRootDir().toUri() + "')"));
+                buildScript.block("publishing").block("repositories").block("maven").property("url",
+                        new Scope.Code("uri('" + project.getPublicationTarget().getHttpRepository().getRootDir().toUri() + "')"));
             }
         } else {
             project.export(new LocalLibrary<>(project, null, library.getApi()));
         }
     }
 
-    private void addSource(Project project, HasCppSource component, CppClass entryPoint, CppSourceFile entryPointSourceFile, CppHeaderFile implHeader) {
+    private void addSource(Project project, HasCppSource component, CppClass entryPoint, CppSourceFile entryPointSourceFile, CppHeaderFile implHeader,
+                           CppHeaderFile privateHeader) {
         int implLayer = Math.max(0, project.getClassGraph().getLayers().size() - 2);
         project.getClassGraph().visit((Graph.Visitor<CppClass>) (nodeDetails, dependencies) -> {
             CppClass cppClass;
@@ -92,8 +132,9 @@ public class CppModelAssembler extends AbstractModelAssembler {
                 cppClass = new CppClass(entryPoint.getName() + "Impl" + nodeDetails.getNameSuffix());
                 implHeader.addClass(cppClass);
                 cppSourceFile = component.addSourceFile(cppClass.getName().toLowerCase() + ".cpp");
+                cppSourceFile.includeHeader(privateHeader);
+                cppSourceFile.includeHeader(implHeader);
                 cppSourceFile.addClass(cppClass);
-                cppSourceFile.addHeader(implHeader);
             }
             if (layer == implLayer) {
                 addReferences(component, cppClass, cppSourceFile);
@@ -108,11 +149,11 @@ public class CppModelAssembler extends AbstractModelAssembler {
     private void addReferences(HasCppSource component, CppClass cppClass, CppSourceFile sourceFile) {
         for (CppLibraryApi library : component.getReferencedLibraries()) {
             cppClass.uses(library.getApiClass());
-            sourceFile.addHeader(library.getApiHeader());
+            sourceFile.includeHeader(library.getApiHeader());
         }
     }
 
-    private void addDependencies(Project project, HasCppSource component,  BuildScript buildScript) {
+    private void addDependencies(Project project, HasCppSource component, BuildScript buildScript) {
         for (Library<? extends CppLibraryApi> library : project.getRequiredLibraries(CppLibraryApi.class)) {
             buildScript.dependsOn("implementation", library.getDependency());
             component.uses(library.getApi());

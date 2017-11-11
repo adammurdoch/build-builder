@@ -253,6 +253,17 @@ public class Main {
         @Option(name = "--http-repo", description = "Generate an HTTP repository (default: false)")
         boolean httpRepo = false;
 
+        @Option(name = "--header-files", description = "The number of header files to generate for each project (default: 3)")
+        int headers = 3;
+
+        @Override
+        protected void validate() {
+            super.validate();
+            if (headers < 3) {
+                throw new IllegalArgumentException("Minimum of 3 header files per project.");
+            }
+        }
+
         @Override
         protected String getType() {
             return "C++";
@@ -270,7 +281,7 @@ public class Main {
 
         @Override
         protected ProjectConfigurer createModelAssembler() {
-            return new CppModelAssembler();
+            return new CppModelAssembler(headers);
         }
     }
 
@@ -305,6 +316,7 @@ public class Main {
 
         @Override
         protected void validate() {
+            super.validate();
             if (includeJavaLibraries && projects < 2) {
                 throw new IllegalArgumentException("Minimum of 2 projects required to add Java libraries to Android build");
             }

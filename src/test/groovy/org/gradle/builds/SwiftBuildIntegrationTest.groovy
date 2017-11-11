@@ -82,7 +82,13 @@ class SwiftBuildIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
         build.project(":").isSwiftApplication()
+        build.project(":").file("src/main/swift").list().size() == count
+        build.project(":").file("src/test/swift").list().size() == count
+
         build.project(":lib1api1").isSwiftLibrary()
+        build.project(":lib1api1").file("src/main/swift").list().size() == count
+        build.project(":lib1api1").file("src/test/swift").list().size() == count
+
         build.project(":lib1api2").isSwiftLibrary()
         build.project(":lib2api").isSwiftLibrary()
 

@@ -6,6 +6,7 @@ import java.util.Set;
 public class HasCppSource extends HasSource<CppSourceFile, CppLibraryApi> {
     private final Set<CppHeaderFile> implHeaders = new LinkedHashSet<>();
     private final Set<CppHeaderFile> publicHeaders = new LinkedHashSet<>();
+    private final Set<CppHeaderFile> privateHeaders = new LinkedHashSet<>();
 
     public Set<CppHeaderFile> getPublicHeaderFiles() {
         return publicHeaders;
@@ -24,6 +25,16 @@ public class HasCppSource extends HasSource<CppSourceFile, CppLibraryApi> {
     public CppHeaderFile addImplementationHeaderFile(String name) {
         CppHeaderFile headerFile = new CppHeaderFile(name);
         implHeaders.add(headerFile);
+        return headerFile;
+    }
+
+    public Set<CppHeaderFile> getPrivateHeadersFiles() {
+        return privateHeaders;
+    }
+
+    public CppHeaderFile addPrivateHeaderFile(String name) {
+        CppHeaderFile headerFile = new CppHeaderFile(name);
+        privateHeaders.add(headerFile);
         return headerFile;
     }
 

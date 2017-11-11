@@ -49,7 +49,11 @@ The `--builds` option specifies the number of builds to generate. Set to greater
 
 The `--java` option includes some Java libraries in an Android build. Default is false. 
 
-The `--version` option specifies the Android plugin version to use. Default is 2.3.1.
+The `--version` option specifies the Android plugin version to use. Default is `2.3.1`.
+
+### C++ specific options
+
+The `--header-files` option specifies the number of header files per project. Default is 3.
 
 ### Swift specific options
 
@@ -96,13 +100,13 @@ Here's an example:
 #### Generating builds
 
 - Android application 
+    - Should use plugin version 3.0 
     - Only a single Java project per layer.
     - Only a single instrumented test per project, doesn't do anything.
     - No multi-dex, multi-apk splits, instant app, etc
 - C++ application    
     - There are no external dependencies
     - There are no tests
-    - There are no private headers
     - Very simple header dependency graph
 - Swift application    
     - There are no external dependencies

@@ -32,12 +32,14 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
     @Unroll
     def "can generate single project build with #sourceFiles source files"() {
         when:
-        new Main().run("java", "--dir", projectDir.absolutePath, "--source-files", sourceFiles)
+        new Main().run("java", "--dir", projectDir.absolutePath, "--source-files", sourceFiles as String)
 
         then:
         build.isBuild()
 
         build.project(":").isJavaApplication()
+        build.project(":").file("src/main/java/org/gradle/example/app").list().size() == sourceFiles
+        build.project(":").file("src/test/java/org/gradle/example/app").list().size() == sourceFiles
 
         build.buildSucceeds(":installDist")
         build.app("build/install/testApp/bin/testApp").succeeds()
@@ -45,7 +47,7 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         build.buildSucceeds("build")
 
         where:
-        sourceFiles << ["1", "2", "5", "10", "20"]
+        sourceFiles << [1, 2, 5, 10, 20]
     }
 
     def "can generate 2 project build"() {
@@ -96,13 +98,19 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
     @Unroll
     def "can generate multi-project build with #sourceFiles source files"() {
         when:
-        new Main().run("java", "--dir", projectDir.absolutePath, "--projects", "4", "--source-files", sourceFiles)
+        new Main().run("java", "--dir", projectDir.absolutePath, "--projects", "4", "--source-files", sourceFiles as String)
 
         then:
         build.isBuild()
 
         build.project(":").isJavaApplication()
+        build.project(":").file("src/main/java/org/gradle/example/app").list().size() == sourceFiles
+        build.project(":").file("src/test/java/org/gradle/example/app").list().size() == sourceFiles
+
         build.project(":lib1api1").isJavaLibrary()
+        build.project(":lib1api1").file("src/main/java/org/gradle/example/lib1api1").list().size() == sourceFiles
+        build.project(":lib1api1").file("src/test/java/org/gradle/example/lib1api1").list().size() == sourceFiles
+
         build.project(":lib1api2").isJavaLibrary()
         build.project(":lib2api").isJavaLibrary()
 
@@ -112,7 +120,7 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         build.buildSucceeds("build")
 
         where:
-        sourceFiles << ["1", "2", "5", "10", "20"]
+        sourceFiles << [1, 2, 5, 10, 20]
     }
 
     def "can generate composite build"() {

@@ -57,6 +57,10 @@ public class CppSourceGenerator extends ProjectComponentSpecificGenerator<HasCpp
             Path sourceFile = project.getProjectDir().resolve("src/main/headers/" + cppHeader.getName());
             writeHeader(cppHeader, sourceFile, false);
         }
+        for (CppHeaderFile cppHeader : component.getPrivateHeadersFiles()) {
+            Path sourceFile = project.getProjectDir().resolve("src/main/cpp/" + cppHeader.getName());
+            writeHeader(cppHeader, sourceFile, false);
+        }
     }
 
     private void writeHeader(CppHeaderFile cppHeader, Path sourceFile, boolean exported) throws IOException {
