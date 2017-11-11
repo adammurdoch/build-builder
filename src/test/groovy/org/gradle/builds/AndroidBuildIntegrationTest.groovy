@@ -239,30 +239,32 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
 
         build.project(":").isAndroidApplication()
         def srcDir = build.project(":").file("src/main/java/org/gradle/example/app")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.repo.core1.RepoCore1.getSomeValue()")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.repo.core1.RepoCore1.INT_CONST")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.repo.lib11.RepoLib11Activity.getSomeValue()")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.repo.lib11.RepoLib11Activity.INT_CONST")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.repo.lib11.R.string.repo_lib1_1_string")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.repo.lib12.RepoLib12.getSomeValue()")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.repo.lib12.RepoLib12.INT_CONST")
+        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.repolib1api1.RepoLib1Api1Activity.getSomeValue()")
+        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.repolib1api1.RepoLib1Api1Activity.INT_CONST")
+        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.repolib1api1.R.string.repolib1api1_string")
+        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.repolib1api2.RepoLib1Api2.getSomeValue()")
+        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.repolib1api2.RepoLib1Api2.INT_CONST")
+        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.repolib2api.RepoLib2Api.getSomeValue()")
+        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.repolib2api.RepoLib2Api.INT_CONST")
 
-        build.project(":lib1_1").isAndroidLibrary()
-        build.project(":core1").isJavaLibrary()
+        build.project(":lib1api").isAndroidLibrary()
+        build.project(":lib2api").isJavaLibrary()
 
         def repoBuild = build(file('repo'))
         repoBuild.isBuild()
         repoBuild.project(':').isEmptyProject()
-        repoBuild.project(':repo_lib1_1').isAndroidLibrary()
-        repoBuild.project(':repo_lib1_2').isJavaLibrary()
-        repoBuild.project(':repo_core1').isJavaLibrary()
+        repoBuild.project(':repolib1api1').isAndroidLibrary()
+        repoBuild.project(':repolib1api2').isJavaLibrary()
+        repoBuild.project(':repolib2api').isJavaLibrary()
 
         repoBuild.buildSucceeds("installDist")
 
-        new File(repoBuild.rootDir, "build/repo/org/gradle/example/repo_core1/1.2/repo_core1-1.2.jar").file
-        new File(repoBuild.rootDir, "build/repo/org/gradle/example/repo_core1/1.2/repo_core1-1.2.pom").file
-        new File(repoBuild.rootDir, "build/repo/org/gradle/example/repo_lib1_1/1.2/repo_lib1_1-1.2.aar").file
-        new File(repoBuild.rootDir, "build/repo/org/gradle/example/repo_lib1_1/1.2/repo_lib1_1-1.2.pom").file
+        new File(repoBuild.rootDir, "build/repo/org/gradle/example/repolib1api1/1.2/repolib1api1-1.2.jar").file
+        new File(repoBuild.rootDir, "build/repo/org/gradle/example/repolib1api1/1.2/repolib1api1-1.2.pom").file
+        new File(repoBuild.rootDir, "build/repo/org/gradle/example/repolib1api2/1.2/repolib1api2-1.2.aar").file
+        new File(repoBuild.rootDir, "build/repo/org/gradle/example/repolib1api2/1.2/repolib1api2-1.2.pom").file
+        new File(repoBuild.rootDir, "build/repo/org/gradle/example/repolib2api/1.2/repolib2api-1.2.aar").file
+        new File(repoBuild.rootDir, "build/repo/org/gradle/example/repolib2api/1.2/repolib2api-1.2.pom").file
 
         def server = repoBuild.app("build/install/repo/bin/repo").start()
         waitFor(new URI("http://localhost:5005"))

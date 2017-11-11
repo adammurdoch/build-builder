@@ -42,7 +42,7 @@ class GraphAssemblerTest extends Specification {
         n1.dependencies.empty
         n1.layer == 1
         n1.nameSuffix == '1Api'
-        !n1.useAlternate
+        n1.useAlternate
     }
 
     def "arranges 3 nodes"() {
@@ -142,7 +142,7 @@ class GraphAssemblerTest extends Specification {
         n2.dependencies == [n3, n4]
         n2.layer == 1
         n2.nameSuffix == '1Api2'
-        !n2.useAlternate
+        n2.useAlternate
 
         n3.dependencies.empty
         n3.layer == 1
@@ -222,24 +222,31 @@ class GraphAssemblerTest extends Specification {
 
         root.dependencies == [n1, n2]
         root.nameSuffix == '0Api'
+        !root.useAlternate
 
         n1.dependencies == [n3, n5, n6]
         n1.nameSuffix == '1Api1'
+        !n1.useAlternate
 
         n2.dependencies == [n3, n5, n6]
         n2.nameSuffix == '1Api2'
+        !n2.useAlternate
 
         n3.dependencies == [n4, n5, n6]
         n3.nameSuffix == '1Impl'
+        !n3.useAlternate
 
         n4.dependencies.empty
         n4.nameSuffix == '1Core'
+        n4.useAlternate
 
         n5.dependencies.empty
         n5.nameSuffix == '2Api1'
+        !n5.useAlternate
 
         n6.dependencies.empty
         n6.nameSuffix == '2Api2'
+        n6.useAlternate
     }
 
     def "arranges 8 nodes"() {
@@ -361,16 +368,27 @@ class GraphAssemblerTest extends Specification {
         graph.layers.size() == 4
 
         nodes[0].dependencies == [nodes[1], nodes[2], nodes[3]]
+        !nodes[0].useAlternate
         nodes[1].dependencies == [nodes[4], nodes[7], nodes[8]]
+        !nodes[1].useAlternate
         nodes[2].dependencies == [nodes[4], nodes[7], nodes[8]]
+        !nodes[2].useAlternate
         nodes[3].dependencies == [nodes[4], nodes[7], nodes[8]]
+        !nodes[3].useAlternate
         nodes[4].dependencies == [nodes[5], nodes[6], nodes[7], nodes[8]]
+        !nodes[4].useAlternate
         nodes[5].dependencies.empty
+        !nodes[5].useAlternate
         nodes[6].dependencies.empty
+        nodes[6].useAlternate
         nodes[7].dependencies == [nodes[9], nodes[10]]
+        !nodes[7].useAlternate
         nodes[8].dependencies == [nodes[9], nodes[10]]
+        nodes[8].useAlternate
         nodes[9].dependencies.empty
+        nodes[9].useAlternate
         nodes[10].dependencies.empty
+        nodes[10].useAlternate
     }
 
     def "arranges 12 nodes"() {

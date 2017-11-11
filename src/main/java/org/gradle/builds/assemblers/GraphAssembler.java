@@ -57,10 +57,6 @@ public class GraphAssembler {
         }
 
         Graph graph = new Graph();
-        layers.get(0).noAlternate = true;
-        if (nodes == 2) {
-            layers.get(1).noAlternate = true;
-        }
         for (Layer layer : layers) {
             if (layer.id < layers.size() - 1) {
                 layer.next = layers.get(layer.id + 1);
@@ -160,10 +156,29 @@ public class GraphAssembler {
                 }
                 nodes = new ArrayList<>(size);
                 for (int i = 0; i < size; i++) {
-                    this.nodes.add(new NodeImpl(this, i, deps, false));
+                    boolean useAlternate;
+                    if (size > 1 && i == size - 1 && layer.canUseAlternate() && canUseAlternate(deps)) {
+                        // Last item of this group and all dependencies use alternate
+                        useAlternate = true;
+                    } else if (size == 1 && layer.canUseAlternate() && deps.isEmpty()) {
+                        // Single item group with no dependencies
+                        useAlternate = true;
+                    } else {
+                        useAlternate = false;
+                    }
+                    this.nodes.add(new NodeImpl(this, i, deps, useAlternate));
                 }
             }
             return nodes;
+        }
+
+        private boolean canUseAlternate(List<NodeImpl> deps) {
+            for (NodeImpl dep : deps) {
+                if (!dep.isUseAlternate()) {
+                    return false;
+                }
+            }
+            return true;
         }
 
         @Override
@@ -176,21 +191,12 @@ public class GraphAssembler {
         final int id;
         final int size;
         Layer next;
-        boolean noAlternate;
         private List<NodeImpl> nodes;
         private List<NodeImpl> api;
 
         Layer(int id, int size) {
             this.id = id;
             this.size = size;
-        }
-
-        boolean isLast() {
-            return next == null;
-        }
-
-        boolean itemShouldUseAlternate(int item) {
-            return size > 1 && item == size - 1 || !noAlternate && size == 1 && isLast();
         }
 
         @Override
@@ -220,6 +226,10 @@ public class GraphAssembler {
                 nodes.addAll(noDeps.getNodes());
                 this.api = api.getProtectedApi();
             }
+        }
+
+        boolean canUseAlternate() {
+            return id != 0;
         }
     }
 }
