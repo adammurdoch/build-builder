@@ -108,12 +108,15 @@ Here's an example:
     - There are no external dependencies
     - There are no tests
     - Very simple header dependency graph
+    - Incremental performance scenarios should mutate deepest header and source files for the target project
 - Swift application    
     - There are no external dependencies
+    - No incremental performance scenarios
 - JVM applications
     - No annotation processors are used.
     - No Java 8 or 9 source.
     - Only a single Java resource is generated for each project.
+    - No incremental performance scenarios
 - External HTTP repo
     - Has fixed size and structure, only a small number of libraries.
     - Not available for Swift
@@ -136,6 +139,7 @@ Here's an example:
 - There are no type hierarchies.
 - Implementation classes are public.
 - Improve project and source file names, particularly test files.
+- No build cache performance scenarios
 
 #### Adding source to an existing build
 

@@ -82,7 +82,7 @@ public class Main {
             Build build = new Build(rootDir, "testApp");
 
             // Inspect model
-            ModelAssembler modelAssembler = new AllTypesProjectDecorator();
+            BuildConfigurer modelAssembler = new AllTypesProjectDecorator();
             Settings settings = new Settings(build.getProjects().size(), sourceFiles);
             build.setSettings(settings);
             new BuildInspector().inspect(build);

@@ -2,7 +2,7 @@ package org.gradle.builds.assemblers;
 
 import org.gradle.builds.model.Build;
 
-public class AllTypesProjectDecorator implements ModelAssembler {
+public class AllTypesProjectDecorator implements BuildConfigurer {
     private final JavaModelAssembler javaModelAssembler = new JavaModelAssembler();
     private final AndroidModelAssembler androidModelAssembler = new AndroidModelAssembler(AndroidModelAssembler.defaultVersion);
     private final CppModelAssembler cppModelAssembler = new CppModelAssembler(3);

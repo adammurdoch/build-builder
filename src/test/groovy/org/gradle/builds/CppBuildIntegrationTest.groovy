@@ -20,6 +20,9 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         new File(srcDir, "app.cpp").text.contains("AppImpl1Api")
         new File(srcDir, "appimpl1api.cpp").text.contains("AppImpl2Api")
 
+        build.project(":").file("performance.scenarios").text.contains('apply-h-change-to = "src/main/headers/app.h"')
+        build.project(":").file("performance.scenarios").text.contains('apply-cpp-change-to = "src/main/cpp/app.cpp"')
+
         build.buildSucceeds(":installDebug")
         build.app("build/install/main/debug/testApp").succeeds()
 
@@ -64,6 +67,9 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":lib1api").file("src/main/public").list() as Set == ["lib1api.h"] as Set
         build.project(":lib1api").file("src/main/headers").list() as Set == ["lib1api_impl.h"] as Set
         build.project(":lib1api").file("src/main/cpp").list() as Set == ["lib1api.cpp", "lib1api_private.h", "lib1apiimpl1api.cpp", "lib1apiimpl2api.cpp"] as Set
+
+        build.project(":").file("performance.scenarios").text.contains('apply-h-change-to = "lib1api/src/main/public/lib1api.h"')
+        build.project(":").file("performance.scenarios").text.contains('apply-cpp-change-to = "lib1api/src/main/cpp/lib1api.cpp"')
 
         build.buildSucceeds(":installDebug")
         build.app("build/install/main/debug/testApp").succeeds()

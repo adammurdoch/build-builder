@@ -94,6 +94,11 @@ public class GraphAssembler {
         }
 
         @Override
+        public boolean isDeepest() {
+            return group.layer.next == null && item == group.size - 1;
+        }
+
+        @Override
         public boolean isUseAlternate() {
             return useAlternate;
         }
@@ -132,14 +137,14 @@ public class GraphAssembler {
         private final Layer layer;
         private final String name;
         private final int size;
-        private final List<? extends Module> implementation;
+        private final List<? extends Module> implementationModules;
         private List<NodeImpl> nodes;
 
-        Group(Layer layer, String name, int size, List<? extends Module> implementation) {
+        Group(Layer layer, String name, int size, List<? extends Module> implementationModules) {
             this.layer = layer;
             this.name = name;
             this.size = size;
-            this.implementation = implementation;
+            this.implementationModules = implementationModules;
         }
 
         @Override
@@ -151,7 +156,7 @@ public class GraphAssembler {
         public List<NodeImpl> getNodes() {
             if (nodes == null) {
                 List<NodeImpl> deps = new ArrayList<>();
-                for (Module module : implementation) {
+                for (Module module : implementationModules) {
                     deps.addAll(module.getProtectedApi());
                 }
                 nodes = new ArrayList<>(size);

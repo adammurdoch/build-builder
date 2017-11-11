@@ -49,6 +49,8 @@ public class Graph {
     public interface Node {
         int getLayer();
 
+        boolean isDeepest();
+
         boolean isUseAlternate();
 
         /**

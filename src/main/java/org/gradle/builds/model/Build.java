@@ -18,6 +18,7 @@ public class Build {
     private PublicationTarget publicationTarget;
     private String typeNamePrefix = "";
     private ProjectInitializer projectInitializer;
+    private Project deepestProject;
 
     public Build(Path rootDir, String rootProjectName) {
         this.rootDir = rootDir;
@@ -137,5 +138,13 @@ public class Build {
 
     public String getName() {
         return rootProject.getName();
+    }
+
+    public void setDeepestProject(Project deepestProject) {
+        this.deepestProject = deepestProject;
+    }
+
+    public Project getDeepestProject() {
+        return deepestProject;
     }
 }

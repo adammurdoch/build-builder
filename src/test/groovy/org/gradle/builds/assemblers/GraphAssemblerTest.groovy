@@ -17,6 +17,7 @@ class GraphAssemblerTest extends Specification {
         def root = graph.nodes[0]
         root.dependencies.empty
         root.layer == 0
+        root.deepest
         root.nameSuffix == '0Api'
         !root.useAlternate
     }
@@ -36,11 +37,13 @@ class GraphAssemblerTest extends Specification {
 
         root.dependencies == [n1]
         root.layer == 0
+        !root.deepest
         root.nameSuffix == '0Api'
         !root.useAlternate
 
         n1.dependencies.empty
         n1.layer == 1
+        n1.deepest
         n1.nameSuffix == '1Api'
         n1.useAlternate
     }
@@ -61,16 +64,19 @@ class GraphAssemblerTest extends Specification {
 
         root.dependencies == [n1]
         root.layer == 0
+        !root.deepest
         root.nameSuffix == '0Api'
         !root.useAlternate
 
         n1.dependencies == [n2]
         n1.layer == 1
+        !n1.deepest
         n1.nameSuffix == '1Api'
         !n1.useAlternate
 
         n2.dependencies.empty
         n2.layer == 2
+        n2.deepest
         n2.nameSuffix == '2Api'
         n2.useAlternate
     }
@@ -93,21 +99,25 @@ class GraphAssemblerTest extends Specification {
 
         root.dependencies == [n1, n2]
         root.layer == 0
+        !root.deepest
         root.nameSuffix == '0Api'
         !root.useAlternate
 
         n1.dependencies == [n3]
         n1.layer == 1
+        !n1.deepest
         n1.nameSuffix == '1Api1'
         !n1.useAlternate
 
         n2.dependencies == [n3]
         n2.layer == 1
+        !n2.deepest
         n2.nameSuffix == '1Api2'
         n2.useAlternate
 
         n3.dependencies.empty
         n3.layer == 2
+        n3.deepest
         n3.nameSuffix == '2Api'
         n3.useAlternate
     }
@@ -136,21 +146,25 @@ class GraphAssemblerTest extends Specification {
 
         n1.dependencies == [n3, n4]
         n1.layer == 1
+        !n1.deepest
         n1.nameSuffix == '1Api1'
         !n1.useAlternate
 
         n2.dependencies == [n3, n4]
         n2.layer == 1
+        !n2.deepest
         n2.nameSuffix == '1Api2'
         n2.useAlternate
 
         n3.dependencies.empty
         n3.layer == 1
+        !n3.deepest
         n3.nameSuffix == '1Core'
         n3.useAlternate
 
         n4.dependencies.empty
         n4.layer == 2
+        n4.deepest
         n4.nameSuffix == '2Api'
         n4.useAlternate
     }
@@ -175,26 +189,32 @@ class GraphAssemblerTest extends Specification {
         def n5 = nodes[5]
 
         root.dependencies == [n1, n2]
+        !root.deepest
         root.nameSuffix == '0Api'
         !root.useAlternate
 
         n1.dependencies == [n3, n4, n5]
+        !n1.deepest
         n1.nameSuffix == '1Api1'
         !n1.useAlternate
 
         n2.dependencies == [n3, n4, n5]
+        !n2.deepest
         n2.nameSuffix == '1Api2'
         !n2.useAlternate
 
         n3.dependencies.empty
+        !n3.deepest
         n3.nameSuffix == '1Core'
         n3.useAlternate
 
         n4.dependencies.empty
+        !n4.deepest
         n4.nameSuffix == '2Api1'
         !n4.useAlternate
 
         n5.dependencies.empty
+        n5.deepest
         n5.nameSuffix == '2Api2'
         n5.useAlternate
     }
@@ -221,30 +241,37 @@ class GraphAssemblerTest extends Specification {
         def n6 = nodes[6]
 
         root.dependencies == [n1, n2]
+        !root.deepest
         root.nameSuffix == '0Api'
         !root.useAlternate
 
         n1.dependencies == [n3, n5, n6]
+        !n1.deepest
         n1.nameSuffix == '1Api1'
         !n1.useAlternate
 
         n2.dependencies == [n3, n5, n6]
+        !n2.deepest
         n2.nameSuffix == '1Api2'
         !n2.useAlternate
 
         n3.dependencies == [n4, n5, n6]
+        !n3.deepest
         n3.nameSuffix == '1Impl'
         !n3.useAlternate
 
         n4.dependencies.empty
+        !n4.deepest
         n4.nameSuffix == '1Core'
         n4.useAlternate
 
         n5.dependencies.empty
+        !n5.deepest
         n5.nameSuffix == '2Api1'
         !n5.useAlternate
 
         n6.dependencies.empty
+        n6.deepest
         n6.nameSuffix == '2Api2'
         n6.useAlternate
     }
@@ -273,27 +300,35 @@ class GraphAssemblerTest extends Specification {
         def n7 = nodes[7]
 
         root.dependencies == [n1, n2, n3]
+        !root.deepest
         root.nameSuffix == '0Api'
 
         n1.dependencies == [n4, n6, n7]
+        !n1.deepest
         n1.nameSuffix == '1Api1'
 
         n2.dependencies == [n4, n6, n7]
+        !n2.deepest
         n2.nameSuffix == '1Api2'
 
         n3.dependencies == [n4, n6, n7]
+        !n3.deepest
         n3.nameSuffix == '1Api3'
 
         n4.dependencies == [n5, n6, n7]
+        !n4.deepest
         n4.nameSuffix == '1Impl'
 
         n5.dependencies.empty
+        !n5.deepest
         n5.nameSuffix == '1Core'
 
         n6.dependencies.empty
+        !n6.deepest
         n6.nameSuffix == '2Api1'
 
         n7.dependencies.empty
+        n7.deepest
         n7.nameSuffix == '2Api2'
     }
 
@@ -455,5 +490,6 @@ class GraphAssemblerTest extends Specification {
         nodes[14].dependencies == [nodes[15], nodes[16]]
         nodes[15].dependencies.empty
         nodes[16].dependencies.empty
+        nodes[16].deepest
     }
 }
