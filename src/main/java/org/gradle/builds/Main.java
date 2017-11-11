@@ -305,8 +305,8 @@ public class Main {
 
         @Override
         protected void validate() {
-            if (includeJavaLibraries && projects < 3) {
-                throw new IllegalArgumentException("Minimum of 3 projects required to add Java libraries to Android build");
+            if (includeJavaLibraries && projects < 2) {
+                throw new IllegalArgumentException("Minimum of 2 projects required to add Java libraries to Android build");
             }
         }
 
