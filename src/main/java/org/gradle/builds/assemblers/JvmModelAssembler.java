@@ -24,7 +24,7 @@ public abstract class JvmModelAssembler extends AbstractModelAssembler {
     }
 
     protected void addSource(Project project, HasJavaSource<?> component, JavaClass apiClass, Consumer<JavaClass> implClass) {
-        int implLayer = Math.max(0, project.getClassGraph().getLayers().size() - 2);
+        int implLayer = Math.max(0, project.getClassGraph().getLayers() - 2);
         String className = project.getQualifiedNamespaceFor() + "." + project.getTypeNameFor();
         project.getClassGraph().visit((Graph.Visitor<JavaClass>) (nodeDetails, dependencies) -> {
             JavaClass javaClass;
@@ -40,8 +40,8 @@ public abstract class JvmModelAssembler extends AbstractModelAssembler {
                 }
                 implClass.accept(javaClass);
             }
-            for (JavaClass dep : dependencies) {
-                javaClass.uses(dep);
+            for (Dependency<JavaClass> dep : dependencies) {
+                javaClass.uses(dep.getTarget());
             }
             return javaClass;
         });

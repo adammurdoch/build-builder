@@ -12,10 +12,11 @@ class GraphAssemblerTest extends Specification {
 
         then:
         graph.nodes.size() == 1
-        graph.layers.size() == 1
+        graph.layers == 1
 
         def root = graph.nodes[0]
-        root.dependencies.empty
+        root.apiDependencies.empty
+        root.implementationDependencies.empty
         root.layer == 0
         root.deepest
         root.nameSuffix == '0Api'
@@ -30,18 +31,20 @@ class GraphAssemblerTest extends Specification {
         then:
         def nodes = graph.nodes
         graph.nodes.size() == 2
-        graph.layers.size() == 2
+        graph.layers == 2
 
         def root = nodes[0]
         def n1 = nodes[1]
 
-        root.dependencies == [n1]
+        root.apiDependencies.empty
+        root.implementationDependencies == [n1]
         root.layer == 0
         !root.deepest
         root.nameSuffix == '0Api'
         !root.useAlternate
 
-        n1.dependencies.empty
+        n1.apiDependencies.empty
+        n1.implementationDependencies.empty
         n1.layer == 1
         n1.deepest
         n1.nameSuffix == '1Api'
@@ -56,25 +59,28 @@ class GraphAssemblerTest extends Specification {
         then:
         def nodes = graph.nodes
         graph.nodes.size() == 3
-        graph.layers.size() == 3
+        graph.layers == 3
 
         def root = nodes[0]
         def n1 = nodes[1]
         def n2 = nodes[2]
 
-        root.dependencies == [n1]
+        root.apiDependencies.empty
+        root.implementationDependencies == [n1]
         root.layer == 0
         !root.deepest
         root.nameSuffix == '0Api'
         !root.useAlternate
 
-        n1.dependencies == [n2]
+        n1.apiDependencies.empty
+        n1.implementationDependencies == [n2]
         n1.layer == 1
         !n1.deepest
         n1.nameSuffix == '1Api'
         !n1.useAlternate
 
-        n2.dependencies.empty
+        n2.apiDependencies.empty
+        n2.implementationDependencies.empty
         n2.layer == 2
         n2.deepest
         n2.nameSuffix == '2Api'
@@ -90,32 +96,36 @@ class GraphAssemblerTest extends Specification {
         then:
         def nodes = graph.nodes as List
         graph.nodes.size() == 4
-        graph.layers.size() == 3
+        graph.layers == 3
 
         def root = nodes[0]
         def n1 = nodes[1]
         def n2 = nodes[2]
         def n3 = nodes[3]
 
-        root.dependencies == [n1, n2]
+        root.apiDependencies == [n1]
+        root.implementationDependencies == [n2]
         root.layer == 0
         !root.deepest
         root.nameSuffix == '0Api'
         !root.useAlternate
 
-        n1.dependencies == [n3]
+        n1.apiDependencies.empty
+        n1.implementationDependencies == [n3]
         n1.layer == 1
         !n1.deepest
         n1.nameSuffix == '1Api1'
         !n1.useAlternate
 
-        n2.dependencies == [n3]
+        n2.apiDependencies.empty
+        n2.implementationDependencies == [n3]
         n2.layer == 1
         !n2.deepest
         n2.nameSuffix == '1Api2'
         n2.useAlternate
 
-        n3.dependencies.empty
+        n3.apiDependencies.empty
+        n3.implementationDependencies.empty
         n3.layer == 2
         n3.deepest
         n3.nameSuffix == '2Api'
@@ -131,7 +141,7 @@ class GraphAssemblerTest extends Specification {
         then:
         def nodes = graph.nodes
         graph.nodes.size() == 5
-        graph.layers.size() == 3
+        graph.layers == 3
 
         def root = nodes[0]
         def n1 = nodes[1]
@@ -139,30 +149,35 @@ class GraphAssemblerTest extends Specification {
         def n3 = nodes[3]
         def n4 = nodes[4]
 
-        root.dependencies == [n1, n2]
+        root.apiDependencies == [n1]
+        root.implementationDependencies == [n2]
         root.layer == 0
         root.nameSuffix == '0Api'
         !root.useAlternate
 
-        n1.dependencies == [n3, n4]
+        n1.apiDependencies.empty
+        n1.implementationDependencies == [n3, n4]
         n1.layer == 1
         !n1.deepest
         n1.nameSuffix == '1Api1'
         !n1.useAlternate
 
-        n2.dependencies == [n3, n4]
+        n2.apiDependencies.empty
+        n2.implementationDependencies == [n3, n4]
         n2.layer == 1
         !n2.deepest
         n2.nameSuffix == '1Api2'
         n2.useAlternate
 
-        n3.dependencies.empty
+        n3.apiDependencies.empty
+        n3.implementationDependencies.empty
         n3.layer == 1
         !n3.deepest
         n3.nameSuffix == '1Core'
         n3.useAlternate
 
-        n4.dependencies.empty
+        n4.apiDependencies.empty
+        n4.implementationDependencies.empty
         n4.layer == 2
         n4.deepest
         n4.nameSuffix == '2Api'
@@ -179,7 +194,7 @@ class GraphAssemblerTest extends Specification {
         then:
         def nodes = graph.nodes as List
         graph.nodes.size() == 6
-        graph.layers.size() == 3
+        graph.layers == 3
 
         def root = nodes[0]
         def n1 = nodes[1]
@@ -188,32 +203,38 @@ class GraphAssemblerTest extends Specification {
         def n4 = nodes[4]
         def n5 = nodes[5]
 
-        root.dependencies == [n1, n2]
+        root.apiDependencies == [n1]
+        root.implementationDependencies == [n2]
         !root.deepest
         root.nameSuffix == '0Api'
         !root.useAlternate
 
-        n1.dependencies == [n3, n4, n5]
+        n1.apiDependencies == [n4]
+        n1.implementationDependencies == [n3, n5]
         !n1.deepest
         n1.nameSuffix == '1Api1'
         !n1.useAlternate
 
-        n2.dependencies == [n3, n4, n5]
+        n2.apiDependencies == [n4]
+        n2.implementationDependencies == [n3, n5]
         !n2.deepest
         n2.nameSuffix == '1Api2'
         !n2.useAlternate
 
-        n3.dependencies.empty
+        n3.apiDependencies.empty
+        n3.implementationDependencies.empty
         !n3.deepest
         n3.nameSuffix == '1Core'
         n3.useAlternate
 
-        n4.dependencies.empty
+        n4.apiDependencies.empty
+        n4.implementationDependencies.empty
         !n4.deepest
         n4.nameSuffix == '2Api1'
         !n4.useAlternate
 
-        n5.dependencies.empty
+        n5.apiDependencies.empty
+        n5.implementationDependencies.empty
         n5.deepest
         n5.nameSuffix == '2Api2'
         n5.useAlternate
@@ -230,7 +251,7 @@ class GraphAssemblerTest extends Specification {
         then:
         def nodes = graph.nodes as List
         graph.nodes.size() == 7
-        graph.layers.size() == 3
+        graph.layers == 3
 
         def root = nodes[0]
         def n1 = nodes[1]
@@ -240,37 +261,44 @@ class GraphAssemblerTest extends Specification {
         def n5 = nodes[5]
         def n6 = nodes[6]
 
-        root.dependencies == [n1, n2]
+        root.apiDependencies == [n1]
+        root.implementationDependencies == [n2]
         !root.deepest
         root.nameSuffix == '0Api'
         !root.useAlternate
 
-        n1.dependencies == [n3, n5, n6]
+        n1.apiDependencies == [n5]
+        n1.implementationDependencies == [n3, n6]
         !n1.deepest
         n1.nameSuffix == '1Api1'
         !n1.useAlternate
 
-        n2.dependencies == [n3, n5, n6]
+        n2.apiDependencies == [n5]
+        n2.implementationDependencies == [n3, n6]
         !n2.deepest
         n2.nameSuffix == '1Api2'
         !n2.useAlternate
 
-        n3.dependencies == [n4, n5, n6]
+        n3.apiDependencies == [n5]
+        n3.implementationDependencies == [n4, n6]
         !n3.deepest
         n3.nameSuffix == '1Impl'
         !n3.useAlternate
 
-        n4.dependencies.empty
+        n4.apiDependencies.empty
+        n4.implementationDependencies.empty
         !n4.deepest
         n4.nameSuffix == '1Core'
         n4.useAlternate
 
-        n5.dependencies.empty
+        n5.apiDependencies.empty
+        n5.implementationDependencies.empty
         !n5.deepest
         n5.nameSuffix == '2Api1'
         !n5.useAlternate
 
-        n6.dependencies.empty
+        n6.apiDependencies.empty
+        n6.implementationDependencies.empty
         n6.deepest
         n6.nameSuffix == '2Api2'
         n6.useAlternate
@@ -288,7 +316,7 @@ class GraphAssemblerTest extends Specification {
         then:
         def nodes = graph.nodes as List
         graph.nodes.size() == 8
-        graph.layers.size() == 3
+        graph.layers == 3
 
         def root = nodes[0]
         def n1 = nodes[1]
@@ -299,35 +327,43 @@ class GraphAssemblerTest extends Specification {
         def n6 = nodes[6]
         def n7 = nodes[7]
 
-        root.dependencies == [n1, n2, n3]
+        root.apiDependencies == [n1]
+        root.implementationDependencies == [n2, n3]
         !root.deepest
         root.nameSuffix == '0Api'
 
-        n1.dependencies == [n4, n6, n7]
+        n1.apiDependencies == [n6]
+        n1.implementationDependencies == [n4, n7]
         !n1.deepest
         n1.nameSuffix == '1Api1'
 
-        n2.dependencies == [n4, n6, n7]
+        n2.apiDependencies == [n6]
+        n2.implementationDependencies == [n4, n7]
         !n2.deepest
         n2.nameSuffix == '1Api2'
 
-        n3.dependencies == [n4, n6, n7]
+        n3.apiDependencies == [n6]
+        n3.implementationDependencies == [n4, n7]
         !n3.deepest
         n3.nameSuffix == '1Api3'
 
-        n4.dependencies == [n5, n6, n7]
+        n4.apiDependencies == [n6]
+        n4.implementationDependencies == [n5, n7]
         !n4.deepest
         n4.nameSuffix == '1Impl'
 
-        n5.dependencies.empty
+        n5.apiDependencies.empty
+        n5.implementationDependencies.empty
         !n5.deepest
         n5.nameSuffix == '1Core'
 
-        n6.dependencies.empty
+        n6.apiDependencies.empty
+        n6.implementationDependencies.empty
         !n6.deepest
         n6.nameSuffix == '2Api1'
 
-        n7.dependencies.empty
+        n7.apiDependencies.empty
+        n7.implementationDependencies.empty
         n7.deepest
         n7.nameSuffix == '2Api2'
     }
@@ -345,19 +381,28 @@ class GraphAssemblerTest extends Specification {
         then:
         def nodes = graph.nodes as List
         graph.nodes.size() == 9
-        graph.layers.size() == 3
+        graph.layers == 3
 
-        nodes[0].dependencies == [nodes[1], nodes[2], nodes[3]]
-        nodes[1].dependencies == [nodes[4], nodes[7], nodes[8]]
-        nodes[2].dependencies == [nodes[4], nodes[7], nodes[8]]
-        nodes[3].dependencies == [nodes[4], nodes[7], nodes[8]]
-        nodes[4].dependencies == [nodes[5], nodes[6], nodes[7], nodes[8]]
-        nodes[5].dependencies.empty
+        nodes[0].apiDependencies == [nodes[1]]
+        nodes[0].implementationDependencies == [nodes[2], nodes[3]]
+        nodes[1].apiDependencies == [nodes[7]]
+        nodes[1].implementationDependencies == [nodes[4], nodes[8]]
+        nodes[2].apiDependencies == [nodes[7]]
+        nodes[2].implementationDependencies == [nodes[4], nodes[8]]
+        nodes[3].apiDependencies == [nodes[7]]
+        nodes[3].implementationDependencies == [nodes[4], nodes[8]]
+        nodes[4].apiDependencies == [nodes[5], nodes[7]]
+        nodes[4].implementationDependencies == [nodes[6], nodes[8]]
+        nodes[5].apiDependencies.empty
+        nodes[5].implementationDependencies.empty
         nodes[5].nameSuffix == '1Core1'
-        nodes[6].dependencies.empty
+        nodes[6].apiDependencies.empty
+        nodes[6].implementationDependencies.empty
         nodes[6].nameSuffix == '1Core2'
-        nodes[7].dependencies.empty
-        nodes[8].dependencies.empty
+        nodes[7].apiDependencies.empty
+        nodes[7].implementationDependencies.empty
+        nodes[8].apiDependencies.empty
+        nodes[8].implementationDependencies.empty
     }
 
     def "arranges 10 nodes"() {
@@ -373,18 +418,28 @@ class GraphAssemblerTest extends Specification {
         then:
         def nodes = graph.nodes as List
         graph.nodes.size() == 10
-        graph.layers.size() == 4
+        graph.layers == 4
 
-        nodes[0].dependencies == [nodes[1], nodes[2], nodes[3]]
-        nodes[1].dependencies == [nodes[4], nodes[7], nodes[8]]
-        nodes[2].dependencies == [nodes[4], nodes[7], nodes[8]]
-        nodes[3].dependencies == [nodes[4], nodes[7], nodes[8]]
-        nodes[4].dependencies == [nodes[5], nodes[6], nodes[7], nodes[8]]
-        nodes[5].dependencies.empty
-        nodes[6].dependencies.empty
-        nodes[7].dependencies == [nodes[9]]
-        nodes[8].dependencies == [nodes[9]]
-        nodes[9].dependencies.empty
+        nodes[0].apiDependencies == [nodes[1]]
+        nodes[0].implementationDependencies == [nodes[2], nodes[3]]
+        nodes[1].apiDependencies == [nodes[7]]
+        nodes[1].implementationDependencies == [nodes[4], nodes[8]]
+        nodes[2].apiDependencies == [nodes[7]]
+        nodes[2].implementationDependencies == [nodes[4], nodes[8]]
+        nodes[3].apiDependencies == [nodes[7]]
+        nodes[3].implementationDependencies == [nodes[4], nodes[8]]
+        nodes[4].apiDependencies == [nodes[5], nodes[7]]
+        nodes[4].implementationDependencies == [nodes[6], nodes[8]]
+        nodes[5].apiDependencies.empty
+        nodes[5].implementationDependencies.empty
+        nodes[6].apiDependencies.empty
+        nodes[6].implementationDependencies.empty
+        nodes[7].apiDependencies.empty
+        nodes[7].implementationDependencies == [nodes[9]]
+        nodes[8].apiDependencies.empty
+        nodes[8].implementationDependencies == [nodes[9]]
+        nodes[9].apiDependencies.empty
+        nodes[9].implementationDependencies.empty
     }
 
     def "arranges 11 nodes"() {
@@ -400,29 +455,40 @@ class GraphAssemblerTest extends Specification {
         then:
         def nodes = graph.nodes as List
         graph.nodes.size() == 11
-        graph.layers.size() == 4
+        graph.layers == 4
 
-        nodes[0].dependencies == [nodes[1], nodes[2], nodes[3]]
+        nodes[0].apiDependencies == [nodes[1]]
+        nodes[0].implementationDependencies == [nodes[2], nodes[3]]
         !nodes[0].useAlternate
-        nodes[1].dependencies == [nodes[4], nodes[7], nodes[8]]
+        nodes[1].apiDependencies == [nodes[7]]
+        nodes[1].implementationDependencies == [nodes[4], nodes[8]]
         !nodes[1].useAlternate
-        nodes[2].dependencies == [nodes[4], nodes[7], nodes[8]]
+        nodes[2].apiDependencies == [nodes[7]]
+        nodes[2].implementationDependencies == [nodes[4], nodes[8]]
         !nodes[2].useAlternate
-        nodes[3].dependencies == [nodes[4], nodes[7], nodes[8]]
+        nodes[3].apiDependencies == [nodes[7]]
+        nodes[3].implementationDependencies == [nodes[4], nodes[8]]
         !nodes[3].useAlternate
-        nodes[4].dependencies == [nodes[5], nodes[6], nodes[7], nodes[8]]
+        nodes[4].apiDependencies == [nodes[5], nodes[7]]
+        nodes[4].implementationDependencies == [nodes[6], nodes[8]]
         !nodes[4].useAlternate
-        nodes[5].dependencies.empty
+        nodes[5].apiDependencies.empty
+        nodes[5].implementationDependencies.empty
         !nodes[5].useAlternate
-        nodes[6].dependencies.empty
+        nodes[6].apiDependencies.empty
+        nodes[6].implementationDependencies.empty
         nodes[6].useAlternate
-        nodes[7].dependencies == [nodes[9], nodes[10]]
+        nodes[7].apiDependencies.empty
+        nodes[7].implementationDependencies == [nodes[9], nodes[10]]
         !nodes[7].useAlternate
-        nodes[8].dependencies == [nodes[9], nodes[10]]
+        nodes[8].apiDependencies.empty
+        nodes[8].implementationDependencies == [nodes[9], nodes[10]]
         nodes[8].useAlternate
-        nodes[9].dependencies.empty
+        nodes[9].apiDependencies.empty
+        nodes[9].implementationDependencies.empty
         nodes[9].useAlternate
-        nodes[10].dependencies.empty
+        nodes[10].apiDependencies.empty
+        nodes[10].implementationDependencies.empty
         nodes[10].useAlternate
     }
 
@@ -439,23 +505,35 @@ class GraphAssemblerTest extends Specification {
         then:
         def nodes = graph.nodes as List
         graph.nodes.size() == 12
-        graph.layers.size() == 4
+        graph.layers == 4
 
-        nodes[0].dependencies == [nodes[1], nodes[2], nodes[3]]
-        nodes[1].dependencies == [nodes[4], nodes[7], nodes[8]]
-        nodes[2].dependencies == [nodes[4], nodes[7], nodes[8]]
-        nodes[3].dependencies == [nodes[4], nodes[7], nodes[8]]
-        nodes[4].dependencies == [nodes[5], nodes[6], nodes[7], nodes[8]]
-        nodes[5].dependencies.empty
+        nodes[0].apiDependencies == [nodes[1]]
+        nodes[0].implementationDependencies == [nodes[2], nodes[3]]
+        nodes[1].apiDependencies == [nodes[7]]
+        nodes[1].implementationDependencies == [nodes[4], nodes[8]]
+        nodes[2].apiDependencies == [nodes[7]]
+        nodes[2].implementationDependencies == [nodes[4], nodes[8]]
+        nodes[3].apiDependencies == [nodes[7]]
+        nodes[3].implementationDependencies == [nodes[4], nodes[8]]
+        nodes[4].apiDependencies == [nodes[5], nodes[7]]
+        nodes[4].implementationDependencies == [nodes[6], nodes[8]]
+        nodes[5].apiDependencies.empty
+        nodes[5].implementationDependencies.empty
         nodes[5].nameSuffix == '1Core1'
-        nodes[6].dependencies.empty
+        nodes[6].apiDependencies.empty
+        nodes[6].implementationDependencies.empty
         nodes[6].nameSuffix == '1Core2'
-        nodes[7].dependencies == [nodes[9], nodes[10], nodes[11]]
-        nodes[8].dependencies == [nodes[9], nodes[10], nodes[11]]
-        nodes[9].dependencies.empty
+        nodes[7].apiDependencies == [nodes[10]]
+        nodes[7].implementationDependencies == [nodes[9], nodes[11]]
+        nodes[8].apiDependencies == [nodes[10]]
+        nodes[8].implementationDependencies == [nodes[9], nodes[11]]
+        nodes[9].apiDependencies.empty
+        nodes[9].implementationDependencies.empty
         nodes[9].nameSuffix == '2Core'
-        nodes[10].dependencies.empty
-        nodes[11].dependencies.empty
+        nodes[10].apiDependencies.empty
+        nodes[10].implementationDependencies.empty
+        nodes[11].apiDependencies.empty
+        nodes[11].implementationDependencies.empty
     }
 
     def "arranges 17 nodes"() {
@@ -471,25 +549,42 @@ class GraphAssemblerTest extends Specification {
         then:
         def nodes = graph.nodes as List
         graph.nodes.size() == 17
-        graph.layers.size() == 5
+        graph.layers == 5
 
-        nodes[0].dependencies == [nodes[1], nodes[2], nodes[3]]
-        nodes[1].dependencies == [nodes[4], nodes[7], nodes[8], nodes[9]]
-        nodes[2].dependencies == [nodes[4], nodes[7], nodes[8], nodes[9]]
-        nodes[3].dependencies == [nodes[4], nodes[7], nodes[8], nodes[9]]
-        nodes[4].dependencies == [nodes[5], nodes[6], nodes[7], nodes[8], nodes[9]]
-        nodes[5].dependencies.empty
-        nodes[6].dependencies.empty
-        nodes[7].dependencies == [nodes[10], nodes[13], nodes[14]]
-        nodes[8].dependencies == [nodes[10], nodes[13], nodes[14]]
-        nodes[9].dependencies == [nodes[10], nodes[13], nodes[14]]
-        nodes[10].dependencies == [nodes[11], nodes[12], nodes[13], nodes[14]]
-        nodes[11].dependencies.empty
-        nodes[12].dependencies.empty
-        nodes[13].dependencies == [nodes[15], nodes[16]]
-        nodes[14].dependencies == [nodes[15], nodes[16]]
-        nodes[15].dependencies.empty
-        nodes[16].dependencies.empty
+        nodes[0].apiDependencies == [nodes[1]]
+        nodes[0].implementationDependencies == [nodes[2], nodes[3]]
+        nodes[1].apiDependencies == [nodes[7]]
+        nodes[1].implementationDependencies == [nodes[4], nodes[8], nodes[9]]
+        nodes[2].apiDependencies == [nodes[7]]
+        nodes[2].implementationDependencies == [nodes[4], nodes[8], nodes[9]]
+        nodes[3].apiDependencies == [nodes[7]]
+        nodes[3].implementationDependencies == [nodes[4], nodes[8], nodes[9]]
+        nodes[4].apiDependencies == [nodes[5], nodes[7]]
+        nodes[4].implementationDependencies == [nodes[6], nodes[8], nodes[9]]
+        nodes[5].apiDependencies.empty
+        nodes[5].implementationDependencies.empty
+        nodes[6].apiDependencies.empty
+        nodes[6].implementationDependencies.empty
+        nodes[7].apiDependencies == [nodes[13]]
+        nodes[7].implementationDependencies == [nodes[10], nodes[14]]
+        nodes[8].apiDependencies == [nodes[13]]
+        nodes[8].implementationDependencies == [nodes[10], nodes[14]]
+        nodes[9].apiDependencies == [nodes[13]]
+        nodes[9].implementationDependencies == [nodes[10], nodes[14]]
+        nodes[10].apiDependencies == [nodes[11], nodes[13]]
+        nodes[10].implementationDependencies == [nodes[12], nodes[14]]
+        nodes[11].apiDependencies.empty
+        nodes[11].implementationDependencies.empty
+        nodes[12].apiDependencies.empty
+        nodes[12].implementationDependencies.empty
+        nodes[13].apiDependencies.empty
+        nodes[13].implementationDependencies == [nodes[15], nodes[16]]
+        nodes[14].apiDependencies.empty
+        nodes[14].implementationDependencies == [nodes[15], nodes[16]]
+        nodes[15].apiDependencies.empty
+        nodes[15].implementationDependencies.empty
+        nodes[16].apiDependencies.empty
+        nodes[16].implementationDependencies.empty
         nodes[16].deepest
     }
 }

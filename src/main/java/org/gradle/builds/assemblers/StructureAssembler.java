@@ -1,13 +1,14 @@
 package org.gradle.builds.assemblers;
 
 import org.gradle.builds.model.Build;
+import org.gradle.builds.model.Dependency;
 import org.gradle.builds.model.Project;
 
 public class StructureAssembler {
     public void arrangeClasses(Build build) {
         Settings settings = build.getSettings();
         Graph classGraph = new GraphAssembler().arrange(settings.getSourceFileCount());
-        System.out.println("* Arranging source files in " + classGraph.getLayers().size() + " layers per project.");
+        System.out.println("* Arranging source files in " + classGraph.getLayers() + " layers per project.");
         for (Project project : build.getProjects()) {
             project.setClassGraph(classGraph);
         }
@@ -16,7 +17,7 @@ public class StructureAssembler {
     public void arrangeProjects(Build build, ProjectInitializer projectInitializer) {
         Settings settings = build.getSettings();
         Graph projectGraph = new GraphAssembler().arrange(settings.getProjectCount());
-        System.out.println("* Arranging projects in " + projectGraph.getLayers().size() + " layers.");
+        System.out.println("* Arranging projects in " + projectGraph.getLayers() + " layers.");
 
         projectGraph.visit((Graph.Visitor<Project>) (nodeDetails, dependencies) -> {
             Project project;
@@ -35,7 +36,7 @@ public class StructureAssembler {
                     projectInitializer.initLibraryProject(project);
                 }
             }
-            for (Project dep : dependencies) {
+            for (Dependency<Project> dep : dependencies) {
                 project.requires(dep);
             }
             if (nodeDetails.isDeepest()) {

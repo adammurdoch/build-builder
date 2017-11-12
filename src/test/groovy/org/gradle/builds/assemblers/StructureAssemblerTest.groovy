@@ -40,7 +40,7 @@ class StructureAssemblerTest extends Specification {
         build.subprojects.size() == 1
 
         def subprojects = build.subprojects as List
-        build.rootProject.dependencies as List == subprojects
+        impl(build.rootProject) == subprojects
     }
 
     def "builds dependency graph with three projects"() {
@@ -53,9 +53,12 @@ class StructureAssemblerTest extends Specification {
         build.subprojects.size() == 2
 
         def subprojects = build.subprojects as List
-        build.rootProject.dependencies as List == [subprojects[1]]
-        subprojects[1].dependencies as List == [subprojects[0]]
-        subprojects[0].dependencies.empty
+        api(build.rootProject).empty
+        impl(build.rootProject) == [subprojects[1]]
+        api(subprojects[1]).empty
+        impl(subprojects[1]) == [subprojects[0]]
+        api(subprojects[0]).empty
+        impl(subprojects[0]).empty
     }
 
     def "builds dependency graph with four projects"() {
@@ -68,10 +71,14 @@ class StructureAssemblerTest extends Specification {
         build.subprojects.size() == 3
 
         def subprojects = build.subprojects as List
-        build.rootProject.dependencies as List == [subprojects[1], subprojects[2]]
-        subprojects[1].dependencies as List == [subprojects[0]]
-        subprojects[2].dependencies as List == [subprojects[0]]
-        subprojects[0].dependencies.empty
+        api(build.rootProject) == [subprojects[1]]
+        impl(build.rootProject) == [subprojects[2]]
+        api(subprojects[1]).empty
+        impl(subprojects[1]) == [subprojects[0]]
+        api(subprojects[2]).empty
+        impl(subprojects[2]) == [subprojects[0]]
+        api(subprojects[0]).empty
+        impl(subprojects[0]).empty
     }
 
     def "builds dependency graph with five projects"() {
@@ -84,14 +91,27 @@ class StructureAssemblerTest extends Specification {
         build.subprojects.size() == 4
 
         def subprojects = build.subprojects as List
-        build.rootProject.dependencies as List == [subprojects[2], subprojects[3]]
-        subprojects[0].dependencies.empty
-        subprojects[1].dependencies.empty
-        subprojects[2].dependencies as List == [subprojects[0], subprojects[1]]
-        subprojects[3].dependencies as List == [subprojects[0], subprojects[1]]
+        api(build.rootProject) == [subprojects[2]]
+        impl(build.rootProject) == [subprojects[3]]
+        api(subprojects[2]).empty
+        impl(subprojects[2]) == [subprojects[0], subprojects[1]]
+        api(subprojects[3]).empty
+        impl(subprojects[3]) == [subprojects[0], subprojects[1]]
+        api(subprojects[0]).empty
+        impl(subprojects[0]).empty
+        api(subprojects[1]).empty
+        impl(subprojects[1]).empty
     }
 
     def projects(int p) {
         return new Settings(p, 3)
+    }
+
+    def api(Project p) {
+        return p.dependencies.findAll { it.api }*.target
+    }
+
+    def impl(Project p) {
+        return p.dependencies.findAll { !it.api }*.target
     }
 }

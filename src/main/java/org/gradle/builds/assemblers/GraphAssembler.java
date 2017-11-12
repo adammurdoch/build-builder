@@ -74,12 +74,14 @@ public class GraphAssembler {
         private final Group group;
         private final int item;
         final boolean useAlternate;
-        private final List<NodeImpl> dependencies;
+        private final List<NodeImpl> api;
+        private final List<NodeImpl> implementation;
 
-        NodeImpl(Group group, int item, List<NodeImpl> dependencies, boolean useAlternate) {
+        NodeImpl(Group group, int item, List<NodeImpl> api, List<NodeImpl> implementation, boolean useAlternate) {
             this.group = group;
             this.item = item;
-            this.dependencies = dependencies;
+            this.api = api;
+            this.implementation = implementation;
             this.useAlternate = useAlternate;
         }
 
@@ -109,8 +111,13 @@ public class GraphAssembler {
         }
 
         @Override
-        public List<? extends Graph.Node> getDependencies() {
-            return dependencies;
+        public List<? extends Graph.Node> getApiDependencies() {
+            return api;
+        }
+
+        @Override
+        public List<? extends Graph.Node> getImplementationDependencies() {
+            return implementation;
         }
     }
 
@@ -137,14 +144,14 @@ public class GraphAssembler {
         private final Layer layer;
         private final String name;
         private final int size;
-        private final List<? extends Module> implementationModules;
+        private final List<? extends Module> requiredModules;
         private List<NodeImpl> nodes;
 
-        Group(Layer layer, String name, int size, List<? extends Module> implementationModules) {
+        Group(Layer layer, String name, int size, List<? extends Module> requiredModules) {
             this.layer = layer;
             this.name = name;
             this.size = size;
-            this.implementationModules = implementationModules;
+            this.requiredModules = requiredModules;
         }
 
         @Override
@@ -155,23 +162,30 @@ public class GraphAssembler {
         @Override
         public List<NodeImpl> getNodes() {
             if (nodes == null) {
-                List<NodeImpl> deps = new ArrayList<>();
-                for (Module module : implementationModules) {
-                    deps.addAll(module.getProtectedApi());
+                List<NodeImpl> implDeps = new ArrayList<>();
+                List<NodeImpl> apiDeps = new ArrayList<>();
+                for (Module module : requiredModules) {
+                    List<NodeImpl> api = module.getProtectedApi();
+                    if (api.size() > 1) {
+                        apiDeps.add(api.get(0));
+                        implDeps.addAll(api.subList(1, api.size()));
+                    } else {
+                        implDeps.addAll(api);
+                    }
                 }
                 nodes = new ArrayList<>(size);
                 for (int i = 0; i < size; i++) {
                     boolean useAlternate;
-                    if (size > 1 && i == size - 1 && layer.canUseAlternate() && canUseAlternate(deps)) {
+                    if (size > 1 && i == size - 1 && layer.canUseAlternate() && canUseAlternate(implDeps) && canUseAlternate(apiDeps)) {
                         // Last item of this group and all dependencies use alternate
                         useAlternate = true;
-                    } else if (size == 1 && layer.canUseAlternate() && deps.isEmpty()) {
+                    } else if (size == 1 && layer.canUseAlternate() && implDeps.isEmpty()) {
                         // Single item group with no dependencies
                         useAlternate = true;
                     } else {
                         useAlternate = false;
                     }
-                    this.nodes.add(new NodeImpl(this, i, deps, useAlternate));
+                    this.nodes.add(new NodeImpl(this, i, apiDeps, implDeps, useAlternate));
                 }
             }
             return nodes;

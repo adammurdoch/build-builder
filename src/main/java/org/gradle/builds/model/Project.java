@@ -14,7 +14,7 @@ public class Project {
     private final String name;
     private final Path projectDir;
     private final BuildScript buildScript = new BuildScript();
-    private final Set<Project> dependencies = new LinkedHashSet<>();
+    private final List<Dependency<Project>> dependencies = new ArrayList<>();
     private final Set<Component> components = new LinkedHashSet<>();
     private final List<LocalLibrary<?>> exportedLibraries = new ArrayList<>();
     private final List<Library<?>> requiredLibraries = new ArrayList<>();
@@ -122,11 +122,11 @@ public class Project {
         return buildScript;
     }
 
-    public Set<Project> getDependencies() {
+    public List<Dependency<Project>> getDependencies() {
         return dependencies;
     }
 
-    public void requires(Project project) {
+    public void requires(Dependency<Project> project) {
         this.dependencies.add(project);
     }
 

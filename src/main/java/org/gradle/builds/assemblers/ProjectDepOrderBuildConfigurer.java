@@ -1,6 +1,7 @@
 package org.gradle.builds.assemblers;
 
 import org.gradle.builds.model.Build;
+import org.gradle.builds.model.Dependency;
 import org.gradle.builds.model.Project;
 
 import java.util.HashSet;
@@ -26,8 +27,8 @@ public class ProjectDepOrderBuildConfigurer implements BuildConfigurer {
             return;
         }
 
-        for (Project dep : project.getDependencies()) {
-            populate(settings, dep, seen);
+        for (Dependency<Project> dep : project.getDependencies()) {
+            populate(settings, dep.getTarget(), seen);
         }
 
         configurer.configure(settings, project);

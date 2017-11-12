@@ -120,7 +120,7 @@ public class CppModelAssembler extends AbstractModelAssembler {
 
     private void addSource(Project project, HasCppSource component, CppClass entryPoint, CppSourceFile entryPointSourceFile, CppHeaderFile implHeader,
                            CppHeaderFile privateHeader) {
-        int implLayer = Math.max(0, project.getClassGraph().getLayers().size() - 2);
+        int implLayer = Math.max(0, project.getClassGraph().getLayers() - 2);
         project.getClassGraph().visit((Graph.Visitor<CppClass>) (nodeDetails, dependencies) -> {
             CppClass cppClass;
             CppSourceFile cppSourceFile;
@@ -139,8 +139,8 @@ public class CppModelAssembler extends AbstractModelAssembler {
             if (layer == implLayer) {
                 addReferences(component, cppClass, cppSourceFile);
             }
-            for (CppClass dep : dependencies) {
-                cppClass.uses(dep);
+            for (Dependency<CppClass> dep : dependencies) {
+                cppClass.uses(dep.getTarget());
             }
             return cppClass;
         });

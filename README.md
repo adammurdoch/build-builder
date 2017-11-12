@@ -131,9 +131,10 @@ Here's an example:
     - slf4j
     - support-core-utils (Android builds only)
 - Only a basic dependency graph is available, between projects and between source files and external libraries
-    - Arranged in layers 
     - Only one layer of a project references classes from other projects
-    - Generates a deep and narrow graph
+    - Generates a deep and narrow graph, should be wider and have more independent paths
+    - Each layer should leak into other layers
+    - More incoming and api dependencies
 - Generated classes are small.
 - There are no transitive API classes. 
 - There are no type hierarchies.

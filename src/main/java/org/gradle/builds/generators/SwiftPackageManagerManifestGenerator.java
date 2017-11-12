@@ -1,6 +1,7 @@
 package org.gradle.builds.generators;
 
 import org.gradle.builds.model.Build;
+import org.gradle.builds.model.Dependency;
 import org.gradle.builds.model.HasSwiftSource;
 import org.gradle.builds.model.Project;
 
@@ -33,8 +34,9 @@ public class SwiftPackageManagerManifestGenerator implements Generator<Build> {
                 writer.print("        Target(name: \"" + project.getName() + "\"");
                 if (!project.getDependencies().isEmpty()) {
                     writer.print(", dependencies: [");
-                    for (Project dep : project.getDependencies()) {
-                        writer.print("\"" + dep.getName() + "\", ");
+                    // TODO - should use required libraries instead
+                    for (Dependency<Project> dep : project.getDependencies()) {
+                        writer.print("\"" + dep.getTarget().getName() + "\", ");
                     }
                     writer.print("]");
                 }
