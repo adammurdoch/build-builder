@@ -119,9 +119,9 @@ public class AndroidModelAssembler extends JvmModelAssembler {
     }
 
     private void addDependencies(Project project, AndroidComponent component, BuildScript buildScript) {
-        for (Library<? extends JvmLibraryApi> library : project.getRequiredLibraries(JvmLibraryApi.class)) {
-            buildScript.dependsOn("compile", library.getDependency());
-            component.uses(library.getApi());
+        for (Dependency<Library<? extends JvmLibraryApi>> library : project.getRequiredLibraries(JvmLibraryApi.class)) {
+            buildScript.dependsOn("compile", library.getTarget().getDependency());
+            component.uses(library.withTarget(library.getTarget().getApi()));
         }
         buildScript.dependsOnExternal("testCompile", "junit:junit:4.12");
         buildScript.dependsOnExternal("androidTestCompile", "com.android.support:support-annotations:25.1.0");
@@ -139,7 +139,7 @@ public class AndroidModelAssembler extends JvmModelAssembler {
         androidComponent.stringResource(stringResourceName, "some-value");
 
         addSource(project, androidComponent, activity, javaClass -> {
-            javaClass.uses(rClass);
+            javaClass.uses(Dependency.implementation(rClass));
         });
     }
 }

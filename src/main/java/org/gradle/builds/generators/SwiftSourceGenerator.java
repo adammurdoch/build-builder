@@ -42,9 +42,10 @@ public class SwiftSourceGenerator extends ProjectComponentSpecificGenerator<HasS
                 printWriter.println("public class " + swiftClass.getName() + " {");
                 printWriter.println("    public init() { }");
                 printWriter.println("    public func doSomething() {");
-                for (SwiftClass dep : swiftClass.getReferencedClasses()) {
-                    String varName = dep.getName().toLowerCase();
-                    printWriter.println("        let " + varName + " = " + dep.getName() + "()");
+                for (Dependency<SwiftClass> dep : swiftClass.getReferencedClasses()) {
+                    SwiftClass targetClass = dep.getTarget();
+                    String varName = targetClass.getName().toLowerCase();
+                    printWriter.println("        let " + varName + " = " + targetClass.getName() + "()");
                     printWriter.println("        " + varName + ".doSomething()");
                 }
                 printWriter.println("    }");

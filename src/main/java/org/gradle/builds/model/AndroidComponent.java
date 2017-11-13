@@ -1,15 +1,15 @@
 package org.gradle.builds.model;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class AndroidComponent extends HasJavaSource<JvmLibraryApi> {
     private String packageName;
     private String labelResource;
     private final Map<String, String> stringResources = new LinkedHashMap<>();
-    private final Set<JavaClass> activities = new LinkedHashSet<>();
+    private final List<JavaClass> activities = new ArrayList<>();
 
     public String getPackageName() {
         return packageName;
@@ -35,7 +35,7 @@ public class AndroidComponent extends HasJavaSource<JvmLibraryApi> {
         stringResources.put(name, value);
     }
 
-    public Set<JavaClass> getActivities() {
+    public List<JavaClass> getActivities() {
         return activities;
     }
 

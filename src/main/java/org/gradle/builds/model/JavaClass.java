@@ -27,19 +27,10 @@ public class JavaClass extends SourceClass<JavaClassApi> {
         return new JavaClassApi(getName(), Collections.singleton("getSomeValue()"), Collections.singleton("INT_CONST"));
     }
 
-    public void uses(JavaClass javaClass) {
-        uses(javaClass.getApi());
-    }
-
-    public void uses(Iterable<JavaClassApi> javaClasses) {
-        for (JavaClassApi javaClass : javaClasses) {
-            uses(javaClass);
-        }
-    }
-
     public Set<String> getMethodReferences() {
         Set<String> methodReferences = new LinkedHashSet<>();
-        for (JavaClassApi javaClass : getReferencedClasses()) {
+        for (Dependency<JavaClassApi> dependency : getReferencedClasses()) {
+            JavaClassApi javaClass = dependency.getTarget();
             for (String methodName : javaClass.getMethods()) {
                 methodReferences.add(javaClass.getName() + "." + methodName);
             }
@@ -49,7 +40,8 @@ public class JavaClass extends SourceClass<JavaClassApi> {
 
     public Set<String> getFieldReferences() {
         Set<String> fieldReferences = new LinkedHashSet<>();
-        for (JavaClassApi javaClass : getReferencedClasses()) {
+        for (Dependency<JavaClassApi> dependency : getReferencedClasses()) {
+            JavaClassApi javaClass = dependency.getTarget();
             for (String fieldName : javaClass.getFields()) {
                 fieldReferences.add(javaClass.getName() + "." + fieldName);
             }

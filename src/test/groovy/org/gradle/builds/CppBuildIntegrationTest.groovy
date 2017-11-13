@@ -81,6 +81,25 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         file("repo/test/lib1api/1.2/lib1api-1.2.pom").file
     }
 
+    def "can generate 6 project build"() {
+        when:
+        new Main().run("cpp", "--dir", projectDir.absolutePath, "--projects", "6")
+
+        then:
+        build.isBuild()
+        build.project(":").isCppApplication()
+        build.project(":lib1api1").isCppLibrary()
+        build.project(":lib1api1").file("src/main/public/lib1api1.h").text.contains("#include \"lib2api1.h\"")
+        build.project(":lib1api2").isCppLibrary()
+        build.project(":lib1api2").file("src/main/public/lib1api2.h").text.contains("#include \"lib2api1.h\"")
+
+        build.buildSucceeds(":installDebug")
+        build.app("build/install/main/debug/testApp").succeeds()
+
+        build.buildSucceeds("build")
+        build.buildSucceeds("publish")
+    }
+
     @Unroll
     def "can generate #projects project build"() {
         when:

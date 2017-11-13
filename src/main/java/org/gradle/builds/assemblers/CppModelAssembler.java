@@ -67,6 +67,7 @@ public class CppModelAssembler extends AbstractModelAssembler {
             addPublishing(project, lib, project.getBuildScript());
             addDependencies(project, lib, buildScript);
 
+            addApiHeaders(lib, apiHeader);
             addSource(project, lib, apiClass, apiSourceFile, implHeader, privateHeader);
         } else if (project.component(CppApplication.class) != null) {
             CppApplication app = project.component(CppApplication.class);
@@ -97,6 +98,14 @@ public class CppModelAssembler extends AbstractModelAssembler {
             addDependencies(project, app, buildScript);
 
             addSource(project, app, appClass, mainSourceFile, implHeader, privateHeader);
+        }
+    }
+
+    private void addApiHeaders(CppLibrary lib, CppHeaderFile header) {
+        for (Dependency<CppLibraryApi> dependency : lib.getReferencedLibraries()) {
+            if (dependency.isApi()) {
+                header.includeHeader(dependency.getTarget().getApiHeader());
+            }
         }
     }
 
@@ -140,23 +149,29 @@ public class CppModelAssembler extends AbstractModelAssembler {
                 addReferences(component, cppClass, cppSourceFile);
             }
             for (Dependency<CppClass> dep : dependencies) {
-                cppClass.uses(dep.getTarget());
+                cppClass.uses(dep);
             }
             return cppClass;
         });
     }
 
     private void addReferences(HasCppSource component, CppClass cppClass, CppSourceFile sourceFile) {
-        for (CppLibraryApi library : component.getReferencedLibraries()) {
-            cppClass.uses(library.getApiClass());
-            sourceFile.includeHeader(library.getApiHeader());
+        for (Dependency<CppLibraryApi> dependency : component.getReferencedLibraries()) {
+            CppLibraryApi api = dependency.getTarget();
+            cppClass.uses(dependency.withTarget(api.getApiClass()));
+            sourceFile.includeHeader(api.getApiHeader());
         }
     }
 
     private void addDependencies(Project project, HasCppSource component, BuildScript buildScript) {
-        for (Library<? extends CppLibraryApi> library : project.getRequiredLibraries(CppLibraryApi.class)) {
-            buildScript.dependsOn("implementation", library.getDependency());
-            component.uses(library.getApi());
+        for (Dependency<Library<? extends CppLibraryApi>> dependency : project.getRequiredLibraries(CppLibraryApi.class)) {
+            Library<? extends CppLibraryApi> library = dependency.getTarget();
+            if (dependency.isApi() && component instanceof CppLibrary) {
+                buildScript.dependsOn("api", library.getDependency());
+            } else {
+                buildScript.dependsOn("implementation", library.getDependency());
+            }
+            component.uses(dependency.withTarget(library.getApi()));
         }
     }
 }

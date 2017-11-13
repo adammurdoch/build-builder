@@ -1,14 +1,14 @@
 package org.gradle.builds.model;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 public class HasCppSource extends HasSource<CppSourceFile, CppLibraryApi> {
-    private final Set<CppHeaderFile> implHeaders = new LinkedHashSet<>();
-    private final Set<CppHeaderFile> publicHeaders = new LinkedHashSet<>();
-    private final Set<CppHeaderFile> privateHeaders = new LinkedHashSet<>();
+    private final List<CppHeaderFile> implHeaders = new ArrayList<>();
+    private final List<CppHeaderFile> publicHeaders = new ArrayList<>();
+    private final List<CppHeaderFile> privateHeaders = new ArrayList<>();
 
-    public Set<CppHeaderFile> getPublicHeaderFiles() {
+    public List<CppHeaderFile> getPublicHeaderFiles() {
         return publicHeaders;
     }
 
@@ -18,7 +18,7 @@ public class HasCppSource extends HasSource<CppSourceFile, CppLibraryApi> {
         return headerFile;
     }
 
-    public Set<CppHeaderFile> getImplementationHeaderFiles() {
+    public List<CppHeaderFile> getImplementationHeaderFiles() {
         return implHeaders;
     }
 
@@ -28,7 +28,7 @@ public class HasCppSource extends HasSource<CppSourceFile, CppLibraryApi> {
         return headerFile;
     }
 
-    public Set<CppHeaderFile> getPrivateHeadersFiles() {
+    public List<CppHeaderFile> getPrivateHeadersFiles() {
         return privateHeaders;
     }
 

@@ -1,7 +1,8 @@
 package org.gradle.builds.model;
 
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -11,7 +12,7 @@ import java.util.Set;
  */
 public abstract class SourceClass<REF> {
     private final String name;
-    private final Set<REF> referencedClasses = new LinkedHashSet<>();
+    private final List<Dependency<REF>> referencedClasses = new ArrayList<>();
     private final Set<ClassRole> roles = new HashSet<>();
 
     protected SourceClass(String name) {
@@ -22,11 +23,11 @@ public abstract class SourceClass<REF> {
         return name;
     }
 
-    public Set<REF> getReferencedClasses() {
+    public List<Dependency<REF>> getReferencedClasses() {
         return referencedClasses;
     }
 
-    public void uses(REF refClass) {
+    public void uses(Dependency<REF> refClass) {
         referencedClasses.add(refClass);
     }
 

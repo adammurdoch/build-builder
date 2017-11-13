@@ -3,10 +3,7 @@ package org.gradle.builds.model;
 import org.gradle.builds.assemblers.Graph;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Project {
@@ -14,10 +11,10 @@ public class Project {
     private final String name;
     private final Path projectDir;
     private final BuildScript buildScript = new BuildScript();
-    private final List<Dependency<Project>> dependencies = new ArrayList<>();
+    private final List<Dependency<Project>> requiredProjects = new ArrayList<>();
     private final Set<Component> components = new LinkedHashSet<>();
     private final List<LocalLibrary<?>> exportedLibraries = new ArrayList<>();
-    private final List<Library<?>> requiredLibraries = new ArrayList<>();
+    private final List<Dependency<Library<?>>> requiredLibraries = new ArrayList<>();
     private String typeName;
     private Graph classGraph;
     private PublicationTarget publicationTarget;
@@ -122,12 +119,12 @@ public class Project {
         return buildScript;
     }
 
-    public List<Dependency<Project>> getDependencies() {
-        return dependencies;
+    public List<Dependency<Project>> getRequiredProjects() {
+        return requiredProjects;
     }
 
-    public void requires(Dependency<Project> project) {
-        this.dependencies.add(project);
+    public void requiresProject(Dependency<Project> project) {
+        this.requiredProjects.add(project);
     }
 
     public void setClassGraph(Graph classGraph) {
@@ -171,7 +168,7 @@ public class Project {
      * Returns the local libraries provided by this project, if any.
      */
     public <T> List<LocalLibrary<? extends T>> getExportedLibraries(Class<T> type) {
-        return exportedLibraries.stream().filter(d -> type.isInstance(d.getApi())).map(d -> (LocalLibrary<T>)d).collect(Collectors.toList());
+        return exportedLibraries.stream().filter(d -> type.isInstance(d.getApi())).map(d -> (LocalLibrary<T>) d).collect(Collectors.toList());
     }
 
     public void export(LocalLibrary<?> library) {
@@ -181,15 +178,27 @@ public class Project {
     /**
      * Returns the libraries required by this project, if any.
      */
-    public <T> List<Library<? extends T>> getRequiredLibraries(Class<T> type) {
-        return requiredLibraries.stream().filter(d -> type.isInstance(d.getApi())).map(d -> (Library<T>)d).collect(Collectors.toList());
+    public <T> List<Dependency<Library<? extends T>>> getRequiredLibraries(Class<T> type) {
+        return (List) requiredLibraries.stream().filter(d -> type.isInstance(d.getTarget().getApi())).collect(Collectors.toList());
     }
 
+    public void requires(Dependency<Library<?>> dependency) {
+        requiredLibraries.add(dependency);
+    }
+
+    /**
+     * Adds an implementation dependency on the given library.
+     */
     public void requires(Library<?> library) {
-        this.requiredLibraries.add(library);
+        this.requiredLibraries.add(Dependency.implementation(library));
     }
 
-    public void requires(List<? extends Library<?>> libraries) {
-        this.requiredLibraries.addAll(libraries);
+    /**
+     * Adds implementation dependencies on the given libraries.
+     */
+    public void requires(Collection<? extends Library<?>> libraries) {
+        for (Library<?> library : libraries) {
+            requires(library);
+        }
     }
 }

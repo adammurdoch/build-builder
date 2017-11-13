@@ -24,7 +24,7 @@ public class SwiftModelAssembler extends AbstractModelAssembler {
             buildScript.requirePlugin("swift-library");
             buildScript.requirePlugin("xctest");
             addPublishing(project, library, project.getBuildScript());
-            addDependencies(project, library, buildScript, true);
+            addDependencies(project, library, buildScript);
             if (library.isSwiftPm()) {
                 buildScript.block("library").property("source.from", new Scope.Code("rootProject.file('Sources/" + project.getName() + "')"));
             }
@@ -44,7 +44,7 @@ public class SwiftModelAssembler extends AbstractModelAssembler {
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("swift-executable");
             buildScript.requirePlugin("xctest");
-            addDependencies(project, application, buildScript, false);
+            addDependencies(project, application, buildScript);
             if (application.isSwiftPm()) {
                 buildScript.block("executable").property("source.from", new Scope.Code("rootProject.file('Sources/" + project.getName() + "')"));
             }
@@ -85,25 +85,26 @@ public class SwiftModelAssembler extends AbstractModelAssembler {
                 addReferences(component, swiftClass, swiftSourceFile);
             }
             for (Dependency<SwiftClass> dep : dependencies) {
-                swiftClass.uses(dep.getTarget());
+                swiftClass.uses(dep);
             }
             return swiftClass;
         });
     }
 
     private void addReferences(HasSwiftSource component, SwiftClass swiftClass, SwiftSourceFile sourceFile) {
-        for (SwiftLibraryApi library : component.getReferencedLibraries()) {
-            swiftClass.uses(library.getApiClass());
-            sourceFile.addModule(library.getModule());
+        for (Dependency<SwiftLibraryApi> dependency : component.getReferencedLibraries()) {
+            SwiftLibraryApi api = dependency.getTarget();
+            swiftClass.uses(dependency.withTarget(api.getApiClass()));
+            sourceFile.addModule(api.getModule());
         }
     }
 
-    private void addDependencies(Project project, HasSwiftSource component, BuildScript buildScript, boolean libHack) {
+    private void addDependencies(Project project, HasSwiftSource component, BuildScript buildScript) {
         // TODO - remove this hack
-        String configuration = libHack ? "api" : "implementation";
-        for (Library<? extends SwiftLibraryApi> library : project.getRequiredLibraries(SwiftLibraryApi.class)) {
-            buildScript.dependsOn(configuration, library.getDependency());
-            component.uses(library.getApi());
+        String configuration = component instanceof SwiftLibrary ? "api" : "implementation";
+        for (Dependency<Library<? extends SwiftLibraryApi>> library : project.getRequiredLibraries(SwiftLibraryApi.class)) {
+            buildScript.dependsOn(configuration, library.getTarget().getDependency());
+            component.uses(library.withTarget(library.getTarget().getApi()));
         }
     }
 

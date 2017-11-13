@@ -35,13 +35,15 @@ public abstract class JvmModelAssembler extends AbstractModelAssembler {
                 javaClass = component.addClass(className + "Impl" + nodeDetails.getNameSuffix());
             }
             if (layer == implLayer) {
-                for (JvmLibraryApi library : component.getReferencedLibraries()) {
-                    javaClass.uses(library.getApiClasses());
+                for (Dependency<? extends JvmLibraryApi> dependency : component.getReferencedLibraries()) {
+                    for (JavaClassApi api : dependency.getTarget().getApiClasses()) {
+                        javaClass.uses(dependency.withTarget(api));
+                    }
                 }
                 implClass.accept(javaClass);
             }
             for (Dependency<JavaClass> dep : dependencies) {
-                javaClass.uses(dep.getTarget());
+                javaClass.uses(dep.withTarget(dep.getTarget().getApi()));
             }
             return javaClass;
         });

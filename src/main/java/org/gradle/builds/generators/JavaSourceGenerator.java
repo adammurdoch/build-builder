@@ -91,7 +91,8 @@ public class JavaSourceGenerator extends ProjectFileGenerator {
                 printWriter.println("        text.setText(getSomeValue());");
                 printWriter.println("    }");
                 AndroidComponent androidLibrary = project.component(AndroidComponent.class);
-                for (JvmLibraryApi jvmLibraryApi : androidLibrary.getReferencedLibraries()) {
+                for (Dependency<JvmLibraryApi> dependency : androidLibrary.getReferencedLibraries()) {
+                    JvmLibraryApi jvmLibraryApi = dependency.getTarget();
                     if (jvmLibraryApi instanceof AndroidLibraryApi) {
                         AndroidLibraryApi referencedLibrary = (AndroidLibraryApi) jvmLibraryApi;
                         printWriter.println();

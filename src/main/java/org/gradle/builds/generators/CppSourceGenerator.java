@@ -38,9 +38,10 @@ public class CppSourceGenerator extends ProjectComponentSpecificGenerator<HasCpp
                 for (CppClass cppClass : cppSource.getClasses()) {
                     printWriter.println();
                     printWriter.println("void " + cppClass.getName() + "::doSomething() {");
-                    for (CppClass dep : cppClass.getReferencedClasses()) {
-                        String varName = dep.getName().toLowerCase();
-                        printWriter.println("    " + dep.getName() + " " + varName + ";");
+                    for (Dependency<CppClass> dep : cppClass.getReferencedClasses()) {
+                        CppClass targetClass = dep.getTarget();
+                        String varName = targetClass.getName().toLowerCase();
+                        printWriter.println("    " + targetClass.getName() + " " + varName + ";");
                         printWriter.println("    " + varName + ".doSomething();");
                     }
                     printWriter.println("}");

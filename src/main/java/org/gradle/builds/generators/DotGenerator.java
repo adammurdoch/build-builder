@@ -1,9 +1,6 @@
 package org.gradle.builds.generators;
 
-import org.gradle.builds.model.Build;
-import org.gradle.builds.model.Library;
-import org.gradle.builds.model.Model;
-import org.gradle.builds.model.Project;
+import org.gradle.builds.model.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -26,8 +23,14 @@ public class DotGenerator implements Generator<Model> {
                 }
                 writer.println("  }");
                 for (Project project : build.getProjects()) {
-                    for (Library<?> library : project.getRequiredLibraries(Object.class)) {
-                        writer.println("  " + project.getName() + " -> " + library.getDisplayName());
+                    for (Dependency<Library<?>> library : project.getRequiredLibraries(Object.class)) {
+                        writer.print("  ");
+                        writer.print(project.getName());
+                        writer.print(" -> ");
+                        writer.print(library.getTarget().getDisplayName());
+                        writer.print(" [color = \"");
+                        writer.print(library.isApi() ? "black" : "grey56");
+                        writer.println("\"]");
                     }
                 }
             }

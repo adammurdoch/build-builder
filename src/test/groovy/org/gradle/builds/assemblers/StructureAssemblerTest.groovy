@@ -27,7 +27,7 @@ class StructureAssemblerTest extends Specification {
         then:
         build.projects.size() == 1
         build.subprojects.empty
-        build.rootProject.dependencies.empty
+        build.rootProject.requiredProjects.empty
     }
 
     def "builds dependency graph with two projects"() {
@@ -108,10 +108,10 @@ class StructureAssemblerTest extends Specification {
     }
 
     def api(Project p) {
-        return p.dependencies.findAll { it.api }*.target
+        return p.requiredProjects.findAll { it.api }*.target
     }
 
     def impl(Project p) {
-        return p.dependencies.findAll { !it.api }*.target
+        return p.requiredProjects.findAll { !it.api }*.target
     }
 }

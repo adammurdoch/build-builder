@@ -37,7 +37,7 @@ public class StructureAssembler {
                 }
             }
             for (Dependency<Project> dep : dependencies) {
-                project.requires(dep);
+                project.requiresProject(dep);
             }
             if (nodeDetails.isDeepest()) {
                 build.setDeepestProject(project);

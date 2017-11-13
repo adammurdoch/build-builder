@@ -29,4 +29,8 @@ public class Dependency<T> {
     public boolean isApi() {
         return api;
     }
+
+    public <S> Dependency<S> withTarget(S target) {
+        return new Dependency<>(target, api);
+    }
 }

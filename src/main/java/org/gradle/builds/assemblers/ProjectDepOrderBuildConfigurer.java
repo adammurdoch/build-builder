@@ -27,7 +27,7 @@ public class ProjectDepOrderBuildConfigurer implements BuildConfigurer {
             return;
         }
 
-        for (Dependency<Project> dep : project.getDependencies()) {
+        for (Dependency<Project> dep : project.getRequiredProjects()) {
             populate(settings, dep.getTarget(), seen);
         }
 

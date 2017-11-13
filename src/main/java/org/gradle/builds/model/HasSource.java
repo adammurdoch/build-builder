@@ -1,22 +1,22 @@
 package org.gradle.builds.model;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class HasSource<T, L> implements Component {
-    private final Set<L> referencedLibraries = new LinkedHashSet<>();
-    private final Set<T> sourceFiles = new LinkedHashSet<>();
-    private final Set<T> testFiles = new LinkedHashSet<>();
+    private final List<Dependency<L>> referencedLibraries = new ArrayList<>();
+    private final List<T> sourceFiles = new ArrayList<>();
+    private final List<T> testFiles = new ArrayList<>();
 
-    public Set<L> getReferencedLibraries() {
+    public List<Dependency<L>> getReferencedLibraries() {
         return referencedLibraries;
     }
 
-    public void uses(L library) {
+    public void uses(Dependency<L> library) {
         referencedLibraries.add(library);
     }
 
-    public Set<T> getSourceFiles() {
+    public List<T> getSourceFiles() {
         return sourceFiles;
     }
 
@@ -25,7 +25,7 @@ public abstract class HasSource<T, L> implements Component {
         return sourceFile;
     }
 
-    public Set<T> getTestFiles() {
+    public List<T> getTestFiles() {
         return testFiles;
     }
 

@@ -32,10 +32,10 @@ public class SwiftPackageManagerManifestGenerator implements Generator<Build> {
             writer.println("    targets: [");
             for (Project project : build.getProjects()) {
                 writer.print("        Target(name: \"" + project.getName() + "\"");
-                if (!project.getDependencies().isEmpty()) {
+                if (!project.getRequiredProjects().isEmpty()) {
                     writer.print(", dependencies: [");
                     // TODO - should use required libraries instead
-                    for (Dependency<Project> dep : project.getDependencies()) {
+                    for (Dependency<Project> dep : project.getRequiredProjects()) {
                         writer.print("\"" + dep.getTarget().getName() + "\", ");
                     }
                     writer.print("]");

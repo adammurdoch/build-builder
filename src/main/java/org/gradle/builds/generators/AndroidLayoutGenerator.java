@@ -34,7 +34,8 @@ public class AndroidLayoutGenerator extends ProjectComponentSpecificGenerator<An
         printWriter.println("      android:layout_height='wrap_content'");
         printWriter.println("      android:layout_centerHorizontal='true'");
         printWriter.println("      android:layout_centerVertical='true' />");
-        for (JvmLibraryApi library : component.getReferencedLibraries()) {
+        for (Dependency<JvmLibraryApi> dependency : component.getReferencedLibraries()) {
+            JvmLibraryApi library = dependency.getTarget();
             if (library instanceof AndroidLibraryApi) {
                 printWriter.println("    <Button");
                 printWriter.println("      android:layout_width='wrap_content'");
