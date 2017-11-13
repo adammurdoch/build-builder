@@ -35,25 +35,38 @@ public class CppSourceGenerator extends ProjectComponentSpecificGenerator<HasCpp
     private void writeSourceFile(CppSourceFile cppSource, Path sourceFile) throws IOException {
         Files.createDirectories(sourceFile.getParent());
         try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(sourceFile))) {
+            String typeName = cppSource.getName().replace(".cpp", "");
             printWriter.println("// GENERATED SOURCE FILE");
             for (CppHeaderFile headerFile : cppSource.getHeaderFiles()) {
                 printWriter.println("#include \"" + headerFile.getName() + "\"");
             }
-            if (cppSource.hasMainFunction()) {
-                printWriter.println("#include <stdio.h>");
+            printWriter.println("#include <iostream>");
+
+            // Add some filler
+            for (int i = 0; i < 4; i++) {
                 printWriter.println();
+                functionHeader(printWriter);
+                printWriter.println("int " + typeName + (i + 1) + "(int a, int b) {");
+                printWriter.println("    return a + b;");
+                printWriter.println("}");
+            }
+
+            if (cppSource.hasMainFunction()) {
+                printWriter.println();
+                functionHeader(printWriter);
                 printWriter.println("int main() {");
                 for (CppClass cppClass : cppSource.getMainFunctionReferencedClasses()) {
                     String varName = cppClass.getName().toLowerCase();
                     printWriter.println("    " + cppClass.getName() + " " + varName + ";");
                     printWriter.println("    " + varName + ".doSomething();");
                 }
-                printWriter.println("    printf(\"it works\\n\");");
+                printWriter.println("    std::cout << \"it works\" << std::endl;");
                 printWriter.println("    return 0;");
                 printWriter.println("}");
             }
             for (CppClass cppClass : cppSource.getClasses()) {
                 printWriter.println();
+                functionHeader(printWriter);
                 printWriter.println("void " + cppClass.getName() + "::doSomething() {");
                 for (Dependency<CppClass> dep : cppClass.getReferencedClasses()) {
                     CppClass targetClass = dep.getTarget();
@@ -70,7 +83,8 @@ public class CppSourceGenerator extends ProjectComponentSpecificGenerator<HasCpp
     private void writeHeader(CppHeaderFile cppHeader, Path sourceFile, boolean exported) throws IOException {
         Files.createDirectories(sourceFile.getParent());
         try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(sourceFile))) {
-            String guardMacro = "_" + cppHeader.getName().replace(".", "_").toUpperCase() + "_";
+            String typeName = cppHeader.getName().replace(".h", "");
+            String guardMacro = "__" + typeName.toUpperCase() + "__";
             printWriter.println("// GENERATED SOURCE FILE");
             printWriter.println("#ifndef " + guardMacro);
             printWriter.println("#define " + guardMacro);
@@ -88,8 +102,20 @@ public class CppSourceGenerator extends ProjectComponentSpecificGenerator<HasCpp
                 printWriter.println();
                 printWriter.println("#include \"" + headerFile.getName() + "\"");
             }
+
+            // Add some filler
+            for (int i = 0; i < 4; i++) {
+                printWriter.println();
+                typeHeader(printWriter);
+                printWriter.println("struct " + typeName + (i + 1) + " {");
+                printWriter.println("    int x;");
+                printWriter.println("    int y;");
+                printWriter.println("};");
+            }
+
             for (CppClass cppClass : cppHeader.getClasses()) {
                 printWriter.println();
+                typeHeader(printWriter);
                 printWriter.println("class " + cppClass.getName() + " {");
                 printWriter.println("  public:");
                 if (exported) {
@@ -110,5 +136,17 @@ public class CppSourceGenerator extends ProjectComponentSpecificGenerator<HasCpp
             printWriter.println("#endif");
             printWriter.println();
         }
+    }
+
+    private void typeHeader(PrintWriter printWriter) {
+        printWriter.println("/*");
+        printWriter.println(" * Here is a type declaration.");
+        printWriter.println(" */");
+    }
+
+    private void functionHeader(PrintWriter printWriter) {
+        printWriter.println("/*");
+        printWriter.println(" * Here is a function.");
+        printWriter.println(" */");
     }
 }
