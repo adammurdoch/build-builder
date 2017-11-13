@@ -81,17 +81,41 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         file("repo/test/lib1api/1.2/lib1api-1.2.pom").file
     }
 
-    def "can generate 6 project build"() {
+    def "can generate build with API dependencies between projects"() {
         when:
         new Main().run("cpp", "--dir", projectDir.absolutePath, "--projects", "6")
 
         then:
         build.isBuild()
         build.project(":").isCppApplication()
+        build.project(":").file("src/main/headers/app.h").text.contains("#include \"lib1api1.h\"")
+        build.project(":").file("src/main/headers/app.h").text.contains("void doSomethingWith(Lib1Api1& p);")
         build.project(":lib1api1").isCppLibrary()
         build.project(":lib1api1").file("src/main/public/lib1api1.h").text.contains("#include \"lib2api1.h\"")
+        build.project(":lib1api1").file("src/main/public/lib1api1.h").text.contains("void doSomethingWith(Lib2Api1& p);")
         build.project(":lib1api2").isCppLibrary()
         build.project(":lib1api2").file("src/main/public/lib1api2.h").text.contains("#include \"lib2api1.h\"")
+        build.project(":lib1api2").file("src/main/public/lib1api2.h").text.contains("void doSomethingWith(Lib2Api1& p);")
+
+        build.buildSucceeds(":installDebug")
+        build.app("build/install/main/debug/testApp").succeeds()
+
+        build.buildSucceeds("build")
+        build.buildSucceeds("publish")
+    }
+
+    def "can generate build with API dependencies between projects and source files"() {
+        when:
+        new Main().run("cpp", "--dir", projectDir.absolutePath, "--projects", "6", "--source-files", "6")
+
+        then:
+        build.isBuild()
+        build.project(":").isCppApplication()
+        build.project(":").file("src/main/headers/app.h").text.contains("void doSomethingWith(AppImpl2Api1& p);")
+        build.project(":lib1api1").isCppLibrary()
+        build.project(":lib1api1").file("src/main/headers/lib1api1_impl.h").text.contains("void doSomethingWith(Lib1Api1Impl2Api1& p);")
+        build.project(":lib1api2").isCppLibrary()
+        build.project(":lib1api2").file("src/main/headers/lib1api2_impl.h").text.contains("void doSomethingWith(Lib1Api2Impl2Api1& p);")
 
         build.buildSucceeds(":installDebug")
         build.app("build/install/main/debug/testApp").succeeds()

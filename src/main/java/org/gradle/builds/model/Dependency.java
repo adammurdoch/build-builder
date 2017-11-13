@@ -33,4 +33,11 @@ public class Dependency<T> {
     public <S> Dependency<S> withTarget(S target) {
         return new Dependency<>(target, api);
     }
+
+    public Dependency<T> asImplementation() {
+        if (!api) {
+            return this;
+        }
+        return new Dependency<>(target, false);
+    }
 }

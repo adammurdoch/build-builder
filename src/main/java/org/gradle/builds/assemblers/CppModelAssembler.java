@@ -97,12 +97,13 @@ public class CppModelAssembler extends AbstractModelAssembler {
             buildScript.requirePlugin("cpp-executable");
             addDependencies(project, app, buildScript);
 
+            addApiHeaders(app, implHeader);
             addSource(project, app, appClass, mainSourceFile, implHeader, privateHeader);
         }
     }
 
-    private void addApiHeaders(CppLibrary lib, CppHeaderFile header) {
-        for (Dependency<CppLibraryApi> dependency : lib.getReferencedLibraries()) {
+    private void addApiHeaders(HasCppSource component, CppHeaderFile header) {
+        for (Dependency<CppLibraryApi> dependency : component.getReferencedLibraries()) {
             if (dependency.isApi()) {
                 header.includeHeader(dependency.getTarget().getApiHeader());
             }
@@ -135,8 +136,18 @@ public class CppModelAssembler extends AbstractModelAssembler {
             CppSourceFile cppSourceFile;
             int layer = nodeDetails.getLayer();
             if (layer == 0) {
+                // Entry points should be encoded in the graph
                 cppClass = entryPoint;
                 cppSourceFile = entryPointSourceFile;
+                // Incoming API/implementation dependencies should be encoded in the graph
+                addIncomingApiDependencies(component, cppClass, cppSourceFile);
+                if (layer == implLayer) {
+                    addIncomingImplementationDependencies(component, cppClass, cppSourceFile);
+                }
+                for (Dependency<CppClass> dep : dependencies) {
+                    // Forcing to implementation should be encoded in the graph
+                    cppClass.uses(dep.asImplementation());
+                }
             } else {
                 cppClass = new CppClass(entryPoint.getName() + "Impl" + nodeDetails.getNameSuffix());
                 implHeader.addClass(cppClass);
@@ -144,21 +155,43 @@ public class CppModelAssembler extends AbstractModelAssembler {
                 cppSourceFile.includeHeader(privateHeader);
                 cppSourceFile.includeHeader(implHeader);
                 cppSourceFile.addClass(cppClass);
-            }
-            if (layer == implLayer) {
-                addReferences(component, cppClass, cppSourceFile);
-            }
-            for (Dependency<CppClass> dep : dependencies) {
-                cppClass.uses(dep);
+                if (layer == implLayer) {
+                    // Incoming API/implementation dependencies should be encoded in the graph
+                    // Forcing to implementation should be encoded in the graph
+                    addIncomingDependenciesAsImplementation(component, cppClass, cppSourceFile);
+                }
+                for (Dependency<CppClass> dep : dependencies) {
+                    cppClass.uses(dep);
+                }
             }
             return cppClass;
         });
     }
 
-    private void addReferences(HasCppSource component, CppClass cppClass, CppSourceFile sourceFile) {
+    private void addIncomingApiDependencies(HasCppSource component, CppClass cppClass, CppSourceFile sourceFile) {
+        for (Dependency<CppLibraryApi> dependency : component.getReferencedLibraries()) {
+            if (dependency.isApi()) {
+                CppLibraryApi api = dependency.getTarget();
+                cppClass.uses(dependency.withTarget(api.getApiClass()));
+                sourceFile.includeHeader(api.getApiHeader());
+            }
+        }
+    }
+
+    private void addIncomingImplementationDependencies(HasCppSource component, CppClass cppClass, CppSourceFile sourceFile) {
+        for (Dependency<CppLibraryApi> dependency : component.getReferencedLibraries()) {
+            if (!dependency.isApi()) {
+                CppLibraryApi api = dependency.getTarget();
+                cppClass.uses(dependency.withTarget(api.getApiClass()));
+                sourceFile.includeHeader(api.getApiHeader());
+            }
+        }
+    }
+
+    private void addIncomingDependenciesAsImplementation(HasCppSource component, CppClass cppClass, CppSourceFile sourceFile) {
         for (Dependency<CppLibraryApi> dependency : component.getReferencedLibraries()) {
             CppLibraryApi api = dependency.getTarget();
-            cppClass.uses(dependency.withTarget(api.getApiClass()));
+            cppClass.uses(Dependency.implementation(api.getApiClass()));
             sourceFile.includeHeader(api.getApiHeader());
         }
     }

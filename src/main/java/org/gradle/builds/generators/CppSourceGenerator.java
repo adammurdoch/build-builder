@@ -16,40 +16,8 @@ public class CppSourceGenerator extends ProjectComponentSpecificGenerator<HasCpp
     protected void generate(Build build, Project project, HasCppSource component) throws IOException {
         for (CppSourceFile cppSource : component.getSourceFiles()) {
             Path sourceFile = project.getProjectDir().resolve("src/main/cpp/" + cppSource.getName());
-            Files.createDirectories(sourceFile.getParent());
-            try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(sourceFile))) {
-                printWriter.println("// GENERATED SOURCE FILE");
-                for (CppHeaderFile headerFile : cppSource.getHeaderFiles()) {
-                    printWriter.println("#include \"" + headerFile.getName() + "\"");
-                }
-                if (cppSource.hasMainFunction()) {
-                    printWriter.println("#include <stdio.h>");
-                    printWriter.println();
-                    printWriter.println("int main() {");
-                    for (CppClass cppClass : cppSource.getMainFunctionReferencedClasses()) {
-                        String varName = cppClass.getName().toLowerCase();
-                        printWriter.println("    " + cppClass.getName() + " " + varName + ";");
-                        printWriter.println("    " + varName + ".doSomething();");
-                    }
-                    printWriter.println("    printf(\"it works\\n\");");
-                    printWriter.println("    return 0;");
-                    printWriter.println("}");
-                }
-                for (CppClass cppClass : cppSource.getClasses()) {
-                    printWriter.println();
-                    printWriter.println("void " + cppClass.getName() + "::doSomething() {");
-                    for (Dependency<CppClass> dep : cppClass.getReferencedClasses()) {
-                        CppClass targetClass = dep.getTarget();
-                        String varName = targetClass.getName().toLowerCase();
-                        printWriter.println("    " + targetClass.getName() + " " + varName + ";");
-                        printWriter.println("    " + varName + ".doSomething();");
-                    }
-                    printWriter.println("}");
-                }
-                printWriter.println();
-            }
+            writeSourceFile(cppSource, sourceFile);
         }
-
         for (CppHeaderFile cppHeader : component.getPublicHeaderFiles()) {
             Path sourceFile = project.getProjectDir().resolve("src/main/public/" + cppHeader.getName());
             writeHeader(cppHeader, sourceFile, true);
@@ -64,13 +32,48 @@ public class CppSourceGenerator extends ProjectComponentSpecificGenerator<HasCpp
         }
     }
 
+    private void writeSourceFile(CppSourceFile cppSource, Path sourceFile) throws IOException {
+        Files.createDirectories(sourceFile.getParent());
+        try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(sourceFile))) {
+            printWriter.println("// GENERATED SOURCE FILE");
+            for (CppHeaderFile headerFile : cppSource.getHeaderFiles()) {
+                printWriter.println("#include \"" + headerFile.getName() + "\"");
+            }
+            if (cppSource.hasMainFunction()) {
+                printWriter.println("#include <stdio.h>");
+                printWriter.println();
+                printWriter.println("int main() {");
+                for (CppClass cppClass : cppSource.getMainFunctionReferencedClasses()) {
+                    String varName = cppClass.getName().toLowerCase();
+                    printWriter.println("    " + cppClass.getName() + " " + varName + ";");
+                    printWriter.println("    " + varName + ".doSomething();");
+                }
+                printWriter.println("    printf(\"it works\\n\");");
+                printWriter.println("    return 0;");
+                printWriter.println("}");
+            }
+            for (CppClass cppClass : cppSource.getClasses()) {
+                printWriter.println();
+                printWriter.println("void " + cppClass.getName() + "::doSomething() {");
+                for (Dependency<CppClass> dep : cppClass.getReferencedClasses()) {
+                    CppClass targetClass = dep.getTarget();
+                    String varName = targetClass.getName().toLowerCase();
+                    printWriter.println("    " + targetClass.getName() + " " + varName + ";");
+                    printWriter.println("    " + varName + ".doSomething();");
+                }
+                printWriter.println("}");
+            }
+            printWriter.println();
+        }
+    }
+
     private void writeHeader(CppHeaderFile cppHeader, Path sourceFile, boolean exported) throws IOException {
         Files.createDirectories(sourceFile.getParent());
         try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(sourceFile))) {
-            String macro = "_" + cppHeader.getName().replace(".", "_").toUpperCase() + "_";
+            String guardMacro = "_" + cppHeader.getName().replace(".", "_").toUpperCase() + "_";
             printWriter.println("// GENERATED SOURCE FILE");
-            printWriter.println("#ifndef " + macro);
-            printWriter.println("#define " + macro);
+            printWriter.println("#ifndef " + guardMacro);
+            printWriter.println("#define " + guardMacro);
             if (exported) {
                 printWriter.println();
                 printWriter.println("#ifndef EXPORT_FUNC");
@@ -93,6 +96,13 @@ public class CppSourceGenerator extends ProjectComponentSpecificGenerator<HasCpp
                     printWriter.println("    void EXPORT_FUNC doSomething();");
                 } else {
                     printWriter.println("    void doSomething();");
+                }
+                for (Dependency<CppClass> dependency : cppClass.getReferencedClasses()) {
+                    if (dependency.isApi()) {
+                        printWriter.print("    void doSomethingWith(");
+                        printWriter.print(dependency.getTarget().getName());
+                        printWriter.println("& p);");
+                    }
                 }
                 printWriter.println("};");
             }
