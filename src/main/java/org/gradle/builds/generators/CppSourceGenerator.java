@@ -41,6 +41,8 @@ public class CppSourceGenerator extends ProjectComponentSpecificGenerator<HasCpp
                 printWriter.println("#include \"" + headerFile.getName() + "\"");
             }
             printWriter.println("#include <iostream>");
+            // Add some filler
+            printWriter.println("#include <stdio.h>");
 
             // Add some filler
             for (int i = 0; i < 4; i++) {
@@ -98,8 +100,15 @@ public class CppSourceGenerator extends ProjectComponentSpecificGenerator<HasCpp
                 printWriter.println("#endif");
                 printWriter.println("#endif");
             }
-            for (CppHeaderFile headerFile : cppHeader.getHeaderFiles()) {
+            for (int i = 0; i < cppHeader.getHeaderFiles().size(); i++) {
+                CppHeaderFile headerFile = cppHeader.getHeaderFiles().get(i);
                 printWriter.println();
+                if (i == 0) {
+                    // Use a macro include for one of the includes
+                    String macro = headerFile.getName().replace(".h", "_H").toUpperCase();
+                    printWriter.println("#define " + macro + " \"" + headerFile.getName() + "\"");
+                    printWriter.println("#include " + macro + "");
+                }
                 printWriter.println("#include \"" + headerFile.getName() + "\"");
             }
 

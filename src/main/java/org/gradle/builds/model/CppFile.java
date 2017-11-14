@@ -1,16 +1,16 @@
 package org.gradle.builds.model;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class CppFile extends SourceFile<CppClass> {
-    private final Set<CppHeaderFile> headers = new LinkedHashSet<>();
+    private final List<CppHeaderFile> headers = new ArrayList<>();
 
     protected CppFile(String name) {
         super(name);
     }
 
-    public Set<CppHeaderFile> getHeaderFiles() {
+    public List<CppHeaderFile> getHeaderFiles() {
         return headers;
     }
 
