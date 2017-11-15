@@ -5,6 +5,7 @@ import org.gradle.builds.assemblers.*;
 import org.gradle.builds.generators.*;
 import org.gradle.builds.inspectors.BuildInspector;
 import org.gradle.builds.model.Build;
+import org.gradle.builds.model.MacroIncludes;
 import org.gradle.builds.model.Model;
 
 import java.io.File;
@@ -256,6 +257,9 @@ public class Main {
         @Option(name = "--header-files", description = "The number of header files to generate for each project (default: 3)")
         int headers = 3;
 
+        @Option(name = "--macro-include", description = "Specifies how headers files should reference other header files (values: none, simple, complex. default: simple)")
+        MacroIncludes macroIncludes = MacroIncludes.simple;
+
         @Override
         protected void validate() {
             super.validate();
@@ -281,7 +285,7 @@ public class Main {
 
         @Override
         protected ProjectConfigurer createModelAssembler() {
-            return new CppModelAssembler(headers);
+            return new CppModelAssembler(headers, macroIncludes);
         }
     }
 

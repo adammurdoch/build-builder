@@ -8,13 +8,15 @@ public class CppModelAssembler extends AbstractModelAssembler {
     private final int libPublicHeaders;
     private final int libImplHeaders;
     private final int libPrivateHeaders;
+    private final MacroIncludes macroIncludes;
 
-    public CppModelAssembler(int headers) {
+    public CppModelAssembler(int headers, MacroIncludes macroIncludes) {
         appImplHeaders = (headers - 1) / 2;
         appPrivateHeaders = headers - appImplHeaders - 2;
         libPublicHeaders = (headers - 3) / 3;
         libImplHeaders = (headers - libPublicHeaders - 2) / 2;
         libPrivateHeaders = headers - libPublicHeaders - libImplHeaders - 3;
+        this.macroIncludes = macroIncludes;
     }
 
     @Override
@@ -69,6 +71,7 @@ public class CppModelAssembler extends AbstractModelAssembler {
 
             addApiHeaders(lib, apiHeader);
             addSource(project, lib, apiClass, apiSourceFile, implHeader, privateHeader);
+            lib.setMacroIncludes(macroIncludes);
         } else if (project.component(CppApplication.class) != null) {
             CppApplication app = project.component(CppApplication.class);
 
@@ -99,6 +102,7 @@ public class CppModelAssembler extends AbstractModelAssembler {
 
             addApiHeaders(app, implHeader);
             addSource(project, app, appClass, mainSourceFile, implHeader, privateHeader);
+            app.setMacroIncludes(macroIncludes);
         }
     }
 

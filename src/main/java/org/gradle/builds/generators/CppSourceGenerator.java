@@ -14,21 +14,22 @@ public class CppSourceGenerator extends ProjectComponentSpecificGenerator<HasCpp
 
     @Override
     protected void generate(Build build, Project project, HasCppSource component) throws IOException {
+        MacroIncludes macroIncludes = component.getMacroIncludes();
         for (CppSourceFile cppSource : component.getSourceFiles()) {
             Path sourceFile = project.getProjectDir().resolve("src/main/cpp/" + cppSource.getName());
             writeSourceFile(cppSource, sourceFile);
         }
         for (CppHeaderFile cppHeader : component.getPublicHeaderFiles()) {
             Path sourceFile = project.getProjectDir().resolve("src/main/public/" + cppHeader.getName());
-            writeHeader(cppHeader, sourceFile, true);
+            writeHeader(cppHeader, sourceFile, true, macroIncludes);
         }
         for (CppHeaderFile cppHeader : component.getImplementationHeaderFiles()) {
             Path sourceFile = project.getProjectDir().resolve("src/main/headers/" + cppHeader.getName());
-            writeHeader(cppHeader, sourceFile, false);
+            writeHeader(cppHeader, sourceFile, false, macroIncludes);
         }
         for (CppHeaderFile cppHeader : component.getPrivateHeadersFiles()) {
             Path sourceFile = project.getProjectDir().resolve("src/main/cpp/" + cppHeader.getName());
-            writeHeader(cppHeader, sourceFile, false);
+            writeHeader(cppHeader, sourceFile, false, macroIncludes);
         }
     }
 
@@ -82,7 +83,7 @@ public class CppSourceGenerator extends ProjectComponentSpecificGenerator<HasCpp
         }
     }
 
-    private void writeHeader(CppHeaderFile cppHeader, Path sourceFile, boolean exported) throws IOException {
+    private void writeHeader(CppHeaderFile cppHeader, Path sourceFile, boolean exported, MacroIncludes macroIncludes) throws IOException {
         Files.createDirectories(sourceFile.getParent());
         try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(sourceFile))) {
             String typeName = cppHeader.getName().replace(".h", "");
@@ -104,10 +105,22 @@ public class CppSourceGenerator extends ProjectComponentSpecificGenerator<HasCpp
                 CppHeaderFile headerFile = cppHeader.getHeaderFiles().get(i);
                 printWriter.println();
                 if (i == 0) {
-                    // Use a macro include for one of the includes
-                    String macro = headerFile.getName().replace(".h", "_H").toUpperCase();
-                    printWriter.println("#define " + macro + " \"" + headerFile.getName() + "\"");
-                    printWriter.println("#include " + macro + "");
+                    switch (macroIncludes) {
+                        case simple:
+                            // Use a macro include for one of the includes
+                            String macro = headerFile.getName().replace(".h", "_H").toUpperCase();
+                            printWriter.println("#define " + macro + " \"" + headerFile.getName() + "\"");
+                            printWriter.println("#include " + macro + "");
+                            break;
+                        case complex:
+                            // Use a macro include for one of the includes
+                            String macro1 = headerFile.getName().replace(".h", "_H").toUpperCase();
+                            String macro2 = "__" + macro1;
+                            printWriter.println("#define " + macro2 + "(X) #X");
+                            printWriter.println("#define " + macro1 + " " + macro2 + "(" + headerFile.getName() + ")");
+                            printWriter.println("#include " + macro1 + "");
+                            break;
+                    }
                 }
                 printWriter.println("#include \"" + headerFile.getName() + "\"");
             }

@@ -124,6 +124,53 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         build.buildSucceeds("publish")
     }
 
+    def "can generate multi-project build with simple macro includes"() {
+        when:
+        new Main().run("cpp", "--dir", projectDir.absolutePath, "--projects", "2", "--macro-include", "simple")
+
+        then:
+        build.isBuild()
+        build.project(":").isCppApplication()
+        build.project(":").file("src/main/headers/app.h").text.contains("#include APP_DEFS1_H")
+        build.project(":").file("src/main/headers/app.h").text.contains('#define APP_DEFS1_H "app_defs1.h"')
+
+        build.buildSucceeds(":installDebug")
+        build.app("build/install/main/debug/testApp").succeeds()
+
+        build.buildSucceeds("build")
+    }
+
+    def "can generate multi-project build with complex macro includes"() {
+        when:
+        new Main().run("cpp", "--dir", projectDir.absolutePath, "--projects", "2", "--macro-include", "complex")
+
+        then:
+        build.isBuild()
+        build.project(":").isCppApplication()
+        build.project(":").file("src/main/headers/app.h").text.contains("#include APP_DEFS1_H")
+        build.project(":").file("src/main/headers/app.h").text.contains('#define APP_DEFS1_H __APP_DEFS1_H(app_defs1.h)')
+
+        build.buildSucceeds(":installDebug")
+        build.app("build/install/main/debug/testApp").succeeds()
+
+        build.buildSucceeds("build")
+    }
+
+    def "can generate multi-project build with no macro includes"() {
+        when:
+        new Main().run("cpp", "--dir", projectDir.absolutePath, "--projects", "2", "--macro-include", "none")
+
+        then:
+        build.isBuild()
+        build.project(":").isCppApplication()
+        !build.project(":").file("src/main/headers/app.h").text.contains("#include APP_DEFS1_H")
+
+        build.buildSucceeds(":installDebug")
+        build.app("build/install/main/debug/testApp").succeeds()
+
+        build.buildSucceeds("build")
+    }
+
     @Unroll
     def "can generate #projects project build"() {
         when:
