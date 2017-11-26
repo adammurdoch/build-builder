@@ -97,7 +97,10 @@ public class CppModelAssembler extends AbstractModelAssembler {
             mainSourceFile.addClass(appClass);
 
             BuildScript buildScript = project.getBuildScript();
-            buildScript.requirePlugin("cpp-executable");
+            buildScript.requirePlugin("cpp-executable", "4.2");
+            buildScript.requirePlugin("cpp-executable", "4.3");
+            buildScript.requirePlugin("cpp-executable", "4.4");
+            buildScript.requirePlugin("cpp-application", "4.5");
             addDependencies(project, app, buildScript);
 
             addApiHeaders(app, implHeader);

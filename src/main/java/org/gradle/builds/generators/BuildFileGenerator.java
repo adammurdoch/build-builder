@@ -40,8 +40,8 @@ public class BuildFileGenerator extends ProjectFileGenerator {
             }
             if (!buildScript.getPlugins().isEmpty()) {
                 printWriter.println();
-                for (String pluginId : buildScript.getPlugins()) {
-                    printWriter.println("apply plugin: '" + pluginId + "'");
+                for (ProjectScriptBlock.Plugin plugin : buildScript.getPlugins()) {
+                    apply(printWriter, "", plugin);
                 }
             }
 
@@ -50,8 +50,8 @@ public class BuildFileGenerator extends ProjectFileGenerator {
                 printWriter.println();
                 printWriter.println("allprojects {");
                 if (!allProjects.getPlugins().isEmpty()) {
-                    for (String pluginId : allProjects.getPlugins()) {
-                        printWriter.println("    apply plugin: '" + pluginId + "'");
+                    for (ProjectScriptBlock.Plugin plugin : allProjects.getPlugins()) {
+                        apply(printWriter, "    ", plugin);
                     }
                 }
                 if (!allProjects.getRepositories().isEmpty()) {
@@ -76,6 +76,16 @@ public class BuildFileGenerator extends ProjectFileGenerator {
             }
             writeBlockContents(buildScript, "", printWriter);
             printWriter.println();
+        }
+    }
+
+    private void apply(PrintWriter printWriter, String indent, ProjectScriptBlock.Plugin plugin) {
+        if (plugin.getVersion() == null) {
+            printWriter.print(indent);
+            printWriter.println("apply plugin: '" + plugin.getId() + "'");
+        } else {
+            printWriter.print(indent);
+            printWriter.println("if (gradle.gradleVersion.startsWith('" + plugin.getVersion() + "')) { apply plugin: '" + plugin.getId() + "' }");
         }
     }
 

@@ -187,6 +187,7 @@ public class Main {
                                     // TODO - remove this
                                     new XCTestInfoPlistGenerator(),
                                     new HttpServerMainGenerator(),
+                                    new ReadmeGenerator(),
                                     new ScenarioFileGenerator())),
                             new DotGenerator());
         }
@@ -210,7 +211,7 @@ public class Main {
             return new File(rootDir).getCanonicalFile().toPath();
         }
 
-        private Settings createSettings() {
+        protected Settings createSettings() {
             return new Settings(projects, sourceFiles);
         }
 
@@ -266,6 +267,11 @@ public class Main {
             if (headers < 3) {
                 throw new IllegalArgumentException("Minimum of 3 header files per project.");
             }
+        }
+
+        @Override
+        protected Settings createSettings() {
+            return new CppSettings(projects, sourceFiles, headers, macroIncludes);
         }
 
         @Override

@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.function.Consumer;
 
 public class ScenarioFileGenerator implements Generator<Build> {
     public void generate(Build build) throws IOException {
@@ -16,15 +17,13 @@ public class ScenarioFileGenerator implements Generator<Build> {
         Files.createDirectories(scenarioFile.getParent());
         try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(scenarioFile))) {
             printWriter.println("// GENERATED SCENARIO FILE");
-            printWriter.println();
-            printWriter.println("assemble {");
-            printWriter.println("    tasks = [\":assemble\"]");
-            printWriter.println("}");
-            printWriter.println();
-            printWriter.println("cleanAssemble {");
-            printWriter.println("    cleanup-tasks = [\"clean\"]");
-            printWriter.println("    tasks = [\":assemble\"]");
-            printWriter.println("}");
+            scenario("assemble", printWriter, false, p ->{
+                printWriter.println("    tasks = [\":assemble\"]");
+            });
+            scenario("cleanAssemble", printWriter, true, p ->{
+                printWriter.println("    cleanup-tasks = [\"clean\"]");
+                printWriter.println("    tasks = [\":assemble\"]");
+            });
 
             if (build.getRootProject().component(HasCppSource.class) != null) {
                 Project deepestProject = build.getDeepestProject();
@@ -40,26 +39,45 @@ public class ScenarioFileGenerator implements Generator<Build> {
                 if (!projectDir.isEmpty()) {
                     projectDir = projectDir + "/";
                 }
-                printWriter.println();
-                printWriter.println("abiAssemble {");
-                printWriter.println("    tasks = [\":assemble\"]");
-                printWriter.print("    apply-h-change-to = \"");
-                printWriter.print(projectDir);
-                printWriter.print(header);
-                printWriter.println("\"");
-                printWriter.println("}");
-                printWriter.println();
-                printWriter.println("nonAbiAssemble {");
-                printWriter.println("    tasks = [\":assemble\"]");
-                printWriter.print("    apply-cpp-change-to = \"");
-                printWriter.print(projectDir);
-                printWriter.print("src/main/cpp/");
-                printWriter.print(sourceFile.getName());
-                printWriter.println("\"");
-                printWriter.println("}");
+                String finalProjectDir = projectDir;
+                scenario("abiAssemble", printWriter, false, p ->{
+                    printWriter.println("    tasks = [\":assemble\"]");
+                    printWriter.print("    apply-h-change-to = \"");
+                    printWriter.print(finalProjectDir);
+                    printWriter.print(header);
+                    printWriter.println("\"");
+
+                });
+                scenario("nonAbiAssemble", printWriter, false, p -> {
+                    printWriter.println("    tasks = [\":assemble\"]");
+                    printWriter.print("    apply-cpp-change-to = \"");
+                    printWriter.print(finalProjectDir);
+                    printWriter.print("src/main/cpp/");
+                    printWriter.print(sourceFile.getName());
+                    printWriter.println("\"");
+                });
             }
 
             printWriter.println();
+        }
+    }
+
+    private void scenario(String name, PrintWriter printWriter, boolean cache, Consumer<PrintWriter> body) {
+        printWriter.println();
+        printWriter.println(name + " {");
+        body.accept(printWriter);
+        printWriter.println("}");
+        printWriter.println();
+        printWriter.println(name + "Parallel {");
+        printWriter.println("    gradle-args = [\"--parallel\"]");
+        body.accept(printWriter);
+        printWriter.println("}");
+        if (cache) {
+            printWriter.println();
+            printWriter.println(name + "ParallelCache {");
+            printWriter.println("    gradle-args = [\"--parallel\", \"--build-cache\", \"-Dorg.gradle.caching.native=true\"]");
+            body.accept(printWriter);
+            printWriter.println("}");
         }
     }
 }
