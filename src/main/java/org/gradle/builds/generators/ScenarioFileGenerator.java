@@ -17,15 +17,14 @@ public class ScenarioFileGenerator implements Generator<Build> {
         Files.createDirectories(scenarioFile.getParent());
         try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(scenarioFile))) {
             printWriter.println("// GENERATED SCENARIO FILE");
-            scenario("assemble", printWriter, false, p ->{
-                printWriter.println("    tasks = [\":linkDebug\", \":linkRelease\"]");
-            });
-            scenario("cleanAssemble", printWriter, true, p ->{
-                printWriter.println("    cleanup-tasks = [\"clean\"]");
-                printWriter.println("    tasks = [\":linkDebug\", \":linkRelease\"]");
-            });
-
             if (build.getRootProject().component(HasCppSource.class) != null) {
+                scenario("assemble", printWriter, false, p ->{
+                    printWriter.println("    tasks = [\":linkDebug\", \":linkRelease\"]");
+                });
+                scenario("cleanAssemble", printWriter, true, p ->{
+                    printWriter.println("    cleanup-tasks = [\"clean\"]");
+                    printWriter.println("    tasks = [\":linkDebug\", \":linkRelease\"]");
+                });
                 Project deepestProject = build.getDeepestProject();
                 HasCppSource component = deepestProject.component(HasCppSource.class);
                 String header;
