@@ -18,11 +18,11 @@ public class ScenarioFileGenerator implements Generator<Build> {
         try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(scenarioFile))) {
             printWriter.println("// GENERATED SCENARIO FILE");
             scenario("assemble", printWriter, false, p ->{
-                printWriter.println("    tasks = [\":assemble\"]");
+                printWriter.println("    tasks = [\":linkDebug\", \":linkRelease\"]");
             });
             scenario("cleanAssemble", printWriter, true, p ->{
                 printWriter.println("    cleanup-tasks = [\"clean\"]");
-                printWriter.println("    tasks = [\":assemble\"]");
+                printWriter.println("    tasks = [\":linkDebug\", \":linkRelease\"]");
             });
 
             if (build.getRootProject().component(HasCppSource.class) != null) {
@@ -41,15 +41,14 @@ public class ScenarioFileGenerator implements Generator<Build> {
                 }
                 String finalProjectDir = projectDir;
                 scenario("abiAssemble", printWriter, false, p ->{
-                    printWriter.println("    tasks = [\":assemble\"]");
+                    printWriter.println("    tasks = [\":linkDebug\", \":linkRelease\"]");
                     printWriter.print("    apply-h-change-to = \"");
                     printWriter.print(finalProjectDir);
                     printWriter.print(header);
                     printWriter.println("\"");
-
                 });
                 scenario("nonAbiAssemble", printWriter, false, p -> {
-                    printWriter.println("    tasks = [\":assemble\"]");
+                    printWriter.println("    tasks = [\":linkDebug\", \":linkRelease\"]");
                     printWriter.print("    apply-cpp-change-to = \"");
                     printWriter.print(finalProjectDir);
                     printWriter.print("src/main/cpp/");
