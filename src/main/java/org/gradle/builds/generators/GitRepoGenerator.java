@@ -7,18 +7,34 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.gradle.builds.model.Build;
+import org.gradle.builds.model.Model;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
-public class GitRepoGenerator implements Generator<Build> {
+public class GitRepoGenerator implements Generator<Model> {
     @Override
-    public void generate(Build model, FileGenerator fileGenerator) throws IOException {
-        Path rootDir = model.getRootDir();
+    public void generate(Model model, FileGenerator fileGenerator) throws IOException {
+        for (Build build : model.getBuilds()) {
+            generate(model, build, fileGenerator);
+        }
+    }
+
+    private void generate(Model model, Build build, FileGenerator fileGenerator) throws IOException {
+        Path rootDir = build.getRootDir();
+        List<Build> ignored = new ArrayList<>(model.getBuilds().size());
 
         fileGenerator.generate(rootDir.resolve(".gitignore"), writer -> {
             writer.println("build");
             writer.println(".gradle");
+            for (Build other : model.getBuilds()) {
+                if (other.getRootDir().startsWith(rootDir) && !other.getRootDir().equals(rootDir)) {
+                    ignored.add(other);
+                    writer.println(rootDir.relativize(other.getRootDir()));
+                }
+            }
         });
 
         FileRepositoryBuilder builder = new FileRepositoryBuilder();
@@ -29,6 +45,19 @@ public class GitRepoGenerator implements Generator<Build> {
                 Git git = new Git(repository);
                 AddCommand addCommand = git.add();
                 for (Path generatedFile : fileGenerator.getGeneratedFiles()) {
+                    if (!generatedFile.startsWith(rootDir)) {
+                        continue;
+                    }
+                    boolean skip = false;
+                    for (Build other : ignored) {
+                        if (generatedFile.startsWith(other.getRootDir())) {
+                            skip = true;
+                            break;
+                        }
+                    }
+                    if (skip) {
+                        continue;
+                    }
                     addCommand.addFilepattern(rootDir.relativize(generatedFile).toString());
                 }
                 addCommand.call();

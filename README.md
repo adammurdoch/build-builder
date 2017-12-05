@@ -21,6 +21,8 @@ Can optionally generate a local HTTP repository and server.
 
 Can optionally generate a Swift Package Manager build for Swift projects.
 
+Generates a git repository for each build.
+
 Generates a [gradle-profiler](https://www.github.com/gradle/gradle-profiler) scenario file for the build.
 
 Generates a Graphiz `dot` file that shows the dependencies between projects.

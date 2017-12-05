@@ -19,6 +19,7 @@ public class CollectingFileGenerator implements FileGenerator {
     @Override
     public void generate(Path file, InputStream content) throws IOException {
         generatedFiles.add(file);
+        Files.createDirectories(file.getParent());
         Files.copy(content, file);
     }
 

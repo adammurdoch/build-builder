@@ -5,8 +5,6 @@ import org.gradle.builds.model.HasJavaSource;
 import org.gradle.builds.model.Project;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class JavaResourceGenerator extends ProjectComponentSpecificGenerator<HasJavaSource> {
@@ -17,10 +15,9 @@ public class JavaResourceGenerator extends ProjectComponentSpecificGenerator<Has
     @Override
     protected void generate(Build build, Project project, HasJavaSource component, FileGenerator fileGenerator) throws IOException {
         Path resourceFile = project.getProjectDir().resolve("src/main/resources/" + project.getName() + ".properties");
-        Files.createDirectories(resourceFile.getParent());
-        try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(resourceFile))) {
+        fileGenerator.generate(resourceFile, printWriter -> {
             printWriter.println("# GENERATED SOURCE FILE");
             printWriter.println("prop=value");
-        }
+        });
     }
 }

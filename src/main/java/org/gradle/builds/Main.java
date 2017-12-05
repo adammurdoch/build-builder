@@ -170,6 +170,7 @@ public class Main {
 
         private Generator<Model> createModelGenerator() {
             return new CompositeGenerator<>(
+                    new DotGenerator(),
                     new ModelGenerator(
                             new CompositeGenerator<>(
                                     new SettingsFileGenerator(),
@@ -188,9 +189,9 @@ public class Main {
                                     new XCTestInfoPlistGenerator(),
                                     new HttpServerMainGenerator(),
                                     new ReadmeGenerator(),
-                                    new ScenarioFileGenerator(),
-                                    new GitRepoGenerator())),
-                            new DotGenerator());
+                                    new ScenarioFileGenerator())),
+                    // Should be last to collect all generated files
+                    new GitRepoGenerator());
         }
 
         private ModelStructureAssembler createModelStructureAssembler() {
