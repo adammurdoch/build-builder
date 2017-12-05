@@ -4,7 +4,6 @@ import org.gradle.builds.model.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class AndroidLayoutGenerator extends ProjectComponentSpecificGenerator<AndroidComponent> {
@@ -13,12 +12,11 @@ public class AndroidLayoutGenerator extends ProjectComponentSpecificGenerator<An
     }
 
     @Override
-    protected void generate(Build build, Project project, AndroidComponent component) throws IOException {
+    protected void generate(Build build, Project project, AndroidComponent component, FileGenerator fileGenerator) throws IOException {
         Path layoutXml = project.getProjectDir().resolve("src/main/res/layout/" + project.getName().toLowerCase() + "_layout.xml");
-        Files.createDirectories(layoutXml.getParent());
-        try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(layoutXml))) {
+        fileGenerator.generate(layoutXml, printWriter -> {
             generate(project, component, printWriter);
-        }
+        });
     }
 
     private void generate(Project project, AndroidComponent component, PrintWriter printWriter) {

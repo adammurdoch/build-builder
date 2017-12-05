@@ -4,15 +4,13 @@ import org.gradle.builds.model.Build;
 import org.gradle.builds.model.Project;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class SettingsFileGenerator implements Generator<Build> {
-    public void generate(Build build) throws IOException {
+    @Override
+    public void generate(Build build, FileGenerator fileGenerator) throws IOException {
         Path settingsFile = build.getRootDir().resolve("settings.gradle");
-        Files.createDirectories(settingsFile.getParent());
-        try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(settingsFile))) {
+        fileGenerator.generate(settingsFile, printWriter -> {
             printWriter.println("// GENERATED SETTINGS SCRIPT");
             printWriter.println("rootProject.name = '" + build.getRootProject().getName() + "'");
             if (!build.getSubprojects().isEmpty()) {
@@ -28,6 +26,6 @@ public class SettingsFileGenerator implements Generator<Build> {
                     printWriter.println("includeBuild '" + build.getRootDir().relativize(childBuild.getRootDir()) + "'");
                 }
             }
-        }
+        });
     }
 }

@@ -6,13 +6,11 @@ import org.gradle.builds.model.HasSwiftSource;
 import org.gradle.builds.model.Project;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class SwiftPackageManagerManifestGenerator implements Generator<Build> {
     @Override
-    public void generate(Build build) throws IOException {
+    public void generate(Build build, FileGenerator fileGenerator) throws IOException {
         HasSwiftSource component = build.getRootProject().component(HasSwiftSource.class);
         if (component == null) {
             return;
@@ -22,7 +20,7 @@ public class SwiftPackageManagerManifestGenerator implements Generator<Build> {
         }
 
         Path manifestFile = build.getRootDir().resolve("Package.swift");
-        try (PrintWriter writer = new PrintWriter(Files.newBufferedWriter(manifestFile))) {
+        fileGenerator.generate(manifestFile, writer -> {
             writer.println("import PackageDescription");
             writer.println();
             writer.println("let package = Package(");
@@ -44,6 +42,6 @@ public class SwiftPackageManagerManifestGenerator implements Generator<Build> {
             }
             writer.println("    ]");
             writer.println(")");
-        }
+        });
     }
 }

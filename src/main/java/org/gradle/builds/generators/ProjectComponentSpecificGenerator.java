@@ -9,17 +9,17 @@ import java.io.IOException;
 public abstract class ProjectComponentSpecificGenerator<T extends Component> extends ProjectFileGenerator {
     private final Class<T> type;
 
-    public ProjectComponentSpecificGenerator(Class<T> type) {
+    protected ProjectComponentSpecificGenerator(Class<T> type) {
         this.type = type;
     }
 
     @Override
-    protected void generate(Build build, Project project) throws IOException {
+    protected void generate(Build build, Project project, FileGenerator fileGenerator) throws IOException {
         T component = project.component(type);
         if (component != null) {
-            generate(build, project, component);
+            generate(build, project, component, fileGenerator);
         }
     }
 
-    protected abstract void generate(Build build, Project project, T component) throws IOException;
+    protected abstract void generate(Build build, Project project, T component, FileGenerator fileGenerator) throws IOException;
 }

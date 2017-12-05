@@ -93,9 +93,9 @@ public class Main {
             new StructureAssembler().arrangeClasses(build);
             modelAssembler.populate(build);
 
-            new AndroidStringResourcesGenerator().generate(build);
-            new JavaSourceGenerator().generate(build);
-            new CppSourceGenerator().generate(build);
+            new AndroidStringResourcesGenerator().generate(build, new CollectingFileGenerator());
+            new JavaSourceGenerator().generate(build, new CollectingFileGenerator());
+            new CppSourceGenerator().generate(build, new CollectingFileGenerator());
 
             return null;
         }
@@ -133,7 +133,7 @@ public class Main {
             createModelConfigurer().populate(model);
 
             // Generate files
-            createModelGenerator().generate(model);
+            createModelGenerator().generate(model, new CollectingFileGenerator());
 
             return null;
         }
@@ -188,7 +188,8 @@ public class Main {
                                     new XCTestInfoPlistGenerator(),
                                     new HttpServerMainGenerator(),
                                     new ReadmeGenerator(),
-                                    new ScenarioFileGenerator())),
+                                    new ScenarioFileGenerator(),
+                                    new GitRepoGenerator())),
                             new DotGenerator());
         }
 

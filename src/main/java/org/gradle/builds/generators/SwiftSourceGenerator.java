@@ -3,8 +3,6 @@ package org.gradle.builds.generators;
 import org.gradle.builds.model.*;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class SwiftSourceGenerator extends ProjectComponentSpecificGenerator<HasSwiftSource> {
@@ -13,22 +11,21 @@ public class SwiftSourceGenerator extends ProjectComponentSpecificGenerator<HasS
     }
 
     @Override
-    protected void generate(Build build, Project project, HasSwiftSource component) throws IOException {
+    protected void generate(Build build, Project project, HasSwiftSource component, FileGenerator fileGenerator) throws IOException {
         Path srcDir = component.isSwiftPm() ? build.getRootDir().resolve("Sources/" + project.getName()) : project.getProjectDir().resolve("src/main/swift/");
         for (SwiftSourceFile swiftSource : component.getSourceFiles()) {
-            generateSourceFile(srcDir, swiftSource);
+            generateSourceFile(srcDir, swiftSource, fileGenerator);
         }
 
         Path testDir = component.isSwiftPm() ? build.getRootDir().resolve("Tests/" + project.getName() + "Tests") : project.getProjectDir().resolve("src/test/swift/");
         for (SwiftSourceFile swiftSource : component.getTestFiles()) {
-            generateTestSourceFile(testDir, swiftSource);
+            generateTestSourceFile(testDir, swiftSource, fileGenerator);
         }
     }
 
-    private void generateSourceFile(Path srcDir, SwiftSourceFile swiftSource) throws IOException {
+    private void generateSourceFile(Path srcDir, SwiftSourceFile swiftSource, FileGenerator fileGenerator) throws IOException {
         Path sourceFile = srcDir.resolve(swiftSource.getName());
-        Files.createDirectories(sourceFile.getParent());
-        try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(sourceFile))) {
+        fileGenerator.generate(sourceFile, printWriter -> {
             printWriter.println("// GENERATED SOURCE FILE");
             printWriter.println();
             if (swiftSource.hasMainFunction()) {
@@ -61,13 +58,12 @@ public class SwiftSourceGenerator extends ProjectComponentSpecificGenerator<HasS
                 printWriter.println("print(\"it works\");");
             }
             printWriter.println();
-        }
+        });
     }
 
-    private void generateTestSourceFile(Path srcDir, SwiftSourceFile swiftSource) throws IOException {
+    private void generateTestSourceFile(Path srcDir, SwiftSourceFile swiftSource, FileGenerator fileGenerator) throws IOException {
         Path sourceFile = srcDir.resolve(swiftSource.getName());
-        Files.createDirectories(sourceFile.getParent());
-        try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(sourceFile))) {
+        fileGenerator.generate(sourceFile, printWriter -> {
             printWriter.println("// GENERATED SOURCE FILE");
             printWriter.println("import XCTest");
             for (String module : swiftSource.getModules()) {
@@ -86,6 +82,6 @@ public class SwiftSourceGenerator extends ProjectComponentSpecificGenerator<HasS
                 printWriter.println("}");
                 printWriter.println();
             }
-        }
+        });
     }
 }

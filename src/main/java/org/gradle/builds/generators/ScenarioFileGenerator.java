@@ -7,15 +7,14 @@ import org.gradle.builds.model.Project;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Consumer;
 
 public class ScenarioFileGenerator implements Generator<Build> {
-    public void generate(Build build) throws IOException {
+    @Override
+    public void generate(Build build, FileGenerator fileGenerator) throws IOException {
         Path scenarioFile = build.getRootDir().resolve("performance.scenarios");
-        Files.createDirectories(scenarioFile.getParent());
-        try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(scenarioFile))) {
+        fileGenerator.generate(scenarioFile, printWriter -> {
             printWriter.println("// GENERATED SCENARIO FILE");
             if (build.getRootProject().component(HasCppSource.class) != null) {
                 scenario("assemble", printWriter, false, p ->{
@@ -57,7 +56,7 @@ public class ScenarioFileGenerator implements Generator<Build> {
             }
 
             printWriter.println();
-        }
+        });
     }
 
     private void scenario(String name, PrintWriter printWriter, boolean cache, Consumer<PrintWriter> body) {

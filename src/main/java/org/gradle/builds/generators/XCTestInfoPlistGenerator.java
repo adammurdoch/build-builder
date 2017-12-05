@@ -5,8 +5,6 @@ import org.gradle.builds.model.HasSwiftSource;
 import org.gradle.builds.model.Project;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class XCTestInfoPlistGenerator extends ProjectComponentSpecificGenerator<HasSwiftSource> {
@@ -15,18 +13,17 @@ public class XCTestInfoPlistGenerator extends ProjectComponentSpecificGenerator<
     }
 
     @Override
-    protected void generate(Build build, Project project, HasSwiftSource component) throws IOException {
+    protected void generate(Build build, Project project, HasSwiftSource component, FileGenerator fileGenerator) throws IOException {
         if (!component.getTestFiles().isEmpty()) {
             Path path = project.getProjectDir().resolve("src/test/resources/Info.plist");
-            Files.createDirectories(path.getParent());
-            try (PrintWriter writer = new PrintWriter(Files.newBufferedWriter(path))) {
+            fileGenerator.generate(path, writer -> {
                 writer.println("<?xml version='1.0' encoding='UTF-8'?>");
                 writer.println("<!DOCTYPE plist PUBLIC '-//Apple//DTD PLIST 1.0//EN' 'http://www.apple.com/DTDs/PropertyList-1.0.dtd'>");
                 writer.println("<plist version='1.0'>");
                 writer.println("<dict>");
                 writer.println("</dict>");
                 writer.println("</plist>");
-            }
+            });
         }
     }
 }

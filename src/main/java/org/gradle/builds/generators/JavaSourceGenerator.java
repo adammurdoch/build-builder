@@ -3,39 +3,36 @@ package org.gradle.builds.generators;
 import org.gradle.builds.model.*;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class JavaSourceGenerator extends ProjectFileGenerator {
     private int counter = 1000;
 
     @Override
-    protected void generate(Build build, Project project) throws IOException {
+    protected void generate(Build build, Project project, FileGenerator fileGenerator) throws IOException {
         HasJavaSource<?> component = project.component(HasJavaSource.class);
         if (component != null) {
-            generate(project, component);
+            generate(project, component, fileGenerator);
         }
     }
 
-    private void generate(Project project, HasJavaSource<?> component) throws IOException {
+    private void generate(Project project, HasJavaSource<?> component, FileGenerator fileGenerator) throws IOException {
         for (JavaClass javaClass : component.getSourceFiles()) {
-            generateMainClass(project, javaClass);
+            generateMainClass(project, javaClass, fileGenerator);
         }
 
         for (JavaClass javaClass : component.getTestFiles()) {
             if (javaClass.role(UnitTest.class) != null) {
-                generateUnitTest(project, javaClass, javaClass.role(UnitTest.class));
+                generateUnitTest(project, javaClass, javaClass.role(UnitTest.class), fileGenerator);
             } else if (javaClass.role(InstrumentedTest.class) != null) {
-                generateInstrumentedTest(project, javaClass);
+                generateInstrumentedTest(project, javaClass, fileGenerator);
             }
         }
     }
 
-    private void generateMainClass(Project project, JavaClass javaClass) throws IOException {
+    private void generateMainClass(Project project, JavaClass javaClass, FileGenerator fileGenerator) throws IOException {
         Path sourceFile = project.getProjectDir().resolve("src/main/java/" + javaClass.getName().replace(".", "/") + ".java");
-        Files.createDirectories(sourceFile.getParent());
-        try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(sourceFile))) {
+        fileGenerator.generate(sourceFile, printWriter -> {
             printWriter.println("// GENERATED SOURCE FILE");
             printWriter.println("package " + javaClass.getPackage() + ";");
             printWriter.println();
@@ -105,13 +102,12 @@ public class JavaSourceGenerator extends ProjectFileGenerator {
             }
             printWriter.println("}");
             printWriter.println();
-        }
+        });
     }
 
-    private void generateUnitTest(Project project, JavaClass javaClass, UnitTest unitTest) throws IOException {
+    private void generateUnitTest(Project project, JavaClass javaClass, UnitTest unitTest, FileGenerator fileGenerator) throws IOException {
         Path sourceFile = project.getProjectDir().resolve("src/test/java/" + javaClass.getName().replace(".", "/") + ".java");
-        Files.createDirectories(sourceFile.getParent());
-        try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(sourceFile))) {
+        fileGenerator.generate(sourceFile, printWriter -> {
             printWriter.println("// GENERATED SOURCE FILE");
             printWriter.println("package " + javaClass.getPackage() + ";");
             printWriter.println();
@@ -122,13 +118,12 @@ public class JavaSourceGenerator extends ProjectFileGenerator {
             printWriter.println("    }");
             printWriter.println("}");
             printWriter.println();
-        }
+        });
     }
 
-    private void generateInstrumentedTest(Project project, JavaClass javaClass) throws IOException {
+    private void generateInstrumentedTest(Project project, JavaClass javaClass, FileGenerator fileGenerator) throws IOException {
         Path sourceFile = project.getProjectDir().resolve("src/androidTest/java/" + javaClass.getName().replace(".", "/") + ".java");
-        Files.createDirectories(sourceFile.getParent());
-        try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(sourceFile))) {
+        fileGenerator.generate(sourceFile, printWriter -> {
             printWriter.println("// GENERATED SOURCE FILE");
             printWriter.println("package " + javaClass.getPackage() + ";");
             printWriter.println();
@@ -143,6 +138,6 @@ public class JavaSourceGenerator extends ProjectFileGenerator {
             printWriter.println("    }");
             printWriter.println("}");
             printWriter.println();
-        }
+        });
     }
 }

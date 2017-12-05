@@ -12,9 +12,9 @@ public class CompositeGenerator<T> implements Generator<T> {
     }
 
     @Override
-    public void generate(T build) throws IOException {
+    public void generate(T model, FileGenerator fileGenerator) throws IOException {
         for (Generator<T> generator : generators) {
-            generator.generate(build);
+            generator.generate(model, fileGenerator);
         }
     }
 }

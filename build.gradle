@@ -20,6 +20,7 @@ configurations.all {
 dependencies {
     compile 'io.airlift:airline:0.7'
     compile 'org.gradle:gradle-tooling-api:3.3'
+    compile 'org.eclipse.jgit:org.eclipse.jgit:4.9.1.201712030800-r'
 
     runtime 'org.slf4j:slf4j-simple:1.7.25'
 

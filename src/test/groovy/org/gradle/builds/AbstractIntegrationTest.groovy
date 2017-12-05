@@ -1,6 +1,9 @@
 package org.gradle.builds
 
 import junit.framework.AssertionFailedError
+import org.eclipse.jgit.api.Git
+import org.eclipse.jgit.lib.Repository
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
@@ -123,6 +126,16 @@ abstract class AbstractIntegrationTest extends Specification {
             assert rootDir.directory
             assert file("settings.gradle").file
             project(':').isProject()
+            def repository = FileRepositoryBuilder.create(file(".git"))
+            try {
+                def git = new Git(repository)
+                def status = git.status().call()
+                assert !status.hasUncommittedChanges()
+                assert status.untracked.empty
+                assert status.untrackedFolders.empty
+            } finally {
+                repository.close()
+            }
         }
 
         ProjectLayout project(String path) {
@@ -200,14 +213,6 @@ abstract class AbstractIntegrationTest extends Specification {
         void isEmptyProject() {
             isProject()
             !buildFile.text.contains('plugin')
-        }
-
-        String getPackagePath() {
-            if (path == ':') {
-                return 'app'
-            } else {
-                return path.replace(':', '/').replace('_', '/')
-            }
         }
 
         void containsFilesWithExtension(File dir, String extension) {

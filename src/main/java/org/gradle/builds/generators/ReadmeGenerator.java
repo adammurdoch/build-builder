@@ -5,16 +5,13 @@ import org.gradle.builds.assemblers.Settings;
 import org.gradle.builds.model.Build;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class ReadmeGenerator implements Generator<Build> {
     @Override
-    public void generate(Build build) throws IOException {
+    public void generate(Build build, FileGenerator fileGenerator) throws IOException {
         Path readMe = build.getRootDir().resolve("README.md");
-        Files.createDirectories(readMe.getParent());
-        try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(readMe))) {
+        fileGenerator.generate(readMe, printWriter -> {
             printWriter.println("<!-- GENERATED FILE -->");
             Settings settings = build.getSettings();
             printWriter.println();
@@ -30,6 +27,6 @@ public class ReadmeGenerator implements Generator<Build> {
             }
 
             printWriter.println();
-        }
+        });
     }
 }

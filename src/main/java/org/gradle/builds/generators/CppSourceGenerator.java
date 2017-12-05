@@ -4,7 +4,6 @@ import org.gradle.builds.model.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class CppSourceGenerator extends ProjectComponentSpecificGenerator<HasCppSource> {
@@ -13,29 +12,28 @@ public class CppSourceGenerator extends ProjectComponentSpecificGenerator<HasCpp
     }
 
     @Override
-    protected void generate(Build build, Project project, HasCppSource component) throws IOException {
+    protected void generate(Build build, Project project, HasCppSource component, FileGenerator fileGenerator) throws IOException {
         MacroIncludes macroIncludes = component.getMacroIncludes();
         for (CppSourceFile cppSource : component.getSourceFiles()) {
             Path sourceFile = project.getProjectDir().resolve("src/main/cpp/" + cppSource.getName());
-            writeSourceFile(cppSource, sourceFile);
+            writeSourceFile(cppSource, sourceFile, fileGenerator);
         }
         for (CppHeaderFile cppHeader : component.getPublicHeaderFiles()) {
             Path sourceFile = project.getProjectDir().resolve("src/main/public/" + cppHeader.getName());
-            writeHeader(cppHeader, sourceFile, true, macroIncludes);
+            writeHeader(cppHeader, sourceFile, true, macroIncludes, fileGenerator);
         }
         for (CppHeaderFile cppHeader : component.getImplementationHeaderFiles()) {
             Path sourceFile = project.getProjectDir().resolve("src/main/headers/" + cppHeader.getName());
-            writeHeader(cppHeader, sourceFile, false, macroIncludes);
+            writeHeader(cppHeader, sourceFile, false, macroIncludes, fileGenerator);
         }
         for (CppHeaderFile cppHeader : component.getPrivateHeadersFiles()) {
             Path sourceFile = project.getProjectDir().resolve("src/main/cpp/" + cppHeader.getName());
-            writeHeader(cppHeader, sourceFile, false, macroIncludes);
+            writeHeader(cppHeader, sourceFile, false, macroIncludes, fileGenerator);
         }
     }
 
-    private void writeSourceFile(CppSourceFile cppSource, Path sourceFile) throws IOException {
-        Files.createDirectories(sourceFile.getParent());
-        try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(sourceFile))) {
+    private void writeSourceFile(CppSourceFile cppSource, Path sourceFile, FileGenerator fileGenerator) throws IOException {
+        fileGenerator.generate(sourceFile, printWriter -> {
             String typeName = cppSource.getName().replace(".cpp", "");
             printWriter.println("// GENERATED SOURCE FILE");
             for (CppHeaderFile headerFile : cppSource.getHeaderFiles()) {
@@ -80,12 +78,11 @@ public class CppSourceGenerator extends ProjectComponentSpecificGenerator<HasCpp
                 printWriter.println("}");
             }
             printWriter.println();
-        }
+        });
     }
 
-    private void writeHeader(CppHeaderFile cppHeader, Path sourceFile, boolean exported, MacroIncludes macroIncludes) throws IOException {
-        Files.createDirectories(sourceFile.getParent());
-        try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(sourceFile))) {
+    private void writeHeader(CppHeaderFile cppHeader, Path sourceFile, boolean exported, MacroIncludes macroIncludes, FileGenerator fileGenerator) throws IOException {
+        fileGenerator.generate(sourceFile, printWriter -> {
             String typeName = cppHeader.getName().replace(".h", "");
             String guardMacro = "__" + typeName.toUpperCase() + "__";
             printWriter.println("// GENERATED SOURCE FILE");
@@ -157,7 +154,7 @@ public class CppSourceGenerator extends ProjectComponentSpecificGenerator<HasCpp
             printWriter.println();
             printWriter.println("#endif");
             printWriter.println();
-        }
+        });
     }
 
     private void typeHeader(PrintWriter printWriter) {

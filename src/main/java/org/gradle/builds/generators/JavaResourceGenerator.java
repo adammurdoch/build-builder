@@ -15,7 +15,7 @@ public class JavaResourceGenerator extends ProjectComponentSpecificGenerator<Has
     }
 
     @Override
-    protected void generate(Build build, Project project, HasJavaSource component) throws IOException {
+    protected void generate(Build build, Project project, HasJavaSource component, FileGenerator fileGenerator) throws IOException {
         Path resourceFile = project.getProjectDir().resolve("src/main/resources/" + project.getName() + ".properties");
         Files.createDirectories(resourceFile.getParent());
         try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(resourceFile))) {

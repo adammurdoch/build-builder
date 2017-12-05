@@ -4,19 +4,16 @@ import org.gradle.builds.model.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Set;
 
 public class BuildFileGenerator extends ProjectFileGenerator {
     @Override
-    protected void generate(Build build, Project project) throws IOException {
+    protected void generate(Build build, Project project, FileGenerator fileGenerator) throws IOException {
         Path buildFile = project.getProjectDir().resolve("build.gradle");
-        Files.createDirectories(buildFile.getParent());
-
         BuildScript buildScript = project.getBuildScript();
-        try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(buildFile))) {
+        fileGenerator.generate(buildFile, printWriter -> {
             printWriter.println("// GENERATED BUILD SCRIPT");
             if (!buildScript.getBuildScriptClasspath().isEmpty()) {
                 printWriter.println();
@@ -76,7 +73,7 @@ public class BuildFileGenerator extends ProjectFileGenerator {
             }
             writeBlockContents(buildScript, "", printWriter);
             printWriter.println();
-        }
+        });
     }
 
     private void apply(PrintWriter printWriter, String indent, ProjectScriptBlock.Plugin plugin) {

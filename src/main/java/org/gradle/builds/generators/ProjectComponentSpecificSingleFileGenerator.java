@@ -6,7 +6,6 @@ import org.gradle.builds.model.Project;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 public abstract class ProjectComponentSpecificSingleFileGenerator<T extends Component> extends ProjectComponentSpecificGenerator<T> {
@@ -18,12 +17,11 @@ public abstract class ProjectComponentSpecificSingleFileGenerator<T extends Comp
     }
 
     @Override
-    protected void generate(Build build, Project project, T component) throws IOException {
+    protected void generate(Build build, Project project, T component, FileGenerator fileGenerator) throws IOException {
         Path file = project.getProjectDir().resolve(filePath);
-        Files.createDirectories(file.getParent());
-        try (PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(file))) {
+        fileGenerator.generate(file, printWriter -> {
             generate(project, component, printWriter);
-        }
+        });
     }
 
     protected abstract void generate(Project project, T component, PrintWriter printWriter);

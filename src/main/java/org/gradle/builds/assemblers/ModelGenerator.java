@@ -1,5 +1,6 @@
 package org.gradle.builds.assemblers;
 
+import org.gradle.builds.generators.FileGenerator;
 import org.gradle.builds.generators.Generator;
 import org.gradle.builds.model.Build;
 import org.gradle.builds.model.Model;
@@ -13,9 +14,10 @@ public class ModelGenerator implements Generator<Model> {
         this.buildGenerator = buildGenerator;
     }
 
-    public void generate(Model model) throws IOException {
+    @Override
+    public void generate(Model model, FileGenerator fileGenerator) throws IOException {
         for (Build build : model.getBuilds()) {
-            buildGenerator.generate(build);
+            buildGenerator.generate(build, fileGenerator);
         }
     }
 }
