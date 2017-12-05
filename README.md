@@ -57,6 +57,8 @@ The `--version` option specifies the Android plugin version to use. Default is `
 
 The `--header-files` option specifies the number of header files per project. Default is 3.
 
+The `--boost` option specifies that the source files include references to the boost libraries. Default is false.
+
 ### Swift specific options
 
 The `--swift-pm` option uses Swift package manager source conventions, and also generates a Swift PM build file.

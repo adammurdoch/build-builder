@@ -9,14 +9,16 @@ public class CppModelAssembler extends AbstractModelAssembler {
     private final int libImplHeaders;
     private final int libPrivateHeaders;
     private final MacroIncludes macroIncludes;
+    private final boolean boost;
 
-    public CppModelAssembler(int headers, MacroIncludes macroIncludes) {
+    public CppModelAssembler(int headers, MacroIncludes macroIncludes, boolean boost) {
         appImplHeaders = (headers - 1) / 2;
         appPrivateHeaders = headers - appImplHeaders - 2;
         libPublicHeaders = (headers - 3) / 3;
         libImplHeaders = (headers - libPublicHeaders - 2) / 2;
         libPrivateHeaders = headers - libPublicHeaders - libImplHeaders - 3;
         this.macroIncludes = macroIncludes;
+        this.boost = boost;
     }
 
     @Override
@@ -68,6 +70,7 @@ public class CppModelAssembler extends AbstractModelAssembler {
             buildScript.requirePlugin("cpp-library");
             addPublishing(project, lib, project.getBuildScript());
             addDependencies(project, lib, buildScript);
+            maybeAddBoost(privateHeader, buildScript);
 
             addApiHeaders(lib, apiHeader);
             addSource(project, lib, apiClass, apiSourceFile, implHeader, privateHeader);
@@ -102,10 +105,20 @@ public class CppModelAssembler extends AbstractModelAssembler {
             buildScript.requirePlugin("cpp-executable", "4.4");
             buildScript.requirePlugin("cpp-application", "4.5");
             addDependencies(project, app, buildScript);
+            maybeAddBoost(privateHeader, buildScript);
 
             addApiHeaders(app, implHeader);
             addSource(project, app, appClass, mainSourceFile, implHeader, privateHeader);
             app.setMacroIncludes(macroIncludes);
+        }
+    }
+
+    private void maybeAddBoost(CppHeaderFile privateHeader, BuildScript buildScript) {
+        if (boost) {
+            privateHeader.includeSystemHeader("boost/asio.hpp");
+        }
+        if (boost) {
+            buildScript.block("tasks.withType(AbstractLinkTask)").statement("linkerArgs.add('-lboost_system')");
         }
     }
 

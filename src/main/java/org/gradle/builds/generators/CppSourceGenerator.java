@@ -36,6 +36,10 @@ public class CppSourceGenerator extends ProjectComponentSpecificGenerator<HasCpp
         fileGenerator.generate(sourceFile, printWriter -> {
             String typeName = cppSource.getName().replace(".cpp", "");
             printWriter.println("// GENERATED SOURCE FILE");
+            printWriter.println();
+            for (String headerFile : cppSource.getSystemHeaders()) {
+                printWriter.println("#include <" + headerFile + ">");
+            }
             for (CppHeaderFile headerFile : cppSource.getHeaderFiles()) {
                 printWriter.println("#include \"" + headerFile.getName() + "\"");
             }
@@ -98,9 +102,12 @@ public class CppSourceGenerator extends ProjectComponentSpecificGenerator<HasCpp
                 printWriter.println("#endif");
                 printWriter.println("#endif");
             }
+            printWriter.println();
+            for (String headerFile : cppHeader.getSystemHeaders()) {
+                printWriter.println("#include <" + headerFile + ">");
+            }
             for (int i = 0; i < cppHeader.getHeaderFiles().size(); i++) {
                 CppHeaderFile headerFile = cppHeader.getHeaderFiles().get(i);
-                printWriter.println();
                 if (i == 0) {
                     switch (macroIncludes) {
                         case simple:

@@ -3,8 +3,8 @@ package org.gradle.builds.generators;
 import org.eclipse.jgit.api.AddCommand;
 import org.eclipse.jgit.api.CommitCommand;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.InitCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.gradle.builds.model.Build;
 import org.gradle.builds.model.Model;
@@ -39,10 +39,9 @@ public class GitRepoGenerator implements Generator<Model> {
 
         FileRepositoryBuilder builder = new FileRepositoryBuilder();
         builder.setWorkTree(rootDir.toFile());
-        try (Repository repository = builder.build()) {
-            try {
-                repository.create();
-                Git git = new Git(repository);
+        try {
+            InitCommand init = Git.init();
+            try (Git git = init.setDirectory(rootDir.toFile()).call()) {
                 AddCommand addCommand = git.add();
                 for (Path generatedFile : fileGenerator.getGeneratedFiles()) {
                     if (!generatedFile.startsWith(rootDir)) {
@@ -64,9 +63,9 @@ public class GitRepoGenerator implements Generator<Model> {
                 CommitCommand commitCommand = git.commit();
                 commitCommand.setMessage("Initial version");
                 commitCommand.call();
-            } catch (GitAPIException e) {
-                throw new RuntimeException("Could not create Git repository.", e);
             }
+        } catch (GitAPIException e) {
+            throw new RuntimeException("Could not create Git repository.", e);
         }
     }
 }

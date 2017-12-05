@@ -24,6 +24,7 @@ public class ReadmeGenerator implements Generator<Build> {
                 CppSettings cppSettings = (CppSettings) settings;
                 printWriter.println("- header files per project: " + cppSettings.getHeaders());
                 printWriter.println("- macro includes: " + cppSettings.getMacroIncludes());
+                printWriter.println("- boost: " + cppSettings.isBoost());
             }
 
             printWriter.println();

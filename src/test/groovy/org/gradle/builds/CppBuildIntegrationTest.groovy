@@ -4,7 +4,7 @@ import spock.lang.Unroll
 
 class CppBuildIntegrationTest extends AbstractIntegrationTest {
     def setup() {
-        gradleVersion = "4.3-20170914235708+0000"
+        gradleVersion = "4.4-rc-5"
     }
 
     def "can generate single project build"() {
@@ -164,6 +164,22 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         build.isBuild()
         build.project(":").isCppApplication()
         !build.project(":").file("src/main/headers/app.h").text.contains("#include APP_DEFS1_H")
+
+        build.buildSucceeds(":installDebug")
+        build.app("build/install/main/debug/testApp").succeeds()
+
+        build.buildSucceeds("build")
+    }
+
+    def "can generate multi-project build with boost includes"() {
+        when:
+        new Main().run("cpp", "--dir", projectDir.absolutePath, "--projects", "2", "--boost")
+
+        then:
+        build.isBuild()
+        build.project(":").isCppApplication()
+        build.project(":").file("src/main/cpp/app_private.h").text.contains('#include <boost/asio.hpp>')
+        build.project(":lib1api").file("src/main/cpp/lib1api_private.h").text.contains('#include <boost/asio.hpp>')
 
         build.buildSucceeds(":installDebug")
         build.app("build/install/main/debug/testApp").succeeds()

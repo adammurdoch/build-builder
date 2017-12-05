@@ -260,8 +260,11 @@ public class Main {
         @Option(name = "--header-files", description = "The number of header files to generate for each project (default: 3)")
         int headers = 3;
 
-        @Option(name = "--macro-include", description = "Specifies how headers files should reference other header files (values: none, simple, complex. default: simple)")
-        MacroIncludes macroIncludes = MacroIncludes.simple;
+        @Option(name = "--macro-include", description = "Specifies how headers files should reference other header files (values: none, simple, complex. default: none)")
+        MacroIncludes macroIncludes = MacroIncludes.none;
+
+        @Option(name = "--boost", description = "Include reference to boost libraries (default: false)")
+        boolean boost;
 
         @Override
         protected void validate() {
@@ -273,7 +276,7 @@ public class Main {
 
         @Override
         protected Settings createSettings() {
-            return new CppSettings(projects, sourceFiles, headers, macroIncludes);
+            return new CppSettings(projects, sourceFiles, headers, macroIncludes, boost);
         }
 
         @Override
@@ -293,7 +296,7 @@ public class Main {
 
         @Override
         protected ProjectConfigurer createModelAssembler() {
-            return new CppModelAssembler(headers, macroIncludes);
+            return new CppModelAssembler(headers, macroIncludes, boost);
         }
     }
 
