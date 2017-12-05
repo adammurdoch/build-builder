@@ -6,7 +6,7 @@ Supported build types:
 
 - Java application
 - Android application
-- C++ application (Gradle 4.3 and later)
+- C++ application (Gradle 4.2 and later)
 - Swift application (Gradle 4.4 and later)
 
 Generates one or more projects with source files. Can also be used to add source files to an existing skeleton build. 
@@ -47,19 +47,19 @@ The `--http-repo` option generates an additional build that produces an HTTP rep
 
 The `--builds` option specifies the number of builds to generate. Set to greater than 1 to generate a composite build. Default is 1.
 
-### Android specific options
+#### Android specific options
 
 The `--java` option includes some Java libraries in an Android build. Default is false. 
 
 The `--version` option specifies the Android plugin version to use. Default is `2.3.1`.
 
-### C++ specific options
+#### C++ specific options
 
 The `--header-files` option specifies the number of header files per project. Default is 3.
 
 The `--boost` option specifies that the source files include references to the boost libraries. Default is false.
 
-### Swift specific options
+#### Swift specific options
 
 The `--swift-pm` option uses Swift package manager source conventions, and also generates a Swift PM build file.
 
