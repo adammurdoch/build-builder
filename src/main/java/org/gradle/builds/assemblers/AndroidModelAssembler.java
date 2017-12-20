@@ -104,7 +104,7 @@ public class AndroidModelAssembler extends JvmModelAssembler {
         if (project.getPublicationTarget() != null) {
             String group = "org.gradle.example";
             String module = project.getName();
-            String version = "1.2";
+            String version = project.getVersion();
             project.export(new LocalLibrary<>(project, new ExternalDependencyDeclaration(group, module, version), api));
             buildScript.property("group", group);
             buildScript.property("version", version);

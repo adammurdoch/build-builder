@@ -7,15 +7,16 @@ import java.nio.file.Path;
 public class HttpRepoModelStructureAssembler implements ModelStructureAssembler {
     private final ProjectInitializer buildInitAction;
     private final int libraryCount;
+    private final int versionCount;
 
-    public HttpRepoModelStructureAssembler(ProjectInitializer buildInitAction, int libraryCount) {
+    public HttpRepoModelStructureAssembler(ProjectInitializer buildInitAction, int libraryCount, int versionCount) {
         this.buildInitAction = buildInitAction;
         this.libraryCount = libraryCount;
+        this.versionCount = versionCount;
     }
 
     @Override
     public void attachBuilds(Settings settings, Model model) {
-        Path externalBuildDir = model.getBuild().getRootDir().resolve("external");
         Path repoDir = model.getBuild().getRootDir().resolve("http-repo");
         Path serverDir = model.getBuild().getRootDir().resolve("repo-server");
 
@@ -25,17 +26,26 @@ public class HttpRepoModelStructureAssembler implements ModelStructureAssembler 
         serverBuild.setSettings(new Settings(1, 1));
         serverBuild.setProjectInitializer(new EmptyRootProjectInitializer(buildInitAction));
         serverBuild.publishAs(new PublicationTarget(httpRepository));
-        serverBuild.getRootProject().addComponent(new HttpServerImplementation(httpRepository, externalBuildDir));
+        HttpServerImplementation httpServerImplementation = new HttpServerImplementation(httpRepository);
+        serverBuild.getRootProject().addComponent(httpServerImplementation);
         serverBuild.setTypeNamePrefix("Repo");
         model.addBuild(serverBuild);
 
-        Build libraryBuild = new Build(externalBuildDir, "ext");
-        libraryBuild.setSettings(new Settings(libraryCount + 1, 1));
-        libraryBuild.setProjectInitializer(new EmptyRootProjectInitializer(buildInitAction));
-        libraryBuild.publishAs(new PublicationTarget(httpRepository));
-        libraryBuild.setTypeNamePrefix("Ext");
-        model.addBuild(libraryBuild);
+        for(int i = 0; i < versionCount; i++) {
+            Path externalSourceDir = model.getBuild().getRootDir().resolve("external/v" + (i + 1));
+            Build libraryBuild = new Build(externalSourceDir, "ext");
+            libraryBuild.setSettings(new Settings(libraryCount + 1, 1));
+            libraryBuild.setProjectInitializer(new EmptyRootProjectInitializer(buildInitAction));
+            libraryBuild.publishAs(new PublicationTarget(httpRepository));
+            libraryBuild.setTypeNamePrefix("Ext");
+            libraryBuild.setVersion((i + 1) + ".0");
+            model.addBuild(libraryBuild);
 
-        model.getBuild().dependsOn(libraryBuild);
+            if (i == versionCount - 1) {
+                model.getBuild().dependsOn(libraryBuild);
+            }
+
+            httpServerImplementation.addSourceBuild(externalSourceDir);
+        }
     }
 }

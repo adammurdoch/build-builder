@@ -113,7 +113,9 @@ public class Main {
 
         @Override
         public Void call() throws Exception {
-            validate();
+            ProblemCollector collector = new ProblemCollector();
+            validate(collector);
+            collector.assertNoIssues();
 
             Path rootDir = getRootDir();
 
@@ -150,15 +152,19 @@ public class Main {
             return 0;
         }
 
-        protected void validate() {
+        protected int getHttpRepoVersions() {
+            return 1;
+        }
+
+        protected void validate(ProblemCollector collector) {
             if (projects < 1) {
-                throw new IllegalArgumentException("Minimum of 1 project.");
+                collector.problem("Minimum of 1 project required.");
             }
             if (sourceFiles < 1) {
-                throw new IllegalArgumentException("Minimum of 1 source files per project.");
+                collector.problem("Minimum of 1 source files per project required.");
             }
             if (getBuilds() < 1) {
-                throw new IllegalArgumentException("Minimum of 1 build.");
+                collector.problem("Minimum of 1 build required.");
             }
         }
 
@@ -207,7 +213,7 @@ public class Main {
             if (isHttpRepo()) {
                 return new CompositeModelStructureAssembler(
                         mainBuildAssembler,
-                        new HttpRepoModelStructureAssembler(projectInitializer, getHttpRepoLibraries()));
+                        new HttpRepoModelStructureAssembler(projectInitializer, getHttpRepoLibraries(), getHttpRepoVersions()));
             } else {
                 return mainBuildAssembler;
             }
@@ -235,6 +241,9 @@ public class Main {
         @Option(name = "--http-repo-libraries", description = "Number of libraries to include in the HTTP repository (default: 3)")
         int httpRepoLibraries = 3;
 
+        @Option(name = "--http-repo-versions", description = "Number of versions of each library to include in the HTTP repository (default: 1)")
+        int httpRepoVersions = 1;
+
         @Override
         protected boolean isHttpRepo() {
             return httpRepo;
@@ -242,6 +251,22 @@ public class Main {
 
         protected int getHttpRepoLibraries() {
             return httpRepoLibraries;
+        }
+
+        @Override
+        protected int getHttpRepoVersions() {
+            return httpRepoVersions;
+        }
+
+        @Override
+        protected void validate(ProblemCollector collector) {
+            super.validate(collector);
+            if (httpRepoLibraries < 1) {
+                collector.problem("Minimum of 1 HTTP repository library required.");
+            }
+            if (httpRepoVersions < 1) {
+                collector.problem("Minimum of 1 HTTP repository library version required.");
+            }
         }
     }
 
@@ -275,10 +300,10 @@ public class Main {
         boolean boost;
 
         @Override
-        protected void validate() {
-            super.validate();
+        protected void validate(ProblemCollector collector) {
+            super.validate(collector);
             if (headers < 3) {
-                throw new IllegalArgumentException("Minimum of 3 header files per project.");
+                collector.problem("Minimum of 3 header files per project.");
             }
         }
 
@@ -333,10 +358,10 @@ public class Main {
         boolean includeJavaLibraries = false;
 
         @Override
-        protected void validate() {
-            super.validate();
+        protected void validate(ProblemCollector collector) {
+            super.validate(collector);
             if (includeJavaLibraries && projects < 2) {
-                throw new IllegalArgumentException("Minimum of 2 projects required to add Java libraries to Android build");
+                collector.problem("Minimum of 2 projects required to add Java libraries to Android build");
             }
         }
 

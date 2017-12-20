@@ -11,7 +11,7 @@ public abstract class JvmModelAssembler extends AbstractModelAssembler {
 
     @Override
     protected void rootProject(Project rootProject) {
-        ProjectScriptBlock allProjects = rootProject.getBuildScript().allProjects();
+        BlockWithProjectTarget allProjects = rootProject.getBuildScript().allProjects();
         allProjects.jcenter();
         allProjects.block("tasks.withType(JavaCompile)").property("options.incremental", "true");
     }

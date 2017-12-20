@@ -29,7 +29,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         build.buildSucceeds("build")
 
         build.buildSucceeds("publish")
-        file("repo/test/testApp/1.2/testApp-1.2.pom").file
+        file("repo/test/testApp/1.0/testApp-1.0.pom").file
     }
 
     @Unroll
@@ -77,8 +77,8 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         build.buildSucceeds("build")
 
         build.buildSucceeds("publish")
-        file("repo/test/testApp/1.2/testApp-1.2.pom").file
-        file("repo/test/lib1api/1.2/lib1api-1.2.pom").file
+        file("repo/test/testApp/1.0/testApp-1.0.pom").file
+        file("repo/test/lib1api/1.0/lib1api-1.0.pom").file
     }
 
     def "can generate build with API dependencies between projects"() {
@@ -204,7 +204,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         build.buildSucceeds("build")
 
         build.buildSucceeds("publish")
-        file("repo/test/testApp/1.2/testApp-1.2.pom").file
+        file("repo/test/testApp/1.0/testApp-1.0.pom").file
 
         where:
         projects << ["3", "4", "5", "10", "20"]
@@ -335,12 +335,17 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         build.isBuild()
         build.project(":").isCppApplication()
 
+        def buildFile = build.project(":").file("build.gradle")
+        buildFile.text.contains("implementation 'org.gradle.example:extlib1api1:1.0'")
+        buildFile.text.contains("implementation 'org.gradle.example:extlib1api2:1.0'")
+        buildFile.text.contains("implementation 'org.gradle.example:extlib2api:1.0'")
+
         def srcDir = build.project(":").file("src/main/cpp")
         new File(srcDir, "appimpl1api.cpp").text.contains("ExtLib1Api1")
         new File(srcDir, "appimpl1api.cpp").text.contains("ExtLib1Api2")
         new File(srcDir, "appimpl1api.cpp").text.contains("ExtLib2Api")
 
-        def repoBuild = build(file('external'))
+        def repoBuild = build(file('external/v1'))
         repoBuild.isBuild()
         repoBuild.project(':').isEmptyProject()
         repoBuild.project(':extlib1api1').isCppLibrary()
@@ -349,8 +354,12 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
 
         def serverBuild = build(file('repo-server'))
         serverBuild.buildSucceeds("installDist")
-        file("http-repo/org/gradle/example/extlib2api/1.2/extlib2api-1.2.pom").file
-        file("http-repo/org/gradle/example/extlib2api/1.2/extlib2api-1.2-cpp-api-headers.zip").file
+        file("http-repo/org/gradle/example/extlib1api1/1.0/extlib1api1-1.0.pom").file
+        file("http-repo/org/gradle/example/extlib1api1/1.0/extlib1api1-1.0-cpp-api-headers.zip").file
+        file("http-repo/org/gradle/example/extlib1api2/1.0/extlib1api2-1.0.pom").file
+        file("http-repo/org/gradle/example/extlib1api2/1.0/extlib1api2-1.0-cpp-api-headers.zip").file
+        file("http-repo/org/gradle/example/extlib2api/1.0/extlib2api-1.0.pom").file
+        file("http-repo/org/gradle/example/extlib2api/1.0/extlib2api-1.0-cpp-api-headers.zip").file
 
         def server = serverBuild.app("build/install/repo/bin/repo").start()
         waitFor(new URI("http://localhost:5005"))
@@ -380,15 +389,15 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         def srcDir = build.project(":").file("src/main/cpp")
         new File(srcDir, "appimpl1api.cpp").text.contains("ExtLib1Api")
 
-        def repoBuild = build(file('external'))
+        def repoBuild = build(file('external/v1'))
         repoBuild.isBuild()
         repoBuild.project(':').isEmptyProject()
         repoBuild.project(':extlib1api').isCppLibrary()
 
         def serverBuild = build(file('repo-server'))
         serverBuild.buildSucceeds("installDist")
-        file("http-repo/org/gradle/example/extlib1api/1.2/extlib1api-1.2.pom").file
-        file("http-repo/org/gradle/example/extlib1api/1.2/extlib1api-1.2-cpp-api-headers.zip").file
+        file("http-repo/org/gradle/example/extlib1api/1.0/extlib1api-1.0.pom").file
+        file("http-repo/org/gradle/example/extlib1api/1.0/extlib1api-1.0-cpp-api-headers.zip").file
 
         def server = serverBuild.app("build/install/repo/bin/repo").start()
         waitFor(new URI("http://localhost:5005"))
@@ -403,4 +412,70 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         cleanup:
         server?.kill()
     }
+
+    def "can generate single project build with http repo with multiple versions"() {
+        given:
+        useIsolatedUserHome()
+
+        when:
+        new Main().run("cpp", "--http-repo", "--http-repo-versions", "3", "--dir", projectDir.absolutePath)
+
+        then:
+        build.isBuild()
+        build.project(":").isCppApplication()
+
+        def buildFile = build.project(":").file("build.gradle")
+        buildFile.text.contains("implementation 'org.gradle.example:extlib1api1:3.0'")
+        buildFile.text.contains("implementation 'org.gradle.example:extlib1api2:3.0'")
+        buildFile.text.contains("implementation 'org.gradle.example:extlib2api:3.0'")
+
+        def srcDir = build.project(":").file("src/main/cpp")
+        new File(srcDir, "appimpl1api.cpp").text.contains("ExtLib1Api1")
+        new File(srcDir, "appimpl1api.cpp").text.contains("ExtLib1Api2")
+        new File(srcDir, "appimpl1api.cpp").text.contains("ExtLib2Api")
+
+        def repoBuildV1 = build(file('external/v1'))
+        repoBuildV1.isBuild()
+        repoBuildV1.project(':').isEmptyProject()
+        repoBuildV1.project(':extlib1api1').isCppLibrary()
+        repoBuildV1.project(':extlib1api2').isCppLibrary()
+        repoBuildV1.project(':extlib2api').isCppLibrary()
+
+        def repoBuildV2 = build(file('external/v2'))
+        repoBuildV2.isBuild()
+        repoBuildV2.project(':').isEmptyProject()
+        repoBuildV2.project(':extlib1api1').isCppLibrary()
+        repoBuildV2.project(':extlib1api2').isCppLibrary()
+        repoBuildV2.project(':extlib2api').isCppLibrary()
+
+        def repoBuildV3 = build(file('external/v3'))
+        repoBuildV3.isBuild()
+        repoBuildV3.project(':').isEmptyProject()
+        repoBuildV3.project(':extlib1api1').isCppLibrary()
+        repoBuildV3.project(':extlib1api2').isCppLibrary()
+        repoBuildV3.project(':extlib2api').isCppLibrary()
+
+        def serverBuild = build(file('repo-server'))
+        serverBuild.buildSucceeds("installDist")
+        file("http-repo/org/gradle/example/extlib1api1/1.0/extlib1api1-1.0.pom").file
+        file("http-repo/org/gradle/example/extlib1api1/1.0/extlib1api1-1.0-cpp-api-headers.zip").file
+        file("http-repo/org/gradle/example/extlib1api1/2.0/extlib1api1-2.0.pom").file
+        file("http-repo/org/gradle/example/extlib1api1/2.0/extlib1api1-2.0-cpp-api-headers.zip").file
+        file("http-repo/org/gradle/example/extlib1api1/3.0/extlib1api1-3.0.pom").file
+        file("http-repo/org/gradle/example/extlib1api1/3.0/extlib1api1-3.0-cpp-api-headers.zip").file
+
+        def server = serverBuild.app("build/install/repo/bin/repo").start()
+        waitFor(new URI("http://localhost:5005"))
+
+        build.buildSucceeds(":installDebug")
+
+        def app = build.app("build/install/main/debug/testApp")
+        app.succeeds()
+
+        build.buildSucceeds("build")
+
+        cleanup:
+        server?.kill()
+    }
+
 }

@@ -5,30 +5,30 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class BuildScript extends ProjectScriptBlock {
+public class BuildScript extends BlockWithProjectTarget {
     private final Set<ExternalDependencyDeclaration> buildScriptClasspath = new LinkedHashSet<>();
     private final Map<String, Set<DependencyDeclaration>> dependencies = new LinkedHashMap<>();
-    private ProjectScriptBlock allProjects;
-    private BlockWithDependencies buildscriptBlock;
+    private BlockWithProjectTarget allProjects;
+    private BlockWithRepositories buildscriptBlock;
 
-    public ProjectScriptBlock getAllProjects() {
+    public BlockWithProjectTarget getAllProjects() {
         return allProjects;
     }
 
-    public ProjectScriptBlock allProjects() {
+    public BlockWithProjectTarget allProjects() {
         if (allProjects == null) {
-            allProjects = new ProjectScriptBlock();
+            allProjects = new BlockWithProjectTarget();
         }
         return allProjects;
     }
 
-    public BlockWithDependencies getBuildScriptBlock() {
+    public BlockWithRepositories getBuildScriptBlock() {
         return buildscriptBlock;
     }
 
-    public BlockWithDependencies buildScriptBlock() {
+    public BlockWithRepositories buildScriptBlock() {
         if (buildscriptBlock == null) {
-            buildscriptBlock = new BlockWithDependencies();
+            buildscriptBlock = new BlockWithRepositories();
         }
         return buildscriptBlock;
     }

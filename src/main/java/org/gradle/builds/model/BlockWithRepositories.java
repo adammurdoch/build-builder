@@ -3,7 +3,7 @@ package org.gradle.builds.model;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class BlockWithDependencies extends Scope {
+public class BlockWithRepositories extends Scope {
     private final Set<ScriptBlock> repositories = new LinkedHashSet<>();
 
     public Set<ScriptBlock> getRepositories() {

@@ -12,7 +12,9 @@ import org.gradle.builds.model.Model;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 public class GitRepoGenerator implements Generator<Model> {
     @Override
@@ -29,11 +31,16 @@ public class GitRepoGenerator implements Generator<Model> {
         fileGenerator.generate(rootDir.resolve(".gitignore"), writer -> {
             writer.println("build");
             writer.println(".gradle");
+            Set<String> dirs = new LinkedHashSet<>();
             for (Build other : model.getBuilds()) {
                 if (other.getRootDir().startsWith(rootDir) && !other.getRootDir().equals(rootDir)) {
                     ignored.add(other);
-                    writer.println(rootDir.relativize(other.getRootDir()));
+                    Path relativePath = rootDir.relativize(other.getRootDir());
+                    dirs.add(relativePath.getName(0).toString());
                 }
+            }
+            for (String dir : dirs) {
+                writer.println(dir);
             }
         });
 

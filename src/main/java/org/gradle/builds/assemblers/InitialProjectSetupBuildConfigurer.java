@@ -18,6 +18,10 @@ public class InitialProjectSetupBuildConfigurer implements BuildConfigurer {
         structureAssembler.arrangeProjects(build, build.getProjectInitializer());
         structureAssembler.arrangeClasses(build);
 
+        // Define publications
+        for (Project project : build.getProjects()) {
+            project.setVersion(build.getVersion());
+        }
         if (build.getPublicationTarget() != null) {
             for (Project project : build.getProjects()) {
                 project.publishAs(build.getPublicationTarget());

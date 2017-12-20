@@ -227,7 +227,7 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
         new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.extlib2api.ExtLib2ApiActivity.INT_CONST")
         new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.extlib2api.R.string.extlib2api_string")
 
-        def repoBuild = build(file('external'))
+        def repoBuild = build(file('external/v1'))
         repoBuild.isBuild()
         repoBuild.project(':').isEmptyProject()
         repoBuild.project(':extlib1api1').isAndroidLibrary()
@@ -237,8 +237,8 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
         def serverBuild = build(file('repo-server'))
         serverBuild.buildSucceeds("installDist")
 
-        file("http-repo/org/gradle/example/extlib1api1/1.2/extlib1api1-1.2.pom").file
-        file("http-repo/org/gradle/example/extlib1api1/1.2/extlib1api1-1.2.aar").file
+        file("http-repo/org/gradle/example/extlib1api1/1.0/extlib1api1-1.0.pom").file
+        file("http-repo/org/gradle/example/extlib1api1/1.0/extlib1api1-1.0.aar").file
 
         def server = serverBuild.app("build/install/repo/bin/repo").start()
         waitFor(new URI("http://localhost:5005"))
@@ -275,7 +275,7 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":lib1api").isAndroidLibrary()
         build.project(":lib2api").isJavaLibrary()
 
-        def repoBuild = build(file('external'))
+        def repoBuild = build(file('external/v1'))
         repoBuild.isBuild()
         repoBuild.project(':').isEmptyProject()
         repoBuild.project(':extlib1api1').isAndroidLibrary()
@@ -285,12 +285,12 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
         def serverBuild = build(file('repo-server'))
         serverBuild.buildSucceeds("installDist")
 
-        file("http-repo/org/gradle/example/extlib1api1/1.2/extlib1api1-1.2.aar").file
-        file("http-repo/org/gradle/example/extlib1api1/1.2/extlib1api1-1.2.pom").file
-        file("http-repo/org/gradle/example/extlib1api2/1.2/extlib1api2-1.2.jar").file
-        file("http-repo/org/gradle/example/extlib1api2/1.2/extlib1api2-1.2.pom").file
-        file("http-repo/org/gradle/example/extlib2api/1.2/extlib2api-1.2.jar").file
-        file("http-repo/org/gradle/example/extlib2api/1.2/extlib2api-1.2.pom").file
+        file("http-repo/org/gradle/example/extlib1api1/1.0/extlib1api1-1.0.aar").file
+        file("http-repo/org/gradle/example/extlib1api1/1.0/extlib1api1-1.0.pom").file
+        file("http-repo/org/gradle/example/extlib1api2/1.0/extlib1api2-1.0.jar").file
+        file("http-repo/org/gradle/example/extlib1api2/1.0/extlib1api2-1.0.pom").file
+        file("http-repo/org/gradle/example/extlib2api/1.0/extlib2api-1.0.jar").file
+        file("http-repo/org/gradle/example/extlib2api/1.0/extlib2api-1.0.pom").file
 
         def server = serverBuild.app("build/install/repo/bin/repo").start()
         waitFor(new URI("http://localhost:5005"))

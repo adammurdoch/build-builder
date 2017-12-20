@@ -37,17 +37,17 @@ public class BuildFileGenerator extends ProjectFileGenerator {
             }
             if (!buildScript.getPlugins().isEmpty()) {
                 printWriter.println();
-                for (ProjectScriptBlock.Plugin plugin : buildScript.getPlugins()) {
+                for (BlockWithProjectTarget.Plugin plugin : buildScript.getPlugins()) {
                     apply(printWriter, "", plugin);
                 }
             }
 
-            ProjectScriptBlock allProjects = buildScript.getAllProjects();
+            BlockWithProjectTarget allProjects = buildScript.getAllProjects();
             if (allProjects != null) {
                 printWriter.println();
                 printWriter.println("allprojects {");
                 if (!allProjects.getPlugins().isEmpty()) {
-                    for (ProjectScriptBlock.Plugin plugin : allProjects.getPlugins()) {
+                    for (BlockWithProjectTarget.Plugin plugin : allProjects.getPlugins()) {
                         apply(printWriter, "    ", plugin);
                     }
                 }
@@ -76,7 +76,7 @@ public class BuildFileGenerator extends ProjectFileGenerator {
         });
     }
 
-    private void apply(PrintWriter printWriter, String indent, ProjectScriptBlock.Plugin plugin) {
+    private void apply(PrintWriter printWriter, String indent, BlockWithProjectTarget.Plugin plugin) {
         if (plugin.getVersion() == null) {
             printWriter.print(indent);
             printWriter.println("apply plugin: '" + plugin.getId() + "'");

@@ -18,6 +18,7 @@ public class Project {
     private String typeName;
     private Graph classGraph;
     private PublicationTarget publicationTarget;
+    private String version;
 
     public Project(Project parent, String name, Path projectDir) {
         this.parent = parent;
@@ -86,6 +87,14 @@ public class Project {
             return "app";
         }
         return name.toLowerCase();
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public String getVersion() {
+        return version;
     }
 
     private interface NameCollector {

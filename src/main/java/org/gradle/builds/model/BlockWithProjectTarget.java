@@ -3,7 +3,7 @@ package org.gradle.builds.model;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class ProjectScriptBlock extends BlockWithDependencies {
+public class BlockWithProjectTarget extends BlockWithRepositories {
     private final Set<Plugin> plugins = new LinkedHashSet<>();
 
     public Set<Plugin> getPlugins() {
