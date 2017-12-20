@@ -17,10 +17,11 @@ public class IncludedBuildAssembler implements ModelStructureAssembler {
     public void attachBuilds(Settings settings, Model model) {
         for (int i = 1; i < builds; i++) {
             String name = "child" + i;
+            String typeName = "Child" + i;
             Build childBuild = new Build(model.getBuild().getRootDir().resolve(name), name);
-            childBuild.setSettings(settings);
+            childBuild.setSettings(new Settings(3, settings.getSourceFileCount()));
             childBuild.setProjectInitializer(initializer);
-            childBuild.setTypeNamePrefix("Child" + i);
+            childBuild.setTypeNamePrefix(typeName);
             childBuild.publishAs(new PublicationTarget(null));
             model.addBuild(childBuild);
             model.getBuild().includeBuild(childBuild);

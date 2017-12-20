@@ -19,7 +19,7 @@ public class Build {
     private String typeNamePrefix = "";
     private ProjectInitializer projectInitializer;
     private Project deepestProject;
-    private String version;
+    private String version = "1.0";
 
     public Build(Path rootDir, String rootProjectName) {
         this.rootDir = rootDir;

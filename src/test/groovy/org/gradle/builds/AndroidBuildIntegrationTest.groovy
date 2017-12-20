@@ -177,27 +177,25 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
     def "can generate composite build"() {
         when:
         gradleVersion = "4.2"
-        new Main().run("android", "--dir", projectDir.absolutePath, "--projects", "2", "--builds", "2", "--version", "3.0.0-beta1")
+        new Main().run("android", "--dir", projectDir.absolutePath, "--builds", "2", "--version", "3.0.0")
 
         then:
         build.isBuild()
 
         build.project(":").isAndroidApplication()
-        build.project(":lib1api").isAndroidLibrary()
         def srcDir = build.project(":").file("src/main/java/org/gradle/example/app")
         new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1lib1api.Child1Lib1ApiActivity.getSomeValue()")
         new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1lib1api.Child1Lib1ApiActivity.INT_CONST")
         new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1lib1api.R.string.child1lib1api_string")
-
-        def coreSrcDir = build.project(":lib1api").file("src/main/java/org/gradle/example/lib1api")
-        new File(coreSrcDir, "Lib1ApiImpl1Api.java").text.contains("org.gradle.example.child1lib1api.Child1Lib1ApiActivity.INT_CONST")
-        new File(coreSrcDir, "Lib1ApiImpl1Api.java").text.contains("org.gradle.example.child1lib1api.Child1Lib1ApiActivity.INT_CONST")
-        new File(coreSrcDir, "Lib1ApiImpl1Api.java").text.contains("org.gradle.example.child1lib1api.R.string.child1lib1api_string")
+        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1lib2api.Child1Lib2ApiActivity.getSomeValue()")
+        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1lib2api.Child1Lib2ApiActivity.INT_CONST")
+        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1lib2api.R.string.child1lib2api_string")
 
         def child = build(file("child1"))
         child.isBuild()
         child.project(":").isEmptyProject()
         child.project(":child1lib1api").isAndroidLibrary()
+        child.project(":child1lib2api").isAndroidLibrary()
 
         build.buildSucceeds(":assembleDebug")
         file("build/outputs/apk/debug/testApp-debug.apk").exists()

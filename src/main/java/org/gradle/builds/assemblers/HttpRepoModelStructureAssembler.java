@@ -34,8 +34,13 @@ public class HttpRepoModelStructureAssembler implements ModelStructureAssembler 
         for(int i = 0; i < versionCount; i++) {
             Path externalSourceDir = model.getBuild().getRootDir().resolve("external/v" + (i + 1));
             Build libraryBuild = new Build(externalSourceDir, "ext");
-            libraryBuild.setSettings(new Settings(libraryCount + 1, 1));
-            libraryBuild.setProjectInitializer(new EmptyRootProjectInitializer(buildInitAction));
+            if (libraryCount == 1) {
+                libraryBuild.setSettings(new Settings(1, 1));
+                libraryBuild.setProjectInitializer(new LibraryRootProjectInitializer("Ext", buildInitAction));
+            } else {
+                libraryBuild.setSettings(new Settings(libraryCount + 1, 1));
+                libraryBuild.setProjectInitializer(new EmptyRootProjectInitializer(buildInitAction));
+            }
             libraryBuild.publishAs(new PublicationTarget(httpRepository));
             libraryBuild.setTypeNamePrefix("Ext");
             libraryBuild.setVersion((i + 1) + ".0");

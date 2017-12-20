@@ -131,25 +131,23 @@ class SwiftBuildIntegrationTest extends AbstractIntegrationTest {
 
     def "can generate composite build"() {
         when:
-        new Main().run("swift", "--dir", projectDir.absolutePath, "--projects", "2", "--builds", "2")
+        new Main().run("swift", "--dir", projectDir.absolutePath, "--builds", "2")
 
         then:
         build.isBuild()
 
         build.project(":").isSwiftApplication()
-        build.project(":lib1api").isSwiftLibrary()
         def srcDir = build.project(":").file("src/main/swift")
         new File(srcDir, "AppImpl1Api.swift").text.contains("import Child1lib1api")
         new File(srcDir, "AppImpl1Api.swift").text.contains("let child1lib1api = Child1Lib1Api()")
-
-        def coreSrcDir = build.project(":lib1api").file("src/main/swift")
-        new File(coreSrcDir, "Lib1ApiImpl1Api.swift").text.contains("import Child1lib1api")
-        new File(coreSrcDir, "Lib1ApiImpl1Api.swift").text.contains("let child1lib1api = Child1Lib1Api()")
+        new File(srcDir, "AppImpl1Api.swift").text.contains("import Child1lib2api")
+        new File(srcDir, "AppImpl1Api.swift").text.contains("let child1lib2api = Child1Lib2Api()")
 
         def child = build(file("child1"))
         child.isBuild()
         child.project(":").isEmptyProject()
         child.project(":child1lib1api").isSwiftLibrary()
+        child.project(":child1lib2api").isSwiftLibrary()
 
         build.buildSucceeds(":installDebug")
 

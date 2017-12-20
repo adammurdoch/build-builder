@@ -83,10 +83,7 @@ public class Project {
      * Returns a base name that can be used as a file name for this project.
      */
     public String getFileNameFor() {
-        if (parent == null) {
-            return "app";
-        }
-        return name.toLowerCase();
+        return typeName.toLowerCase();
     }
 
     public void setVersion(String version) {

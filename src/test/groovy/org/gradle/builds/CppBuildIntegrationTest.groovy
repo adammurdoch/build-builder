@@ -298,23 +298,21 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
 
     def "can generate composite build"() {
         when:
-        new Main().run("cpp", "--dir", projectDir.absolutePath, "--projects", "2", "--builds", "2")
+        new Main().run("cpp", "--dir", projectDir.absolutePath, "--builds", "2")
 
         then:
         build.isBuild()
 
         build.project(":").isCppApplication()
-        build.project(":lib1api").isCppLibrary()
         def srcDir = build.project(":").file("src/main/cpp")
         new File(srcDir, "appimpl1api.cpp").text.contains("Child1Lib1Api")
-
-        def coreSrcDir = build.project(":lib1api").file("src/main/cpp")
-        new File(coreSrcDir, "lib1apiimpl1api.cpp").text.contains("Child1Lib1Api")
+        new File(srcDir, "appimpl1api.cpp").text.contains("Child1Lib2Api")
 
         def child = build(file("child1"))
         child.isBuild()
         child.project(":").isEmptyProject()
         child.project(":child1lib1api").isCppLibrary()
+        child.project(":child1lib2api").isCppLibrary()
 
         build.buildSucceeds(":installDebug")
 
@@ -387,17 +385,16 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":").isCppApplication()
 
         def srcDir = build.project(":").file("src/main/cpp")
-        new File(srcDir, "appimpl1api.cpp").text.contains("ExtLib1Api")
+        new File(srcDir, "appimpl1api.cpp").text.contains("Ext ext;")
 
         def repoBuild = build(file('external/v1'))
         repoBuild.isBuild()
-        repoBuild.project(':').isEmptyProject()
-        repoBuild.project(':extlib1api').isCppLibrary()
+        repoBuild.project(':').isCppLibrary()
 
         def serverBuild = build(file('repo-server'))
         serverBuild.buildSucceeds("installDist")
-        file("http-repo/org/gradle/example/extlib1api/1.0/extlib1api-1.0.pom").file
-        file("http-repo/org/gradle/example/extlib1api/1.0/extlib1api-1.0-cpp-api-headers.zip").file
+        file("http-repo/org/gradle/example/ext/1.0/ext-1.0.pom").file
+        file("http-repo/org/gradle/example/ext/1.0/ext-1.0-cpp-api-headers.zip").file
 
         def server = serverBuild.app("build/install/repo/bin/repo").start()
         waitFor(new URI("http://localhost:5005"))

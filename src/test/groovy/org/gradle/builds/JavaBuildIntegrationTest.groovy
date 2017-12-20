@@ -125,31 +125,70 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
 
     def "can generate composite build"() {
         when:
-        new Main().run("java", "--dir", projectDir.absolutePath, "--projects", "2", "--builds", "2")
+        new Main().run("java", "--dir", projectDir.absolutePath, "--builds", "2")
 
         then:
         build.isBuild()
 
         build.project(":").isJavaApplication()
-        build.project(":lib1api").isJavaLibrary()
         def srcDir = build.project(":").file("src/main/java/org/gradle/example/app")
         new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1lib1api.Child1Lib1Api.getSomeValue()")
         new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1lib1api.Child1Lib1Api.INT_CONST")
-
-        def coreSrcDir = build.project(":lib1api").file("src/main/java/org/gradle/example/lib1api")
-        new File(coreSrcDir, "Lib1ApiImpl1Api.java").text.contains("org.gradle.example.child1lib1api.Child1Lib1Api.getSomeValue()")
-        new File(coreSrcDir, "Lib1ApiImpl1Api.java").text.contains("org.gradle.example.child1lib1api.Child1Lib1Api.INT_CONST")
+        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1lib2api.Child1Lib2Api.getSomeValue()")
+        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1lib2api.Child1Lib2Api.INT_CONST")
 
         def child = build(file("child1"))
         child.isBuild()
         child.project(":").isEmptyProject()
         child.project(":child1lib1api").isJavaLibrary()
+        child.project(":child1lib2api").isJavaLibrary()
 
         build.buildSucceeds(":installDist")
 
         def app = build.app("build/install/testApp/bin/testApp")
         app.isApp()
-        app.libDir.list() as Set == ["child1lib1api-1.0.jar", "lib1api.jar", "slf4j-api-1.7.25.jar", "testApp.jar"] as Set
+        app.libDir.list() as Set == ["child1lib1api-1.0.jar", "child1lib2api-1.0.jar", "slf4j-api-1.7.25.jar", "testApp.jar"] as Set
+        app.succeeds()
+
+        build.buildSucceeds("build")
+    }
+
+    def "can generate composite build with 3 builds"() {
+        when:
+        new Main().run("java", "--dir", projectDir.absolutePath, "--builds", "3")
+
+        then:
+        build.isBuild()
+
+        build.project(":").isJavaApplication()
+
+        def srcDir = build.project(":").file("src/main/java/org/gradle/example/app")
+        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1lib1api.Child1Lib1Api.getSomeValue()")
+        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1lib1api.Child1Lib1Api.INT_CONST")
+        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1lib2api.Child1Lib2Api.getSomeValue()")
+        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1lib2api.Child1Lib2Api.INT_CONST")
+        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child2lib1api.Child2Lib1Api.getSomeValue()")
+        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child2lib1api.Child2Lib1Api.INT_CONST")
+        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child2lib2api.Child2Lib2Api.getSomeValue()")
+        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child2lib2api.Child2Lib2Api.INT_CONST")
+
+        def child1 = build(file("child1"))
+        child1.isBuild()
+        child1.project(":").isEmptyProject()
+        child1.project(":child1lib1api").isJavaLibrary()
+        child1.project(":child1lib2api").isJavaLibrary()
+
+        def child2 = build(file("child2"))
+        child2.isBuild()
+        child2.project(":").isEmptyProject()
+        child2.project(":child2lib1api").isJavaLibrary()
+        child2.project(":child2lib2api").isJavaLibrary()
+
+        build.buildSucceeds(":installDist")
+
+        def app = build.app("build/install/testApp/bin/testApp")
+        app.isApp()
+        app.libDir.list() as Set == ["child1lib1api-1.0.jar", "child1lib2api-1.0.jar", "child2lib1api-1.0.jar", "child2lib2api-1.0.jar", "slf4j-api-1.7.25.jar", "testApp.jar"] as Set
         app.succeeds()
 
         build.buildSucceeds("build")
@@ -222,19 +261,18 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":").isJavaApplication()
 
         def srcDir = build.project(":").file("src/main/java/org/gradle/example/app")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.extlib1api.ExtLib1Api.getSomeValue()")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.extlib1api.ExtLib1Api.INT_CONST")
+        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.app.Ext.getSomeValue()")
+        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.app.Ext.INT_CONST")
 
         def repoBuild = build(file('external/v1'))
         repoBuild.isBuild()
-        repoBuild.project(':').isEmptyProject()
-        repoBuild.project(':extlib1api').isJavaLibrary()
+        repoBuild.project(':').isJavaLibrary()
 
         def serverBuild = build(file('repo-server'))
         serverBuild.buildSucceeds("installDist")
 
-        file("http-repo/org/gradle/example/extlib1api/1.0/extlib1api-1.0.pom").file
-        file("http-repo/org/gradle/example/extlib1api/1.0/extlib1api-1.0.jar").file
+        file("http-repo/org/gradle/example/ext/1.0/ext-1.0.pom").file
+        file("http-repo/org/gradle/example/ext/1.0/ext-1.0.jar").file
 
         def server = serverBuild.app("build/install/repo/bin/repo").start()
         waitFor(new URI("http://localhost:5005"))
@@ -243,7 +281,7 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
 
         def app = build.app("build/install/testApp/bin/testApp")
         app.isApp()
-        app.libDir.list() as Set == ["extlib1api-1.0.jar", "slf4j-api-1.7.25.jar", "testApp.jar"] as Set
+        app.libDir.list() as Set == ["ext-1.0.jar", "slf4j-api-1.7.25.jar", "testApp.jar"] as Set
         app.succeeds()
 
         build.buildSucceeds("build")
