@@ -146,6 +146,10 @@ public class Main {
             return false;
         }
 
+        protected int getHttpRepoLibraries() {
+            return 0;
+        }
+
         protected void validate() {
             if (projects < 1) {
                 throw new IllegalArgumentException("Minimum of 1 project.");
@@ -203,7 +207,7 @@ public class Main {
             if (isHttpRepo()) {
                 return new CompositeModelStructureAssembler(
                         mainBuildAssembler,
-                        new HttpRepoModelStructureAssembler(projectInitializer));
+                        new HttpRepoModelStructureAssembler(projectInitializer, getHttpRepoLibraries()));
             } else {
                 return mainBuildAssembler;
             }
@@ -224,18 +228,25 @@ public class Main {
         protected abstract ProjectConfigurer createModelAssembler();
     }
 
-    public static abstract class InitJvmBuild extends InitBuild {
+    public static abstract class InitBinaryDependencyAwareBuild extends InitBuild {
         @Option(name = "--http-repo", description = "Generate an HTTP repository (default: false)")
         boolean httpRepo = false;
+
+        @Option(name = "--http-repo-libraries", description = "Number of libraries to include in the HTTP repository (default: 3)")
+        int httpRepoLibraries = 3;
 
         @Override
         protected boolean isHttpRepo() {
             return httpRepo;
         }
+
+        protected int getHttpRepoLibraries() {
+            return httpRepoLibraries;
+        }
     }
 
     @Command(name = "java", description = "Generates a Java build with source files")
-    public static class InitJavaBuild extends InitJvmBuild {
+    public static class InitJavaBuild extends InitBinaryDependencyAwareBuild {
         @Override
         protected String getType() {
             return "Java";
@@ -253,10 +264,7 @@ public class Main {
     }
 
     @Command(name = "cpp", description = "Generates a C++ build with source files")
-    public static class InitCppBuild extends InitBuild {
-        @Option(name = "--http-repo", description = "Generate an HTTP repository (default: false)")
-        boolean httpRepo = false;
-
+    public static class InitCppBuild extends InitBinaryDependencyAwareBuild {
         @Option(name = "--header-files", description = "The number of header files to generate for each project (default: 3)")
         int headers = 3;
 
@@ -282,11 +290,6 @@ public class Main {
         @Override
         protected String getType() {
             return "C++";
-        }
-
-        @Override
-        protected boolean isHttpRepo() {
-            return httpRepo;
         }
 
         @Override
@@ -322,7 +325,7 @@ public class Main {
     }
 
     @Command(name = "android", description = "Generates an Android build with source files")
-    public static class InitAndroidBuild extends InitJvmBuild {
+    public static class InitAndroidBuild extends InitBinaryDependencyAwareBuild {
         @Option(name = "--version", description = "Android plugin version (default: " + AndroidModelAssembler.defaultVersion + ")")
         String androidVersion = AndroidModelAssembler.defaultVersion;
 

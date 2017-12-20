@@ -52,6 +52,7 @@ public class JavaModelAssembler extends JvmModelAssembler {
                 buildScript.requirePlugin("maven");
                 ScriptBlock deployerBlock = buildScript.block("uploadArchives").block("repositories").block("mavenDeployer");
                 deployerBlock.statement("repository(url: new URI('" + project.getPublicationTarget().getHttpRepository().getRootDir().toUri() + "'))");
+                buildScript.statement("task publish(dependsOn: uploadArchives)");
             }
         } else {
             project.export(new LocalLibrary<>(project, null, api));

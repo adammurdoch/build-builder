@@ -43,7 +43,9 @@ The `--projects` option specifies the number of projects. Default is 1.
 
 The `--source-files` option specifies the number of source files per project. Default is 3.
 
-The `--http-repo` option generates an additional build that produces an HTTP repository that provides external libraries. This repository and its classes are referenced by the generated build. Use `gradle -p repo run` to build and start the HTTP server and libraries. Not available for Swift builds.
+The `--http-repo` option generates an additional build that produces an HTTP Maven repository that provides external libraries. This repository and its classes are referenced by the generated build. Use `gradle -p repo-server run` to build the libraries and start the HTTP server. Not available for Swift builds.
+
+The `--http-repo-libraries` option specifies the number of libraries to include in the HTTP repository. Default is 3.
 
 The `--builds` option specifies the number of builds to generate. Set to greater than 1 to generate a composite build. Default is 1.
 

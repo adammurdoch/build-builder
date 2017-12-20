@@ -4,7 +4,7 @@ import spock.lang.Unroll
 
 class CppBuildIntegrationTest extends AbstractIntegrationTest {
     def setup() {
-        gradleVersion = "4.4-rc-5"
+        gradleVersion = "4.5-20171218235901+0000"
     }
 
     def "can generate single project build"() {
@@ -336,22 +336,61 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":").isCppApplication()
 
         def srcDir = build.project(":").file("src/main/cpp")
-        new File(srcDir, "appimpl1api.cpp").text.contains("RepoLib1Api1")
-        new File(srcDir, "appimpl1api.cpp").text.contains("RepoLib1Api2")
-        new File(srcDir, "appimpl1api.cpp").text.contains("RepoLib2Api")
+        new File(srcDir, "appimpl1api.cpp").text.contains("ExtLib1Api1")
+        new File(srcDir, "appimpl1api.cpp").text.contains("ExtLib1Api2")
+        new File(srcDir, "appimpl1api.cpp").text.contains("ExtLib2Api")
 
-        def repoBuild = build(file('repo'))
+        def repoBuild = build(file('external'))
         repoBuild.isBuild()
         repoBuild.project(':').isEmptyProject()
-        repoBuild.project(':repolib1api1').isCppLibrary()
-        repoBuild.project(':repolib1api2').isCppLibrary()
-        repoBuild.project(':repolib2api').isCppLibrary()
+        repoBuild.project(':extlib1api1').isCppLibrary()
+        repoBuild.project(':extlib1api2').isCppLibrary()
+        repoBuild.project(':extlib2api').isCppLibrary()
 
-        repoBuild.buildSucceeds("installDist")
-        new File(repoBuild.rootDir, "build/repo/org/gradle/example/repolib2api/1.2/repolib2api-1.2.pom").file
-        new File(repoBuild.rootDir, "build/repo/org/gradle/example/repolib2api/1.2/repolib2api-1.2-cpp-api-headers.zip").file
+        def serverBuild = build(file('repo-server'))
+        serverBuild.buildSucceeds("installDist")
+        file("http-repo/org/gradle/example/extlib2api/1.2/extlib2api-1.2.pom").file
+        file("http-repo/org/gradle/example/extlib2api/1.2/extlib2api-1.2-cpp-api-headers.zip").file
 
-        def server = repoBuild.app("build/install/repo/bin/repo").start()
+        def server = serverBuild.app("build/install/repo/bin/repo").start()
+        waitFor(new URI("http://localhost:5005"))
+
+        build.buildSucceeds(":installDebug")
+
+        def app = build.app("build/install/main/debug/testApp")
+        app.succeeds()
+
+        build.buildSucceeds("build")
+
+        cleanup:
+        server?.kill()
+    }
+
+    def "can generate single project build with http repo with single library"() {
+        given:
+        useIsolatedUserHome()
+
+        when:
+        new Main().run("cpp", "--http-repo", "--http-repo-libraries", "1", "--dir", projectDir.absolutePath)
+
+        then:
+        build.isBuild()
+        build.project(":").isCppApplication()
+
+        def srcDir = build.project(":").file("src/main/cpp")
+        new File(srcDir, "appimpl1api.cpp").text.contains("ExtLib1Api")
+
+        def repoBuild = build(file('external'))
+        repoBuild.isBuild()
+        repoBuild.project(':').isEmptyProject()
+        repoBuild.project(':extlib1api').isCppLibrary()
+
+        def serverBuild = build(file('repo-server'))
+        serverBuild.buildSucceeds("installDist")
+        file("http-repo/org/gradle/example/extlib1api/1.2/extlib1api-1.2.pom").file
+        file("http-repo/org/gradle/example/extlib1api/1.2/extlib1api-1.2-cpp-api-headers.zip").file
+
+        def server = serverBuild.app("build/install/repo/bin/repo").start()
         waitFor(new URI("http://localhost:5005"))
 
         build.buildSucceeds(":installDebug")

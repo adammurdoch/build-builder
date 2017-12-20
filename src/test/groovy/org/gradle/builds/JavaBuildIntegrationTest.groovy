@@ -167,32 +167,74 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":").isJavaApplication()
 
         def srcDir = build.project(":").file("src/main/java/org/gradle/example/app")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.repolib1api1.RepoLib1Api1.getSomeValue()")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.repolib1api1.RepoLib1Api1.INT_CONST")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.repolib1api2.RepoLib1Api2.getSomeValue()")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.repolib1api2.RepoLib1Api2.INT_CONST")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.app.AppImpl2Api.getSomeValue()")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.app.AppImpl2Api.INT_CONST")
+        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.extlib1api1.ExtLib1Api1.getSomeValue()")
+        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.extlib1api1.ExtLib1Api1.INT_CONST")
+        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.extlib1api2.ExtLib1Api2.getSomeValue()")
+        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.extlib1api2.ExtLib1Api2.INT_CONST")
+        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.extlib2api.ExtLib2Api.getSomeValue()")
 
-        def repoBuild = build(file('repo'))
+        def repoBuild = build(file('external'))
         repoBuild.isBuild()
         repoBuild.project(':').isEmptyProject()
-        repoBuild.project(':repolib1api1').isJavaLibrary()
-        repoBuild.project(':repolib1api2').isJavaLibrary()
-        repoBuild.project(':repolib2api').isJavaLibrary()
+        repoBuild.project(':extlib1api1').isJavaLibrary()
+        repoBuild.project(':extlib1api2').isJavaLibrary()
+        repoBuild.project(':extlib2api').isJavaLibrary()
 
-        repoBuild.buildSucceeds("installDist")
-        new File(repoBuild.rootDir, "build/repo/org/gradle/example/repolib2api/1.2/repolib2api-1.2.jar").file
-        new File(repoBuild.rootDir, "build/repo/org/gradle/example/repolib2api/1.2/repolib2api-1.2.pom").file
+        def serverBuild = build(file('repo-server'))
+        serverBuild.buildSucceeds("installDist")
+        file("http-repo/org/gradle/example/extlib2api/1.2/extlib2api-1.2.pom").file
+        file("http-repo/org/gradle/example/extlib2api/1.2/extlib2api-1.2.jar").file
 
-        def server = repoBuild.app("build/install/repo/bin/repo").start()
+        def server = serverBuild.app("build/install/repo/bin/repo").start()
         waitFor(new URI("http://localhost:5005"))
 
         build.buildSucceeds(":installDist")
 
         def app = build.app("build/install/testApp/bin/testApp")
         app.isApp()
-        app.libDir.list() as Set == ["repolib1api1-1.2.jar", "repolib1api2-1.2.jar", "repolib2api-1.2.jar", "slf4j-api-1.7.25.jar", "testApp.jar"] as Set
+        app.libDir.list() as Set == ["extlib1api1-1.2.jar", "extlib1api2-1.2.jar", "extlib2api-1.2.jar", "slf4j-api-1.7.25.jar", "testApp.jar"] as Set
+        app.succeeds()
+
+        build.buildSucceeds("build")
+
+        cleanup:
+        server?.kill()
+    }
+
+    def "can generate single project build with http repo with single library"() {
+        given:
+        useIsolatedUserHome()
+
+        when:
+        new Main().run("java", "--http-repo", "--http-repo-libraries", "1", "--dir", projectDir.absolutePath)
+
+        then:
+        build.isBuild()
+        build.project(":").isJavaApplication()
+
+        def srcDir = build.project(":").file("src/main/java/org/gradle/example/app")
+        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.extlib1api.ExtLib1Api.getSomeValue()")
+        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.extlib1api.ExtLib1Api.INT_CONST")
+
+        def repoBuild = build(file('external'))
+        repoBuild.isBuild()
+        repoBuild.project(':').isEmptyProject()
+        repoBuild.project(':extlib1api').isJavaLibrary()
+
+        def serverBuild = build(file('repo-server'))
+        serverBuild.buildSucceeds("installDist")
+
+        file("http-repo/org/gradle/example/extlib1api/1.2/extlib1api-1.2.pom").file
+        file("http-repo/org/gradle/example/extlib1api/1.2/extlib1api-1.2.jar").file
+
+        def server = serverBuild.app("build/install/repo/bin/repo").start()
+        waitFor(new URI("http://localhost:5005"))
+
+        build.buildSucceeds(":installDist")
+
+        def app = build.app("build/install/testApp/bin/testApp")
+        app.isApp()
+        app.libDir.list() as Set == ["extlib1api-1.2.jar", "slf4j-api-1.7.25.jar", "testApp.jar"] as Set
         app.succeeds()
 
         build.buildSucceeds("build")
@@ -215,34 +257,37 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":lib2api").isJavaLibrary()
 
         def srcDir = build.project(":").file("src/main/java/org/gradle/example/app")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.repolib1api1.RepoLib1Api1.getSomeValue()")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.repolib1api1.RepoLib1Api1.INT_CONST")
+        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.extlib1api1.ExtLib1Api1.getSomeValue()")
+        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.extlib1api1.ExtLib1Api1.INT_CONST")
+        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.extlib1api2.ExtLib1Api2.getSomeValue()")
+        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.extlib2api.ExtLib2Api.getSomeValue()")
         def libSrcDir = build.project(":lib1api").file("src/main/java/org/gradle/example/lib1api")
-        new File(libSrcDir, "Lib1ApiImpl1Api.java").text.contains("org.gradle.example.repolib1api1.RepoLib1Api1.getSomeValue()")
-        new File(libSrcDir, "Lib1ApiImpl1Api.java").text.contains("org.gradle.example.repolib1api1.RepoLib1Api1.INT_CONST")
+        new File(libSrcDir, "Lib1ApiImpl1Api.java").text.contains("org.gradle.example.extlib1api1.ExtLib1Api1.getSomeValue()")
+        new File(libSrcDir, "Lib1ApiImpl1Api.java").text.contains("org.gradle.example.extlib1api1.ExtLib1Api1.INT_CONST")
         def coreSrcDir = build.project(":lib2api").file("src/main/java/org/gradle/example/lib2api")
-        new File(coreSrcDir, "Lib2ApiImpl1Api.java").text.contains("org.gradle.example.repolib1api1.RepoLib1Api1.getSomeValue()")
-        new File(coreSrcDir, "Lib2ApiImpl1Api.java").text.contains("org.gradle.example.repolib1api1.RepoLib1Api1.INT_CONST")
+        new File(coreSrcDir, "Lib2ApiImpl1Api.java").text.contains("org.gradle.example.extlib1api1.ExtLib1Api1.getSomeValue()")
+        new File(coreSrcDir, "Lib2ApiImpl1Api.java").text.contains("org.gradle.example.extlib1api1.ExtLib1Api1.INT_CONST")
 
-        def repoBuild = build(file('repo'))
+        def repoBuild = build(file('external'))
         repoBuild.isBuild()
         repoBuild.project(':').isEmptyProject()
-        repoBuild.project(':repolib1api1').isJavaLibrary()
-        repoBuild.project(':repolib1api2').isJavaLibrary()
-        repoBuild.project(':repolib2api').isJavaLibrary()
+        repoBuild.project(':extlib1api1').isJavaLibrary()
+        repoBuild.project(':extlib1api2').isJavaLibrary()
+        repoBuild.project(':extlib2api').isJavaLibrary()
 
-        repoBuild.buildSucceeds("installDist")
-        new File(repoBuild.rootDir, "build/repo/org/gradle/example/repolib2api/1.2/repolib2api-1.2.jar").file
-        new File(repoBuild.rootDir, "build/repo/org/gradle/example/repolib2api/1.2/repolib2api-1.2.pom").file
+        def serverBuild = build(file('repo-server'))
+        serverBuild.buildSucceeds("installDist")
+        file("http-repo/org/gradle/example/extlib2api/1.2/extlib2api-1.2.pom").file
+        file("http-repo/org/gradle/example/extlib2api/1.2/extlib2api-1.2.jar").file
 
-        def server = repoBuild.app("build/install/repo/bin/repo").start()
+        def server = serverBuild.app("build/install/repo/bin/repo").start()
         waitFor(new URI("http://localhost:5005"))
 
         build.buildSucceeds(":installDist")
 
         def app = build.app("build/install/testApp/bin/testApp")
         app.isApp()
-        app.libDir.list() as Set == ["repolib1api1-1.2.jar", "repolib1api2-1.2.jar", "repolib2api-1.2.jar", "lib1api.jar", "lib2api.jar", "slf4j-api-1.7.25.jar", "testApp.jar"] as Set
+        app.libDir.list() as Set == ["extlib1api1-1.2.jar", "extlib1api2-1.2.jar", "extlib2api-1.2.jar", "lib1api.jar", "lib2api.jar", "slf4j-api-1.7.25.jar", "testApp.jar"] as Set
         app.succeeds()
 
         build.buildSucceeds("build")
