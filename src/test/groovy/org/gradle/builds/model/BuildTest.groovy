@@ -14,7 +14,7 @@ class BuildTest extends Specification {
 
     def setup() {
         rootDir = tmpDir.newFolder().toPath()
-        build = new Build(rootDir, "testApp")
+        build = new Build(rootDir, "root", "testApp")
     }
 
     def "adds root project"() {

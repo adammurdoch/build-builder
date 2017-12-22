@@ -20,7 +20,7 @@ public class HttpRepoModelStructureAssembler implements ModelStructureAssembler 
         Path repoDir = model.getBuild().getRootDir().resolve("http-repo");
         Path serverDir = model.getBuild().getRootDir().resolve("repo-server");
 
-        Build serverBuild = new Build(serverDir, "repo");
+        Build serverBuild = new Build(serverDir, "HTTP server build", "repo");
         HttpRepository httpRepository = new HttpRepository(repoDir, 5005);
 
         serverBuild.setSettings(new Settings(1, 1));
@@ -31,9 +31,9 @@ public class HttpRepoModelStructureAssembler implements ModelStructureAssembler 
         serverBuild.setTypeNamePrefix("Repo");
         model.addBuild(serverBuild);
 
-        for(int i = 0; i < versionCount; i++) {
-            Path externalSourceDir = model.getBuild().getRootDir().resolve("external/v" + (i + 1));
-            Build libraryBuild = new Build(externalSourceDir, "ext");
+        for(int i = 1; i <= versionCount; i++) {
+            Path externalSourceDir = model.getBuild().getRootDir().resolve("external/v" + i);
+            Build libraryBuild = new Build(externalSourceDir, "external libraries build v" + i, "ext");
             if (libraryCount == 1) {
                 libraryBuild.setSettings(new Settings(1, 1));
                 libraryBuild.setProjectInitializer(new LibraryRootProjectInitializer("Ext", buildInitAction));
@@ -43,10 +43,10 @@ public class HttpRepoModelStructureAssembler implements ModelStructureAssembler 
             }
             libraryBuild.publishAs(new PublicationTarget(httpRepository));
             libraryBuild.setTypeNamePrefix("Ext");
-            libraryBuild.setVersion((i + 1) + ".0");
+            libraryBuild.setVersion(i + ".0");
             model.addBuild(libraryBuild);
 
-            if (i == versionCount - 1) {
+            if (i == versionCount) {
                 model.getBuild().dependsOn(libraryBuild);
             }
 

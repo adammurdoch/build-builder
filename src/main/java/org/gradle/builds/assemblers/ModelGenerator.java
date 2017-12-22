@@ -17,6 +17,7 @@ public class ModelGenerator implements Generator<Model> {
     @Override
     public void generate(Model model, FileGenerator fileGenerator) throws IOException {
         for (Build build : model.getBuilds()) {
+            System.out.println("* Generating " + build);
             buildGenerator.generate(build, fileGenerator);
         }
     }

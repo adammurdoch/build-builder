@@ -4,7 +4,7 @@ import spock.lang.Unroll
 
 class SwiftBuildIntegrationTest extends AbstractIntegrationTest {
     def setup() {
-        gradleVersion = "4.4-20171102235952+0000"
+        gradleVersion = "4.5-20171218235901+0000"
     }
 
     def "can generate single project build"() {
@@ -131,7 +131,7 @@ class SwiftBuildIntegrationTest extends AbstractIntegrationTest {
 
     def "can generate composite build"() {
         when:
-        new Main().run("swift", "--dir", projectDir.absolutePath, "--builds", "2")
+        new Main().run("swift", "--dir", projectDir.absolutePath, "--included-builds", "1")
 
         then:
         build.isBuild()

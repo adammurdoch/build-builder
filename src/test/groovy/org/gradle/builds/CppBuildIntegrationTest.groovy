@@ -298,7 +298,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
 
     def "can generate composite build"() {
         when:
-        new Main().run("cpp", "--dir", projectDir.absolutePath, "--builds", "2")
+        new Main().run("cpp", "--dir", projectDir.absolutePath, "--included-builds", "1")
 
         then:
         build.isBuild()
@@ -321,4 +321,28 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
 
         build.buildSucceeds("build")
     }
+
+    def "can re-generate a build using different values"() {
+        when:
+        new Main().run("cpp", "--projects", "2", "--dir", projectDir.absolutePath)
+
+        then:
+        build.isBuild()
+        build.project(":").isCppApplication()
+        build.project(":lib1api").isCppLibrary()
+
+        when:
+        new Main().run("cpp", "--source-files", "1", "--dir", projectDir.absolutePath)
+
+        then:
+        build.project(":").isCppApplication()
+        build.withGit { git ->
+            def status = git.status().call()
+            assert status.clean
+            assert !status.hasUncommittedChanges()
+            assert status.untracked.empty
+            assert status.untrackedFolders.empty
+        }
+    }
+
 }

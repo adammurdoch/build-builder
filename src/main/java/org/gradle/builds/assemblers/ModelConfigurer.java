@@ -28,6 +28,7 @@ public class ModelConfigurer {
             doPopulate(depBuild, seen);
         }
         if (seen.add(build)) {
+            System.out.println("* Configure " + build);
             buildConfigurer.populate(build);
         }
     }

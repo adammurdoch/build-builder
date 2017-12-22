@@ -9,11 +9,13 @@ import java.util.stream.Collectors;
 
 public class Build {
     private final Path rootDir;
+    private final String displayName;
     private final Project rootProject;
     private final Map<String, Project> projects = new LinkedHashMap<>();
     private Settings settings;
     private final List<Build> dependsOn = new ArrayList<>();
-    private final List<Build> childBuilds = new ArrayList<>();
+    private final List<Build> includedBuilds = new ArrayList<>();
+    private final List<Build> sourceBuilds = new ArrayList<>();
     private final List<PublishedLibrary<?>> publishedLibraries = new ArrayList<>();
     private PublicationTarget publicationTarget;
     private String typeNamePrefix = "";
@@ -21,10 +23,16 @@ public class Build {
     private Project deepestProject;
     private String version = "1.0";
 
-    public Build(Path rootDir, String rootProjectName) {
+    public Build(Path rootDir, String displayName, String rootProjectName) {
         this.rootDir = rootDir;
+        this.displayName = displayName;
         rootProject = new Project(null, rootProjectName, rootDir);
         projects.put(rootProject.getPath(), rootProject);
+    }
+
+    @Override
+    public String toString() {
+        return displayName;
     }
 
     public Path getRootDir() {
@@ -129,12 +137,12 @@ public class Build {
         return typeNamePrefix;
     }
 
-    public List<Build> getChildBuilds() {
-        return childBuilds;
+    public List<Build> getIncludedBuilds() {
+        return includedBuilds;
     }
 
     public void includeBuild(Build build) {
-        childBuilds.add(build);
+        includedBuilds.add(build);
     }
 
     public String getName() {
@@ -155,5 +163,13 @@ public class Build {
 
     public String getVersion() {
         return version;
+    }
+
+    public List<Build> getSourceBuilds() {
+        return sourceBuilds;
+    }
+
+    public void sourceDependency(Build build) {
+        sourceBuilds.add(build);
     }
 }

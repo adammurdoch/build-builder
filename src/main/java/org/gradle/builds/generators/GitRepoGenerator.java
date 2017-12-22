@@ -1,7 +1,6 @@
 package org.gradle.builds.generators;
 
 import org.eclipse.jgit.api.AddCommand;
-import org.eclipse.jgit.api.CommitCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.InitCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -67,9 +66,10 @@ public class GitRepoGenerator implements Generator<Model> {
                     addCommand.addFilepattern(rootDir.relativize(generatedFile).toString());
                 }
                 addCommand.call();
-                CommitCommand commitCommand = git.commit();
-                commitCommand.setMessage("Initial version");
-                commitCommand.call();
+
+                git.commit().setMessage("Initial version").call();
+                git.tagDelete().setTags(build.getVersion()).call();
+                git.tag().setName(build.getVersion()).call();
             }
         } catch (GitAPIException e) {
             throw new RuntimeException("Could not create Git repository.", e);

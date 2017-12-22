@@ -2,10 +2,10 @@ package org.gradle.builds.assemblers;
 
 import org.gradle.builds.model.Model;
 
-public class SingleBuildModelStructureAssembler implements ModelStructureAssembler {
+public class MainBuildModelStructureAssembler implements ModelStructureAssembler {
     private final ProjectInitializer projectInitializer;
 
-    public SingleBuildModelStructureAssembler(ProjectInitializer projectInitializer) {
+    public MainBuildModelStructureAssembler(ProjectInitializer projectInitializer) {
         this.projectInitializer = projectInitializer;
     }
 

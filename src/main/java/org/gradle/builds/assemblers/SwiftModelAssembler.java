@@ -42,11 +42,11 @@ public class SwiftModelAssembler extends AbstractModelAssembler {
             mainSourceFile.addClass(appClass);
 
             BuildScript buildScript = project.getBuildScript();
-            buildScript.requirePlugin("swift-executable");
+            buildScript.requirePlugin("swift-application");
             buildScript.requirePlugin("xctest");
             addDependencies(project, application, buildScript);
             if (application.isSwiftPm()) {
-                buildScript.block("executable").property("source.from", new Scope.Code("rootProject.file('Sources/" + project.getName() + "')"));
+                buildScript.block("application").property("source.from", new Scope.Code("rootProject.file('Sources/" + project.getName() + "')"));
             }
 
             addSource(project, application, appClass, mainSourceFile);

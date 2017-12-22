@@ -7,7 +7,7 @@ Supported build types:
 - Java application
 - Android application
 - C++ application (Gradle 4.2 and later)
-- Swift application (Gradle 4.4 and later)
+- Swift application (Gradle 4.5 and later)
 
 Generates one or more projects with source files. Can also be used to add source files to an existing skeleton build. 
 The source files have dependencies between each other, as described below.
@@ -17,7 +17,9 @@ Generates XCTest unit tests for Swift projects.
 
 Can optionally generate a composite build.
 
-Can optionally generate a local HTTP repository and server.
+Can optionally generate a build that uses dependencies from a local HTTP repository. Also generates an HTTP server for this repository.
+
+Can optionally generate a build with source dependencies.
 
 Can optionally generate a Swift Package Manager build for Swift projects.
 
@@ -43,13 +45,15 @@ The `--projects` option specifies the number of projects. Default is 1.
 
 The `--source-files` option specifies the number of source files per project. Default is 3.
 
-The `--builds` option specifies the number of builds to generate. Set to greater than 1 to generate a composite build. Default is 1.
+The `--included-builds` option specifies the number of additional included builds to generate. Set to greater than 0 to generate a composite build. Default is 0.
 
 The `--http-repo` option generates an additional build that produces an HTTP Maven repository that provides external libraries. This repository and its classes are referenced by the generated build. Use `gradle -p repo-server run` to build the libraries and start the HTTP server. Not available for Swift builds.
 
 The `--http-repo-libraries` option specifies the number of libraries to include in the HTTP repository. Default is 3.
 
 The `--http-repo-versions` option specifies the number of versions for each library to include in the HTTP repository. Default is 1.
+
+The `--source-dep-libraries` option specifies the number of libraries to include as source dependencies. Default is 0.
 
 #### Android specific options
 
@@ -146,6 +150,7 @@ Here's an example:
     - Generates a deep and narrow graph, should be wider and have more independent paths
     - Each layer should leak into other layers
     - More incoming and api dependencies
+- Does not clean up previously generated files when build is re-generated.
 - Generated classes are small.
 - There are no transitive API classes. 
 - There are no type hierarchies.

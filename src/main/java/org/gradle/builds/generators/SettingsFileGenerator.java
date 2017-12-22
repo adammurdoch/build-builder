@@ -20,11 +20,30 @@ public class SettingsFileGenerator implements Generator<Build> {
                 }
             }
 
-            if (!build.getChildBuilds().isEmpty()) {
+            if (!build.getIncludedBuilds().isEmpty()) {
                 printWriter.println();
-                for (Build childBuild : build.getChildBuilds()) {
+                for (Build childBuild : build.getIncludedBuilds()) {
                     printWriter.println("includeBuild '" + build.getRootDir().relativize(childBuild.getRootDir()) + "'");
                 }
+            }
+
+            if (!build.getSourceBuilds().isEmpty()) {
+                printWriter.println();
+                printWriter.println("sourceControl.vcsMappings {");
+                printWriter.println("    addRule('??') { details ->");
+                printWriter.println("        if (requested instanceof ModuleComponentSelector) {");
+                for (Build childBuild : build.getSourceBuilds()) {
+                    for (Project project : childBuild.getProjects()) {
+                        printWriter.println("            if (requested.group == 'org.gradle.example' && requested.module == '" + project.getName() + "') {");
+                        printWriter.println("                from vcs(GitVersionControlSpec) {");
+                        printWriter.println("                    url = uri('" + childBuild.getRootDir().toUri() + "')");
+                        printWriter.println("                }");
+                        printWriter.println("            }");
+                    }
+                }
+                printWriter.println("        }");
+                printWriter.println("    }");
+                printWriter.println("}");
             }
         });
     }

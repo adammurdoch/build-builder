@@ -17,7 +17,7 @@ class StructureAssemblerTest extends Specification {
         void initLibraryProject(Project project) {
         }
     }
-    def build = new Build(Paths.get("dir"), "testApp")
+    def build = new Build(Paths.get("dir"), "root", "testApp")
 
     def "builds dependency graph with one project"() {
         when:

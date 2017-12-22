@@ -15,10 +15,10 @@ public class IncludedBuildAssembler implements ModelStructureAssembler {
 
     @Override
     public void attachBuilds(Settings settings, Model model) {
-        for (int i = 1; i < builds; i++) {
+        for (int i = 1; i <= builds; i++) {
             String name = "child" + i;
             String typeName = "Child" + i;
-            Build childBuild = new Build(model.getBuild().getRootDir().resolve(name), name);
+            Build childBuild = new Build(model.getBuild().getRootDir().resolve(name), "included build " + i, name);
             childBuild.setSettings(new Settings(3, settings.getSourceFileCount()));
             childBuild.setProjectInitializer(initializer);
             childBuild.setTypeNamePrefix(typeName);

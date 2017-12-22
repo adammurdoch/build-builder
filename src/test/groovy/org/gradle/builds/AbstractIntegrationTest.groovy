@@ -2,12 +2,13 @@ package org.gradle.builds
 
 import junit.framework.AssertionFailedError
 import org.eclipse.jgit.api.Git
-import org.eclipse.jgit.lib.Repository
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
+
+import java.util.function.Consumer
 
 abstract class AbstractIntegrationTest extends Specification {
     @Rule
@@ -121,20 +122,27 @@ abstract class AbstractIntegrationTest extends Specification {
             return new File(rootDir, path)
         }
 
+        void withGit(Consumer<Git> cl) {
+            def repository = FileRepositoryBuilder.create(file(".git"))
+            try {
+                def git = new Git(repository)
+                cl.accept(git)
+            } finally {
+                repository.close()
+            }
+
+        }
+
         // TODO - add more checks
         void isBuild() {
             assert rootDir.directory
             assert file("settings.gradle").file
             project(':').isProject()
-            def repository = FileRepositoryBuilder.create(file(".git"))
-            try {
-                def git = new Git(repository)
+            withGit { git ->
                 def status = git.status().call()
                 assert !status.hasUncommittedChanges()
                 assert status.untracked.empty
                 assert status.untrackedFolders.empty
-            } finally {
-                repository.close()
             }
         }
 
@@ -303,14 +311,14 @@ abstract class AbstractIntegrationTest extends Specification {
 
         void isCppApplication() {
             isCppProject()
-            appliesPlugin("cpp-executable")
+            appliesPlugin("cpp-application")
             doesNotApplyPlugin("cpp-library")
         }
 
         void isCppLibrary() {
             isCppProject()
             appliesPlugin("cpp-library")
-            doesNotApplyPlugin("cpp-executable")
+            doesNotApplyPlugin("cpp-application")
         }
 
         // TODO - add more checks
@@ -328,7 +336,7 @@ abstract class AbstractIntegrationTest extends Specification {
 
         void isSwiftApplication() {
             isSwiftProject()
-            appliesPlugin('swift-executable')
+            appliesPlugin('swift-application')
             doesNotApplyPlugin('swift-library')
             def srcDir = file("src/main/swift")
             assert new File(srcDir, "main.swift").file
@@ -337,7 +345,7 @@ abstract class AbstractIntegrationTest extends Specification {
         void isSwiftLibrary() {
             isSwiftProject()
             appliesPlugin('swift-library')
-            doesNotApplyPlugin('swift-executable')
+            doesNotApplyPlugin('swift-application')
         }
 
         // TODO - add more checks

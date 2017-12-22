@@ -125,7 +125,7 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
 
     def "can generate composite build"() {
         when:
-        new Main().run("java", "--dir", projectDir.absolutePath, "--builds", "2")
+        new Main().run("java", "--dir", projectDir.absolutePath, "--included-builds", "1")
 
         then:
         build.isBuild()
@@ -155,7 +155,7 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
 
     def "can generate composite build with 3 builds"() {
         when:
-        new Main().run("java", "--dir", projectDir.absolutePath, "--builds", "3")
+        new Main().run("java", "--dir", projectDir.absolutePath, "--included-builds", "2")
 
         then:
         build.isBuild()

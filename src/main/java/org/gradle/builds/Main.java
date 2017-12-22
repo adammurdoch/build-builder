@@ -80,7 +80,7 @@ public class Main {
             System.out.println("* Adding source to build in " + rootDir);
             System.out.println("* Source files per project: " + sourceFiles);
 
-            Build build = new Build(rootDir, "testApp");
+            Build build = new Build(rootDir, "main build", "testApp");
 
             // Inspect model
             BuildConfigurer modelAssembler = new AllTypesProjectDecorator();
@@ -108,8 +108,11 @@ public class Main {
         @Option(name = "--projects", description = "The number of projects to include in the build (default: 1)")
         int projects = 1;
 
-        @Option(name = "--builds", description = "The number of builds to generate (default: 1)")
-        int builds = 1;
+        @Option(name = "--included-builds", description = "The number of included builds to generate (default: 0)")
+        int builds = 0;
+
+        @Option(name = "--source-dep-libraries", description = "The number of source dependency libraries to generate (default: 0)")
+        int sourceDeps = 0;
 
         @Override
         public Void call() throws Exception {
@@ -126,7 +129,7 @@ public class Main {
 
             Settings settings = createSettings();
 
-            Model model = new Model(new Build(rootDir, "testApp"));
+            Model model = new Model(new Build(rootDir, "main build", "testApp"));
 
             // Create build structure
             createModelStructureAssembler().attachBuilds(settings, model);
@@ -162,9 +165,6 @@ public class Main {
             }
             if (sourceFiles < 1) {
                 collector.problem("Minimum of 1 source files per project required.");
-            }
-            if (getBuilds() < 1) {
-                collector.problem("Minimum of 1 build required.");
             }
         }
 
@@ -207,9 +207,10 @@ public class Main {
         private ModelStructureAssembler createModelStructureAssembler() {
             ProjectInitializer projectInitializer = createProjectInitializer();
             ModelStructureAssembler mainBuildAssembler = new CompositeModelStructureAssembler(
-                    new SingleBuildModelStructureAssembler(projectInitializer),
+                    new MainBuildModelStructureAssembler(projectInitializer),
                     new IncludedBuildAssembler(projectInitializer,
-                            getBuilds()));
+                            getBuilds()),
+                    new SourceDependencyBuildAssembler(projectInitializer, sourceDeps));
             if (isHttpRepo()) {
                 return new CompositeModelStructureAssembler(
                         mainBuildAssembler,
