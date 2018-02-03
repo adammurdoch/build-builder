@@ -1,7 +1,8 @@
 package org.gradle.builds.assemblers;
 
 import org.gradle.builds.model.Build;
-import org.gradle.builds.model.MutableBuildTree;
+import org.gradle.builds.model.BuildSettingsBuilder;
+import org.gradle.builds.model.BuildTreeBuilder;
 import org.gradle.builds.model.PublicationTarget;
 
 public class SourceDependencyBuildAssembler implements BuildTreeAssembler {
@@ -14,9 +15,9 @@ public class SourceDependencyBuildAssembler implements BuildTreeAssembler {
     }
 
     @Override
-    public void attachBuilds(Settings settings, MutableBuildTree model) {
+    public void attachBuilds(Settings settings, BuildTreeBuilder model) {
         if (sourceDependencies > 0) {
-            Build childBuild = new Build(model.getRootDir().resolve("external/source"), "source dependency build", "src");
+            BuildSettingsBuilder childBuild = new BuildSettingsBuilder(model.getRootDir().resolve("external/source"), "source dependency build", "src");
             childBuild.setSettings(new Settings(sourceDependencies + 1, 1));
             childBuild.setProjectInitializer(initializer);
             childBuild.setTypeNamePrefix("Src");

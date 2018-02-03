@@ -16,24 +16,29 @@ public class HttpRepoModelStructureAssembler implements BuildTreeAssembler {
     }
 
     @Override
-    public void attachBuilds(Settings settings, MutableBuildTree model) {
+    public void attachBuilds(Settings settings, BuildTreeBuilder model) {
         Path repoDir = model.getRootDir().resolve("http-repo");
         Path serverDir = model.getRootDir().resolve("repo-server");
 
-        Build serverBuild = new Build(serverDir, "HTTP server build", "repo");
+        BuildSettingsBuilder serverBuild = new BuildSettingsBuilder(serverDir, "HTTP server build", "repo");
+
         HttpRepository httpRepository = new HttpRepository(repoDir, 5005);
+        HttpServerImplementation httpServerImplementation = new HttpServerImplementation(httpRepository);
 
         serverBuild.setSettings(new Settings(1, 1));
-        serverBuild.setProjectInitializer(new EmptyRootProjectInitializer(buildInitAction));
+        serverBuild.setProjectInitializer(new EmptyRootProjectInitializer(buildInitAction){
+            @Override
+            public void initRootProject(Project project) {
+                project.addComponent(httpServerImplementation);
+            }
+        });
         serverBuild.publishAs(new PublicationTarget(httpRepository));
-        HttpServerImplementation httpServerImplementation = new HttpServerImplementation(httpRepository);
-        serverBuild.getRootProject().addComponent(httpServerImplementation);
         serverBuild.setTypeNamePrefix("Repo");
         model.addBuild(serverBuild);
 
         for(int i = 1; i <= versionCount; i++) {
             Path externalSourceDir = model.getRootDir().resolve("external/v" + i);
-            Build libraryBuild = new Build(externalSourceDir, "external libraries build v" + i, "ext");
+            BuildSettingsBuilder libraryBuild = new BuildSettingsBuilder(externalSourceDir, "external libraries build v" + i, "ext");
             if (libraryCount == 1) {
                 libraryBuild.setSettings(new Settings(1, 1));
                 libraryBuild.setProjectInitializer(new LibraryRootProjectInitializer("Ext", buildInitAction));

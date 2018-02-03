@@ -1,6 +1,7 @@
 package org.gradle.builds.assemblers
 
-import org.gradle.builds.model.Build
+import org.gradle.builds.model.BuildSettingsBuilder
+import org.gradle.builds.model.BuildTreeBuilder
 import org.gradle.builds.model.Project
 import spock.lang.Specification
 
@@ -17,11 +18,10 @@ class StructureAssemblerTest extends Specification {
         void initLibraryProject(Project project) {
         }
     }
-    def build = new Build(Paths.get("dir"), "root", "testApp")
 
     def "builds dependency graph with one project"() {
         when:
-        build.settings = projects(1)
+        def build = projects(1)
         assembler.arrangeProjects(build, initializer)
 
         then:
@@ -32,7 +32,7 @@ class StructureAssemblerTest extends Specification {
 
     def "builds dependency graph with two projects"() {
         when:
-        build.settings = projects(2)
+        def build = projects(2)
         assembler.arrangeProjects(build, initializer)
 
         then:
@@ -45,7 +45,7 @@ class StructureAssemblerTest extends Specification {
 
     def "builds dependency graph with three projects"() {
         when:
-        build.settings = projects(3)
+        def build = projects(3)
         assembler.arrangeProjects(build, initializer)
 
         then:
@@ -63,7 +63,7 @@ class StructureAssemblerTest extends Specification {
 
     def "builds dependency graph with four projects"() {
         when:
-        build.settings = projects(4)
+        def build = projects(4)
         assembler.arrangeProjects(build, initializer)
 
         then:
@@ -83,7 +83,7 @@ class StructureAssemblerTest extends Specification {
 
     def "builds dependency graph with five projects"() {
         when:
-        build.settings = projects(5)
+        def build = projects(5)
         assembler.arrangeProjects(build, initializer)
 
         then:
@@ -104,7 +104,9 @@ class StructureAssemblerTest extends Specification {
     }
 
     def projects(int p) {
-        return new Settings(p, 3)
+        def builder = new BuildTreeBuilder(Paths.get("dir"), new BuildSettingsBuilder(Paths.get("dir"), "root", "testApp"))
+        builder.mainBuild.settings = new Settings(p, 3)
+        builder.toModel().build
     }
 
     def api(Project p) {

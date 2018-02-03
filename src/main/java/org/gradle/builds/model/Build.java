@@ -12,20 +12,28 @@ public class Build {
     private final String displayName;
     private final Project rootProject;
     private final Map<String, Project> projects = new LinkedHashMap<>();
-    private Settings settings;
-    private final List<Build> dependsOn = new ArrayList<>();
-    private final List<Build> includedBuilds = new ArrayList<>();
-    private final List<Build> sourceBuilds = new ArrayList<>();
+    private final List<Build> dependsOn;
+    private final List<Build> includedBuilds;
+    private final List<Build> sourceBuilds;
     private final List<PublishedLibrary<?>> publishedLibraries = new ArrayList<>();
-    private PublicationTarget publicationTarget;
-    private String typeNamePrefix = "";
-    private ProjectInitializer projectInitializer;
+    private final Settings settings;
+    private final PublicationTarget publicationTarget;
+    private final String typeNamePrefix;
+    private final ProjectInitializer projectInitializer;
+    private final String version;
     private Project deepestProject;
-    private String version = "1.0.0";
 
-    public Build(Path rootDir, String displayName, String rootProjectName) {
+    public Build(Path rootDir, String displayName, String rootProjectName, Settings settings, PublicationTarget publicationTarget, String typeNamePrefix, ProjectInitializer projectInitializer, String version, List<Build> dependsOn, List<Build> includedBuilds, List<Build> sourceBuilds) {
         this.rootDir = rootDir;
         this.displayName = displayName;
+        this.settings = settings;
+        this.publicationTarget = publicationTarget;
+        this.typeNamePrefix = typeNamePrefix;
+        this.projectInitializer = projectInitializer;
+        this.version = version;
+        this.dependsOn = dependsOn;
+        this.includedBuilds = includedBuilds;
+        this.sourceBuilds = sourceBuilds;
         rootProject = new Project(null, rootProjectName, rootDir);
         projects.put(rootProject.getPath(), rootProject);
     }
@@ -93,14 +101,6 @@ public class Build {
         return projectInitializer;
     }
 
-    public void setProjectInitializer(ProjectInitializer projectInitializer) {
-        this.projectInitializer = projectInitializer;
-    }
-
-    public void setSettings(Settings settings) {
-        this.settings = settings;
-    }
-
     public Settings getSettings() {
         return settings;
     }
@@ -117,20 +117,8 @@ public class Build {
         return publicationTarget;
     }
 
-    public void publishAs(PublicationTarget publicationTarget) {
-        this.publicationTarget = publicationTarget;
-    }
-
     public List<Build> getDependsOn() {
         return dependsOn;
-    }
-
-    public void dependsOn(Build build) {
-        this.dependsOn.add(build);
-    }
-
-    public void setTypeNamePrefix(String projectNamePrefix) {
-        this.typeNamePrefix = projectNamePrefix;
     }
 
     public String getTypeNamePrefix() {
@@ -139,10 +127,6 @@ public class Build {
 
     public List<Build> getIncludedBuilds() {
         return includedBuilds;
-    }
-
-    public void includeBuild(Build build) {
-        includedBuilds.add(build);
     }
 
     public String getName() {
@@ -157,19 +141,11 @@ public class Build {
         return deepestProject;
     }
 
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
     public String getVersion() {
         return version;
     }
 
     public List<Build> getSourceBuilds() {
         return sourceBuilds;
-    }
-
-    public void sourceDependency(Build build) {
-        sourceBuilds.add(build);
     }
 }

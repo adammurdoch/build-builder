@@ -3,10 +3,10 @@ package org.gradle.builds;
 import io.airlift.airline.*;
 import org.gradle.builds.assemblers.*;
 import org.gradle.builds.generators.*;
-import org.gradle.builds.model.Build;
+import org.gradle.builds.model.BuildSettingsBuilder;
+import org.gradle.builds.model.BuildTreeBuilder;
 import org.gradle.builds.model.MacroIncludes;
 import org.gradle.builds.model.Model;
-import org.gradle.builds.model.MutableBuildTree;
 
 import java.io.File;
 import java.io.IOException;
@@ -92,7 +92,7 @@ public class Main {
             Settings settings = createSettings();
 
             // Create build tree
-            MutableBuildTree buildTree = new MutableBuildTree(new Build(rootDir, "main build", "testApp"));
+            BuildTreeBuilder buildTree = new BuildTreeBuilder(rootDir, new BuildSettingsBuilder(rootDir, "main build", "testApp"));
             createModelStructureAssembler().attachBuilds(settings, buildTree);
 
             // Configure projects

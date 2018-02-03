@@ -59,6 +59,7 @@ class JavaBuildHttpRepoIntegrationTest extends AbstractIntegrationTest {
     def "can generate single project build with http repo with single library"() {
         given:
         useIsolatedUserHome()
+        gradleVersion = '4.1'
 
         when:
         new Main().run("java", "--http-repo", "--http-repo-libraries", "1", "--dir", projectDir.absolutePath)

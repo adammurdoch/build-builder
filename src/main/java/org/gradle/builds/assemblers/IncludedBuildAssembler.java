@@ -1,7 +1,7 @@
 package org.gradle.builds.assemblers;
 
-import org.gradle.builds.model.Build;
-import org.gradle.builds.model.MutableBuildTree;
+import org.gradle.builds.model.BuildSettingsBuilder;
+import org.gradle.builds.model.BuildTreeBuilder;
 import org.gradle.builds.model.PublicationTarget;
 
 public class IncludedBuildAssembler implements BuildTreeAssembler {
@@ -14,11 +14,11 @@ public class IncludedBuildAssembler implements BuildTreeAssembler {
     }
 
     @Override
-    public void attachBuilds(Settings settings, MutableBuildTree model) {
+    public void attachBuilds(Settings settings, BuildTreeBuilder model) {
         for (int i = 1; i <= builds; i++) {
             String name = "child" + i;
             String typeName = "Child" + i;
-            Build childBuild = new Build(model.getRootDir().resolve(name), "included build " + i, name);
+            BuildSettingsBuilder childBuild = new BuildSettingsBuilder(model.getRootDir().resolve(name), "included build " + i, name);
             childBuild.setSettings(new Settings(3, settings.getSourceFileCount()));
             childBuild.setProjectInitializer(initializer);
             childBuild.setTypeNamePrefix(typeName);
