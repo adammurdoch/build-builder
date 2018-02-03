@@ -33,5 +33,31 @@ public class DotGenerator implements Generator<Model> {
             }
             writer.println("}");
         });
+        Path htmlFile = model.getBuild().getRootDir().resolve("dependencies.html");
+        fileGenerator.generate(htmlFile, writer -> {
+            writer.println("<!DOCTYPE html>");
+            writer.println("<html>");
+            writer.println("<head>");
+            writer.println("</head>");
+            writer.println("<body>");
+            writer.println("<div class=\"mermaid\">");
+            writer.println("graph LR");
+            for (Build build : model.getBuilds()) {
+                for (Project project : build.getProjects()) {
+                    for (Dependency<Library<?>> library : project.getRequiredLibraries(Object.class)) {
+                        writer.print("  ");
+                        writer.print(project.getName() + "(" + project.getName() + ")");
+                        writer.print(library.isApi() ? " -- API --> " : " --> ");
+                        writer.print(library.getTarget().getDisplayName() + "(" + library.getTarget().getDisplayName() + ")");
+                        writer.println();
+                    }
+                }
+            }
+            writer.println("</div>");
+            writer.println("<script src=\"https://unpkg.com/mermaid@7.1.2/dist/mermaid.min.js\"></script>");
+            writer.println("<script>mermaid.initialize({startOnLoad:true});</script>");
+            writer.println("</body>");
+            writer.println("</html>");
+        });
     }
 }

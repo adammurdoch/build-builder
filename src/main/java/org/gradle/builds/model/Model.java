@@ -1,14 +1,14 @@
 package org.gradle.builds.model;
 
-import java.util.*;
+import java.util.List;
 
 public class Model {
     private final Build build;
-    private final List<Build> builds = new ArrayList<>();
+    private final List<Build> builds;
 
-    public Model(Build build) {
+    public Model(Build build, List<Build> builds) {
         this.build = build;
-        builds.add(build);
+        this.builds = builds;
     }
 
     /**
@@ -16,10 +16,6 @@ public class Model {
      */
     public Build getBuild() {
         return build;
-    }
-
-    public void addBuild(Build build) {
-        builds.add(build);
     }
 
     public List<Build> getBuilds() {

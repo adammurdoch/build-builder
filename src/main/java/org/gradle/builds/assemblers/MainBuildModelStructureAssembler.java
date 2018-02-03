@@ -1,8 +1,8 @@
 package org.gradle.builds.assemblers;
 
-import org.gradle.builds.model.Model;
+import org.gradle.builds.model.MutableBuildTree;
 
-public class MainBuildModelStructureAssembler implements ModelStructureAssembler {
+public class MainBuildModelStructureAssembler implements BuildTreeAssembler {
     private final ProjectInitializer projectInitializer;
 
     public MainBuildModelStructureAssembler(ProjectInitializer projectInitializer) {
@@ -10,8 +10,8 @@ public class MainBuildModelStructureAssembler implements ModelStructureAssembler
     }
 
     @Override
-    public void attachBuilds(Settings settings, Model model) {
-        model.getBuild().setSettings(settings);
-        model.getBuild().setProjectInitializer(projectInitializer);
+    public void attachBuilds(Settings settings, MutableBuildTree model) {
+        model.getMainBuild().setSettings(settings);
+        model.getMainBuild().setProjectInitializer(projectInitializer);
     }
 }

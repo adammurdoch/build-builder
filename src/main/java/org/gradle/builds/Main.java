@@ -3,10 +3,10 @@ package org.gradle.builds;
 import io.airlift.airline.*;
 import org.gradle.builds.assemblers.*;
 import org.gradle.builds.generators.*;
-import org.gradle.builds.inspectors.BuildInspector;
 import org.gradle.builds.model.Build;
 import org.gradle.builds.model.MacroIncludes;
 import org.gradle.builds.model.Model;
+import org.gradle.builds.model.MutableBuildTree;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,7 +35,6 @@ public class Main {
         cliBuilder.withCommand(InitCppBuild.class);
         cliBuilder.withCommand(InitAndroidBuild.class);
         cliBuilder.withCommand(InitSwiftBuild.class);
-        cliBuilder.withCommand(AddSource.class);
         cliBuilder.withCommand(Help.class);
         cliBuilder.withDefaultCommand(Help.class);
         Cli<Callable<Void>> cli = cliBuilder.build();
@@ -62,43 +61,6 @@ public class Main {
     public static abstract class SourceGenerationCommand implements Callable<Void> {
         @Option(name = "--source-files", description = "The number of source files to generate for each project (default: 3)")
         int sourceFiles = 3;
-    }
-
-    @Command(name = "add-source", description = "Generates source files for an existing build")
-    public static class AddSource extends SourceGenerationCommand {
-        @Option(name = "--dir", description = "The build to add source to (default: current directory)")
-        String rootDir = ".";
-
-        @Override
-        public Void call() throws Exception {
-            if (sourceFiles < 1) {
-                throw new IllegalArgumentException("Minimum of 1 source files per project.");
-            }
-
-            Path rootDir = new File(this.rootDir).getCanonicalFile().toPath();
-
-            System.out.println("* Adding source to build in " + rootDir);
-            System.out.println("* Source files per project: " + sourceFiles);
-
-            Build build = new Build(rootDir, "main build", "testApp");
-
-            // Inspect model
-            BuildConfigurer modelAssembler = new AllTypesProjectDecorator();
-            Settings settings = new Settings(build.getProjects().size(), sourceFiles);
-            build.setSettings(settings);
-            new BuildInspector().inspect(build);
-
-            System.out.println("* Projects: " + build.getProjects().size());
-
-            new StructureAssembler().arrangeClasses(build);
-            modelAssembler.populate(build);
-
-            new AndroidStringResourcesGenerator().generate(build, new CollectingFileGenerator());
-            new JavaSourceGenerator().generate(build, new CollectingFileGenerator());
-            new CppSourceGenerator().generate(build, new CollectingFileGenerator());
-
-            return null;
-        }
     }
 
     public static abstract class InitBuild extends SourceGenerationCommand {
@@ -129,12 +91,12 @@ public class Main {
 
             Settings settings = createSettings();
 
-            Model model = new Model(new Build(rootDir, "main build", "testApp"));
+            // Create build tree
+            MutableBuildTree buildTree = new MutableBuildTree(new Build(rootDir, "main build", "testApp"));
+            createModelStructureAssembler().attachBuilds(settings, buildTree);
 
-            // Create build structure
-            createModelStructureAssembler().attachBuilds(settings, model);
-
-            // Configure model
+            // Configure projects
+            Model model = buildTree.toModel();
             createModelConfigurer().populate(model);
 
             // Generate files
@@ -204,9 +166,9 @@ public class Main {
                     new GitRepoGenerator());
         }
 
-        private ModelStructureAssembler createModelStructureAssembler() {
+        private BuildTreeAssembler createModelStructureAssembler() {
             ProjectInitializer projectInitializer = createProjectInitializer();
-            ModelStructureAssembler mainBuildAssembler = new CompositeModelStructureAssembler(
+            BuildTreeAssembler mainBuildAssembler = new CompositeModelStructureAssembler(
                     new MainBuildModelStructureAssembler(projectInitializer),
                     new IncludedBuildAssembler(projectInitializer,
                             getBuilds()),

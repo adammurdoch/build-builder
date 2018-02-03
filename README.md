@@ -71,14 +71,6 @@ The `--boost` option specifies that the source files include references to the b
 
 The `--swift-pm` option uses Swift package manager source conventions, and also generates a Swift PM build file.
 
-#### Add source files to an existing build
-
-`build-builder add-source [options]`
-
-The `--dir` option specifies the directory containing the build to add source files to. Default is the current directory.
-
-The `--source-files` option specifies the number of source files per project. Default is 3.
-
 ### Build structure and dependency graph
 
 The root project will define an application of the relevant type, and all other projects will define a library of the relevant type. 
