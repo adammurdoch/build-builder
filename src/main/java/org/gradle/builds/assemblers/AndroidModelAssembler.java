@@ -5,7 +5,7 @@ import org.gradle.builds.model.*;
 import java.util.Collections;
 
 public class AndroidModelAssembler extends JvmModelAssembler {
-    public static final String defaultVersion = "2.3.2";
+    public static final String defaultVersion = "3.0.0";
     private static final PublishedLibrary<JavaLibraryApi> supportUtils = new PublishedLibrary<>("support-core-utils", new ExternalDependencyDeclaration("com.android.support:support-core-utils:25.1.0"), new JavaLibraryApi("support-core-utils", Collections.singletonList(JavaClassApi.field("android.support.v4.app.NavUtils", "PARENT_ACTIVITY"))));
     private final String pluginVersion;
 
@@ -20,9 +20,7 @@ public class AndroidModelAssembler extends JvmModelAssembler {
         if (pluginVersion.startsWith("2.5.")) {
             buildScript.buildScriptBlock().mavenLocal();
         }
-        if (pluginVersion.startsWith("3.0.0")) {
-            buildScript.buildScriptBlock().google();
-        }
+        buildScript.buildScriptBlock().google();
         buildScript.buildScriptBlock().jcenter();
         buildScript.requireOnBuildScriptClasspath("com.android.tools.build:gradle:" + pluginVersion);
     }
@@ -48,14 +46,14 @@ public class AndroidModelAssembler extends JvmModelAssembler {
             addApplicationResources(androidApplication);
 
             ScriptBlock androidBlock = buildScript.block("android");
-            androidBlock.property("buildToolsVersion", "25.0.0");
-            androidBlock.property("compileSdkVersion", 25);
+            androidBlock.property("buildToolsVersion", "26.0.2");
+            androidBlock.property("compileSdkVersion", 26);
             ScriptBlock configBlock = androidBlock.block("defaultConfig");
             configBlock.property("applicationId", androidApplication.getPackageName());
             configBlock.property("minSdkVersion", 21);
-            configBlock.property("targetSdkVersion", 25);
+            configBlock.property("targetSdkVersion", 26);
             configBlock.property("versionCode", 1);
-            configBlock.property("versionName", "1.0");
+            configBlock.property("versionName", "1.0.0");
             configBlock.property("testInstrumentationRunner", "android.support.test.runner.AndroidJUnitRunner");
 
             addSourceFiles(project, androidApplication, appActivity, rClass);
@@ -80,13 +78,13 @@ public class AndroidModelAssembler extends JvmModelAssembler {
             addDependencies(project, androidLibrary, buildScript);
 
             ScriptBlock androidBlock = buildScript.block("android");
-            androidBlock.property("buildToolsVersion", "25.0.0");
-            androidBlock.property("compileSdkVersion", 25);
+            androidBlock.property("buildToolsVersion", "26.0.2");
+            androidBlock.property("compileSdkVersion", 26);
             ScriptBlock configBlock = androidBlock.block("defaultConfig");
             configBlock.property("minSdkVersion", 21);
-            configBlock.property("targetSdkVersion", 25);
+            configBlock.property("targetSdkVersion", 26);
             configBlock.property("versionCode", 1);
-            configBlock.property("versionName", "1.0");
+            configBlock.property("versionName", "1.0.0");
             configBlock.property("testInstrumentationRunner", "android.support.test.runner.AndroidJUnitRunner");
 
             addSourceFiles(project, androidLibrary, libraryActivity, rClass);

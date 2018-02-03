@@ -1,6 +1,6 @@
 package org.gradle.builds
 
-class AndroidBuildHttpRepoIntegrationTest extends AbstractIntegrationTest {
+class AndroidBuildHttpRepoIntegrationTest extends AbstractAndroidIntegrationTest {
     def "can generate single project build with http repo"() {
         given:
         useIsolatedUserHome()
@@ -40,7 +40,7 @@ class AndroidBuildHttpRepoIntegrationTest extends AbstractIntegrationTest {
         waitFor(new URI("http://localhost:5005"))
 
         build.buildSucceeds(":assembleDebug")
-        file("build/outputs/apk/testApp-debug.apk").exists()
+        file("build/outputs/apk/debug/testApp-debug.apk").exists()
 
         build.buildSucceeds("build")
 
@@ -92,7 +92,7 @@ class AndroidBuildHttpRepoIntegrationTest extends AbstractIntegrationTest {
         waitFor(new URI("http://localhost:5005"))
 
         build.buildSucceeds(":assembleDebug")
-        file("build/outputs/apk/testApp-debug.apk").exists()
+        file("build/outputs/apk/debug/testApp-debug.apk").exists()
 
         build.buildSucceeds("build")
 

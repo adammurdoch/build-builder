@@ -59,7 +59,7 @@ The `--source-dep-libraries` option specifies the number of libraries to include
 
 The `--java` option includes some Java libraries in an Android build. Default is false. 
 
-The `--version` option specifies the Android plugin version to use. Default is `2.3.1`.
+The `--version` option specifies the Android plugin version to use. Default is `3.0.0`.
 
 #### C++ specific options
 

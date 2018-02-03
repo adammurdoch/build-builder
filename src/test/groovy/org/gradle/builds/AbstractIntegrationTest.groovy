@@ -16,7 +16,7 @@ abstract class AbstractIntegrationTest extends Specification {
     static File rootTmpDir
     File projectDir
     File userHomeDir
-    String gradleVersion = "3.5"
+    String gradleVersion = "4.0"
     BuildLayout build
 
     static File getRootTempDir() {

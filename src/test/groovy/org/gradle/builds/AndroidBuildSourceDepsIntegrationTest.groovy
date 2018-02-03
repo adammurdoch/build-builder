@@ -1,13 +1,13 @@
 package org.gradle.builds
 
-class AndroidBuildSourceDepsIntegrationTest extends AbstractIntegrationTest {
+class AndroidBuildSourceDepsIntegrationTest extends AbstractAndroidIntegrationTest {
     def setup() {
         gradleVersion = "4.6-20180129223723+0000"
     }
 
     def "can generate build with source dependencies"() {
         when:
-        new Main().run("android", "--dir", projectDir.absolutePath, "--source-dep-libraries", "2", "--version", "3.0.0")
+        new Main().run("android", "--dir", projectDir.absolutePath, "--source-dep-libraries", "2")
 
         then:
         build.isBuild()

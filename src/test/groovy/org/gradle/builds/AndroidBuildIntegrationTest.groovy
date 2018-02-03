@@ -2,7 +2,7 @@ package org.gradle.builds
 
 import spock.lang.Unroll
 
-class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
+class AndroidBuildIntegrationTest extends AbstractAndroidIntegrationTest {
     def "can generate single project build"() {
         when:
         new Main().run("android", "--dir", projectDir.absolutePath)
@@ -24,7 +24,7 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
         // TODO check tests
 
         build.buildSucceeds(":assembleDebug")
-        file("build/outputs/apk/testApp-debug.apk").exists()
+        file("build/outputs/apk/debug/testApp-debug.apk").exists()
 
         build.buildSucceeds("build")
     }
@@ -42,7 +42,7 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":").file("src/test/java/org/gradle/example/app").list().size() == sourceFiles
 
         build.buildSucceeds(":assembleDebug")
-        file("build/outputs/apk/testApp-debug.apk").exists()
+        file("build/outputs/apk/debug/testApp-debug.apk").exists()
 
         build.buildSucceeds("build")
 
@@ -68,7 +68,7 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":lib1api").file("src/main/java/org/gradle/example/lib1api").list() as Set == ["Lib1ApiActivity.java", "Lib1ApiImpl1Api.java", "Lib1ApiImpl2Api.java"] as Set
 
         build.buildSucceeds(":assembleDebug")
-        file("build/outputs/apk/testApp-debug.apk").exists()
+        file("build/outputs/apk/debug/testApp-debug.apk").exists()
 
         build.buildSucceeds("build")
     }
@@ -85,7 +85,7 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":").file("src/main/java/org/gradle/example/app").list() as Set == ["AppMainActivity.java", "AppImpl1Api.java", "AppImpl2Api.java"] as Set
 
         build.buildSucceeds(":assembleDebug")
-        file("build/outputs/apk/testApp-debug.apk").exists()
+        file("build/outputs/apk/debug/testApp-debug.apk").exists()
 
         build.buildSucceeds("build")
 
@@ -104,7 +104,7 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":lib1api").isJavaLibrary()
 
         build.buildSucceeds(":assembleDebug")
-        file("build/outputs/apk/testApp-debug.apk").exists()
+        file("build/outputs/apk/debug/testApp-debug.apk").exists()
 
         build.buildSucceeds("build")
     }
@@ -121,7 +121,7 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":lib2api").isJavaLibrary()
 
         build.buildSucceeds(":assembleDebug")
-        file("build/outputs/apk/testApp-debug.apk").exists()
+        file("build/outputs/apk/debug/testApp-debug.apk").exists()
 
         build.buildSucceeds("build")
     }
@@ -141,7 +141,7 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":lib2api2").isJavaLibrary()
 
         build.buildSucceeds(":assembleDebug")
-        file("build/outputs/apk/testApp-debug.apk").exists()
+        file("build/outputs/apk/debug/testApp-debug.apk").exists()
 
         build.buildSucceeds("build")
     }
@@ -166,7 +166,7 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":lib2api").isAndroidLibrary()
 
         build.buildSucceeds(":assembleDebug")
-        file("build/outputs/apk/testApp-debug.apk").exists()
+        file("build/outputs/apk/debug/testApp-debug.apk").exists()
 
         build.buildSucceeds("build")
 
@@ -177,7 +177,7 @@ class AndroidBuildIntegrationTest extends AbstractIntegrationTest {
     def "can generate composite build"() {
         when:
         gradleVersion = "4.2"
-        new Main().run("android", "--dir", projectDir.absolutePath, "--included-builds", "1", "--version", "3.0.0")
+        new Main().run("android", "--dir", projectDir.absolutePath, "--included-builds", "1")
 
         then:
         build.isBuild()
