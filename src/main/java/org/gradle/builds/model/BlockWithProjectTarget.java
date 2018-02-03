@@ -11,28 +11,38 @@ public class BlockWithProjectTarget extends BlockWithRepositories {
     }
 
     public void requirePlugin(String id) {
-        plugins.add(new Plugin(id, null));
+        plugins.add(new Plugin(id, null, null));
     }
 
-    public void requirePlugin(String id, String version) {
-        plugins.add(new Plugin(id, version));
+    public void requirePlugin(String id, String minVersion) {
+        plugins.add(new Plugin(id, minVersion, null));
+    }
+
+    public void requirePlugin(String id, String minVersion, String maxVersion) {
+        plugins.add(new Plugin(id, minVersion, maxVersion));
     }
 
     public static class Plugin {
         private final String id;
-        private final String version;
+        private final String minVersion;
+        private final String maxVersion;
 
-        public Plugin(String id, String version) {
+        Plugin(String id, String minVersion, String maxVersion) {
             this.id = id;
-            this.version = version;
+            this.minVersion = minVersion;
+            this.maxVersion = maxVersion;
         }
 
         public String getId() {
             return id;
         }
 
-        public String getVersion() {
-            return version;
+        public String getMinVersion() {
+            return minVersion;
+        }
+
+        public String getMaxVersion() {
+            return maxVersion;
         }
     }
 }

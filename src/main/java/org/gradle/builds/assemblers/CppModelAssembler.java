@@ -23,6 +23,8 @@ public class CppModelAssembler extends AbstractModelAssembler {
 
     @Override
     protected void rootProject(Project rootProject) {
+        rootProject.getBuildScript().requirePlugin("swiftpm-export", "4.6");
+
         BlockWithProjectTarget allProjects = rootProject.getBuildScript().allProjects();
         allProjects.requirePlugin("xcode");
         allProjects.requirePlugin("maven-publish");
@@ -100,9 +102,7 @@ public class CppModelAssembler extends AbstractModelAssembler {
             mainSourceFile.addClass(appClass);
 
             BuildScript buildScript = project.getBuildScript();
-            buildScript.requirePlugin("cpp-executable", "4.2");
-            buildScript.requirePlugin("cpp-executable", "4.3");
-            buildScript.requirePlugin("cpp-executable", "4.4");
+            buildScript.requirePlugin("cpp-executable", "4.2", "4.4");
             buildScript.requirePlugin("cpp-application", "4.5");
             addDependencies(project, app, buildScript);
             maybeAddBoost(privateHeader, buildScript);

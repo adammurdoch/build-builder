@@ -21,7 +21,7 @@ public class Build {
     private String typeNamePrefix = "";
     private ProjectInitializer projectInitializer;
     private Project deepestProject;
-    private String version = "1.0";
+    private String version = "1.0.0";
 
     public Build(Path rootDir, String displayName, String rootProjectName) {
         this.rootDir = rootDir;

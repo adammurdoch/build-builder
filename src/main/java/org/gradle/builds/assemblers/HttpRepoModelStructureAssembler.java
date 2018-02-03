@@ -43,7 +43,7 @@ public class HttpRepoModelStructureAssembler implements ModelStructureAssembler 
             }
             libraryBuild.publishAs(new PublicationTarget(httpRepository));
             libraryBuild.setTypeNamePrefix("Ext");
-            libraryBuild.setVersion(i + ".0");
+            libraryBuild.setVersion(i + ".0.0");
             model.addBuild(libraryBuild);
 
             if (i == versionCount) {

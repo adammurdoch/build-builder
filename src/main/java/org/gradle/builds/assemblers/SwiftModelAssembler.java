@@ -5,6 +5,7 @@ import org.gradle.builds.model.*;
 public class SwiftModelAssembler extends AbstractModelAssembler {
     @Override
     protected void rootProject(Project rootProject) {
+        rootProject.getBuildScript().requirePlugin("swiftpm-export", "4.6");
         rootProject.getBuildScript().allProjects().requirePlugin("xcode");
     }
 
@@ -42,7 +43,8 @@ public class SwiftModelAssembler extends AbstractModelAssembler {
             mainSourceFile.addClass(appClass);
 
             BuildScript buildScript = project.getBuildScript();
-            buildScript.requirePlugin("swift-application");
+            buildScript.requirePlugin("swift-executable", "4.2", "4.4");
+            buildScript.requirePlugin("swift-application", "4.5");
             buildScript.requirePlugin("xctest");
             addDependencies(project, application, buildScript);
             if (application.isSwiftPm()) {

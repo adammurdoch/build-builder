@@ -17,9 +17,9 @@ class CppBuildHttpRepoIntegrationTest extends AbstractIntegrationTest {
         build.project(":").isCppApplication()
 
         def buildFile = build.project(":").file("build.gradle")
-        buildFile.text.contains("implementation 'org.gradle.example:extlib1api1:1.0'")
-        buildFile.text.contains("implementation 'org.gradle.example:extlib1api2:1.0'")
-        buildFile.text.contains("implementation 'org.gradle.example:extlib2api:1.0'")
+        buildFile.text.contains("implementation 'org.gradle.example:extlib1api1:1.0.0'")
+        buildFile.text.contains("implementation 'org.gradle.example:extlib1api2:1.0.0'")
+        buildFile.text.contains("implementation 'org.gradle.example:extlib2api:1.0.0'")
 
         def srcDir = build.project(":").file("src/main/cpp")
         new File(srcDir, "appimpl1api.cpp").text.contains("ExtLib1Api1")
@@ -35,12 +35,12 @@ class CppBuildHttpRepoIntegrationTest extends AbstractIntegrationTest {
 
         def serverBuild = build(file('repo-server'))
         serverBuild.buildSucceeds("installDist")
-        file("http-repo/org/gradle/example/extlib1api1/1.0/extlib1api1-1.0.pom").file
-        file("http-repo/org/gradle/example/extlib1api1/1.0/extlib1api1-1.0-cpp-api-headers.zip").file
-        file("http-repo/org/gradle/example/extlib1api2/1.0/extlib1api2-1.0.pom").file
-        file("http-repo/org/gradle/example/extlib1api2/1.0/extlib1api2-1.0-cpp-api-headers.zip").file
-        file("http-repo/org/gradle/example/extlib2api/1.0/extlib2api-1.0.pom").file
-        file("http-repo/org/gradle/example/extlib2api/1.0/extlib2api-1.0-cpp-api-headers.zip").file
+        file("http-repo/org/gradle/example/extlib1api1/1.0.0/extlib1api1-1.0.0.pom").file
+        file("http-repo/org/gradle/example/extlib1api1/1.0.0/extlib1api1-1.0.0-cpp-api-headers.zip").file
+        file("http-repo/org/gradle/example/extlib1api2/1.0.0/extlib1api2-1.0.0.pom").file
+        file("http-repo/org/gradle/example/extlib1api2/1.0.0/extlib1api2-1.0.0-cpp-api-headers.zip").file
+        file("http-repo/org/gradle/example/extlib2api/1.0.0/extlib2api-1.0.0.pom").file
+        file("http-repo/org/gradle/example/extlib2api/1.0.0/extlib2api-1.0.0-cpp-api-headers.zip").file
 
         def server = serverBuild.app("build/install/repo/bin/repo").start()
         waitFor(new URI("http://localhost:5005"))
@@ -76,8 +76,8 @@ class CppBuildHttpRepoIntegrationTest extends AbstractIntegrationTest {
 
         def serverBuild = build(file('repo-server'))
         serverBuild.buildSucceeds("installDist")
-        file("http-repo/org/gradle/example/ext/1.0/ext-1.0.pom").file
-        file("http-repo/org/gradle/example/ext/1.0/ext-1.0-cpp-api-headers.zip").file
+        file("http-repo/org/gradle/example/ext/1.0.0/ext-1.0.0.pom").file
+        file("http-repo/org/gradle/example/ext/1.0.0/ext-1.0.0-cpp-api-headers.zip").file
 
         def server = serverBuild.app("build/install/repo/bin/repo").start()
         waitFor(new URI("http://localhost:5005"))
@@ -105,9 +105,9 @@ class CppBuildHttpRepoIntegrationTest extends AbstractIntegrationTest {
         build.project(":").isCppApplication()
 
         def buildFile = build.project(":").file("build.gradle")
-        buildFile.text.contains("implementation 'org.gradle.example:extlib1api1:3.0'")
-        buildFile.text.contains("implementation 'org.gradle.example:extlib1api2:3.0'")
-        buildFile.text.contains("implementation 'org.gradle.example:extlib2api:3.0'")
+        buildFile.text.contains("implementation 'org.gradle.example:extlib1api1:3.0.0'")
+        buildFile.text.contains("implementation 'org.gradle.example:extlib1api2:3.0.0'")
+        buildFile.text.contains("implementation 'org.gradle.example:extlib2api:3.0.0'")
 
         def srcDir = build.project(":").file("src/main/cpp")
         new File(srcDir, "appimpl1api.cpp").text.contains("ExtLib1Api1")
@@ -137,12 +137,12 @@ class CppBuildHttpRepoIntegrationTest extends AbstractIntegrationTest {
 
         def serverBuild = build(file('repo-server'))
         serverBuild.buildSucceeds("installDist")
-        file("http-repo/org/gradle/example/extlib1api1/1.0/extlib1api1-1.0.pom").file
-        file("http-repo/org/gradle/example/extlib1api1/1.0/extlib1api1-1.0-cpp-api-headers.zip").file
-        file("http-repo/org/gradle/example/extlib1api1/2.0/extlib1api1-2.0.pom").file
-        file("http-repo/org/gradle/example/extlib1api1/2.0/extlib1api1-2.0-cpp-api-headers.zip").file
-        file("http-repo/org/gradle/example/extlib1api1/3.0/extlib1api1-3.0.pom").file
-        file("http-repo/org/gradle/example/extlib1api1/3.0/extlib1api1-3.0-cpp-api-headers.zip").file
+        file("http-repo/org/gradle/example/extlib1api1/1.0.0/extlib1api1-1.0.0.pom").file
+        file("http-repo/org/gradle/example/extlib1api1/1.0.0/extlib1api1-1.0.0-cpp-api-headers.zip").file
+        file("http-repo/org/gradle/example/extlib1api1/2.0.0/extlib1api1-2.0.0.pom").file
+        file("http-repo/org/gradle/example/extlib1api1/2.0.0/extlib1api1-2.0.0-cpp-api-headers.zip").file
+        file("http-repo/org/gradle/example/extlib1api1/3.0.0/extlib1api1-3.0.0.pom").file
+        file("http-repo/org/gradle/example/extlib1api1/3.0.0/extlib1api1-3.0.0-cpp-api-headers.zip").file
 
         def server = serverBuild.app("build/install/repo/bin/repo").start()
         waitFor(new URI("http://localhost:5005"))

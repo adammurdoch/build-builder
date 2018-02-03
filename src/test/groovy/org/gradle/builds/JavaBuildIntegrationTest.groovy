@@ -147,7 +147,7 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
 
         def app = build.app("build/install/testApp/bin/testApp")
         app.isApp()
-        app.libDir.list() as Set == ["child1lib1api-1.0.jar", "child1lib2api-1.0.jar", "slf4j-api-1.7.25.jar", "testApp.jar"] as Set
+        app.libDir.list() as Set == ["child1lib1api-1.0.0.jar", "child1lib2api-1.0.0.jar", "slf4j-api-1.7.25.jar", "testApp.jar"] as Set
         app.succeeds()
 
         build.buildSucceeds("build")
@@ -188,7 +188,7 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
 
         def app = build.app("build/install/testApp/bin/testApp")
         app.isApp()
-        app.libDir.list() as Set == ["child1lib1api-1.0.jar", "child1lib2api-1.0.jar", "child2lib1api-1.0.jar", "child2lib2api-1.0.jar", "slf4j-api-1.7.25.jar", "testApp.jar"] as Set
+        app.libDir.list() as Set == ["child1lib1api-1.0.0.jar", "child1lib2api-1.0.0.jar", "child2lib1api-1.0.0.jar", "child2lib2api-1.0.0.jar", "slf4j-api-1.7.25.jar", "testApp.jar"] as Set
         app.succeeds()
 
         build.buildSucceeds("build")

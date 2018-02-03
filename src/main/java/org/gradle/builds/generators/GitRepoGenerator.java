@@ -30,6 +30,12 @@ public class GitRepoGenerator implements Generator<Model> {
         fileGenerator.generate(rootDir.resolve(".gitignore"), writer -> {
             writer.println("build");
             writer.println(".gradle");
+            // Swift PM output
+            writer.println(".build");
+            // XCode
+            writer.println("*.xcodeproj");
+            writer.println("*.xcworkspace");
+
             Set<String> dirs = new LinkedHashSet<>();
             for (Build other : model.getBuilds()) {
                 if (other.getRootDir().startsWith(rootDir) && !other.getRootDir().equals(rootDir)) {

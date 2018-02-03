@@ -77,12 +77,22 @@ public class BuildFileGenerator extends ProjectFileGenerator {
     }
 
     private void apply(PrintWriter printWriter, String indent, BlockWithProjectTarget.Plugin plugin) {
-        if (plugin.getVersion() == null) {
+        if (plugin.getMinVersion() == null && plugin.getMaxVersion() == null) {
             printWriter.print(indent);
             printWriter.println("apply plugin: '" + plugin.getId() + "'");
         } else {
+            printWriter.println(indent);
+            printWriter.println("import org.gradle.util.GradleVersion");
             printWriter.print(indent);
-            printWriter.println("if (gradle.gradleVersion.startsWith('" + plugin.getVersion() + "')) { apply plugin: '" + plugin.getId() + "' }");
+            printWriter.print("if (GradleVersion.current().baseVersion >= GradleVersion.version('" + plugin.getMinVersion() + "')");
+            if (plugin.getMaxVersion() != null) {
+                printWriter.print(" && GradleVersion.current().baseVersion <= GradleVersion.version('" + plugin.getMaxVersion() + "')");
+            }
+            printWriter.println(") {");
+            printWriter.print(indent);
+            printWriter.println("    apply plugin: '" + plugin.getId() + "'");
+            printWriter.print(indent);
+            printWriter.println("}");
         }
     }
 

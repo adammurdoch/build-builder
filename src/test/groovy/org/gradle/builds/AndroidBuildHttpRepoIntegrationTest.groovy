@@ -33,8 +33,8 @@ class AndroidBuildHttpRepoIntegrationTest extends AbstractIntegrationTest {
         def serverBuild = build(file('repo-server'))
         serverBuild.buildSucceeds("installDist")
 
-        file("http-repo/org/gradle/example/extlib1api1/1.0/extlib1api1-1.0.pom").file
-        file("http-repo/org/gradle/example/extlib1api1/1.0/extlib1api1-1.0.aar").file
+        file("http-repo/org/gradle/example/extlib1api1/1.0.0/extlib1api1-1.0.0.pom").file
+        file("http-repo/org/gradle/example/extlib1api1/1.0.0/extlib1api1-1.0.0.aar").file
 
         def server = serverBuild.app("build/install/repo/bin/repo").start()
         waitFor(new URI("http://localhost:5005"))
@@ -81,12 +81,12 @@ class AndroidBuildHttpRepoIntegrationTest extends AbstractIntegrationTest {
         def serverBuild = build(file('repo-server'))
         serverBuild.buildSucceeds("installDist")
 
-        file("http-repo/org/gradle/example/extlib1api1/1.0/extlib1api1-1.0.aar").file
-        file("http-repo/org/gradle/example/extlib1api1/1.0/extlib1api1-1.0.pom").file
-        file("http-repo/org/gradle/example/extlib1api2/1.0/extlib1api2-1.0.jar").file
-        file("http-repo/org/gradle/example/extlib1api2/1.0/extlib1api2-1.0.pom").file
-        file("http-repo/org/gradle/example/extlib2api/1.0/extlib2api-1.0.jar").file
-        file("http-repo/org/gradle/example/extlib2api/1.0/extlib2api-1.0.pom").file
+        file("http-repo/org/gradle/example/extlib1api1/1.0.0/extlib1api1-1.0.0.aar").file
+        file("http-repo/org/gradle/example/extlib1api1/1.0.0/extlib1api1-1.0.0.pom").file
+        file("http-repo/org/gradle/example/extlib1api2/1.0.0/extlib1api2-1.0.0.jar").file
+        file("http-repo/org/gradle/example/extlib1api2/1.0.0/extlib1api2-1.0.0.pom").file
+        file("http-repo/org/gradle/example/extlib2api/1.0.0/extlib2api-1.0.0.jar").file
+        file("http-repo/org/gradle/example/extlib2api/1.0.0/extlib2api-1.0.0.pom").file
 
         def server = serverBuild.app("build/install/repo/bin/repo").start()
         waitFor(new URI("http://localhost:5005"))

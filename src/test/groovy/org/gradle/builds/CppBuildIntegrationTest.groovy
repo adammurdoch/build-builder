@@ -29,7 +29,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         build.buildSucceeds("build")
 
         build.buildSucceeds("publish")
-        file("repo/test/testApp/1.0/testApp-1.0.pom").file
+        file("repo/test/testApp/1.0.0/testApp-1.0.0.pom").file
     }
 
     @Unroll
@@ -77,8 +77,8 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         build.buildSucceeds("build")
 
         build.buildSucceeds("publish")
-        file("repo/test/testApp/1.0/testApp-1.0.pom").file
-        file("repo/test/lib1api/1.0/lib1api-1.0.pom").file
+        file("repo/test/testApp/1.0.0/testApp-1.0.0.pom").file
+        file("repo/test/lib1api/1.0.0/lib1api-1.0.0.pom").file
     }
 
     def "can generate build with API dependencies between projects"() {
@@ -204,7 +204,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         build.buildSucceeds("build")
 
         build.buildSucceeds("publish")
-        file("repo/test/testApp/1.0/testApp-1.0.pom").file
+        file("repo/test/testApp/1.0.0/testApp-1.0.0.pom").file
 
         where:
         projects << ["3", "4", "5", "10", "20"]
