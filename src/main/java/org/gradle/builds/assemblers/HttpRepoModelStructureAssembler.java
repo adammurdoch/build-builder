@@ -20,7 +20,9 @@ public class HttpRepoModelStructureAssembler implements BuildTreeAssembler {
         Path repoDir = model.getRootDir().resolve("http-repo");
         Path serverDir = model.getRootDir().resolve("repo-server");
 
-        BuildSettingsBuilder serverBuild = new BuildSettingsBuilder(serverDir, "HTTP server build", "repo");
+        BuildSettingsBuilder serverBuild = model.addBuild(serverDir);
+        serverBuild.setDisplayName("HTTP server build");
+        serverBuild.setRootProjectName("repo");
 
         HttpRepository httpRepository = new HttpRepository(repoDir, 5005);
         HttpServerImplementation httpServerImplementation = new HttpServerImplementation(httpRepository);
@@ -34,11 +36,12 @@ public class HttpRepoModelStructureAssembler implements BuildTreeAssembler {
         });
         serverBuild.publishAs(new PublicationTarget(httpRepository));
         serverBuild.setTypeNamePrefix("Repo");
-        model.addBuild(serverBuild);
 
         for(int i = 1; i <= versionCount; i++) {
             Path externalSourceDir = model.getRootDir().resolve("external/v" + i);
-            BuildSettingsBuilder libraryBuild = new BuildSettingsBuilder(externalSourceDir, "external libraries build v" + i, "ext");
+            BuildSettingsBuilder libraryBuild = model.addBuild(externalSourceDir);
+            libraryBuild.setDisplayName("external libraries build v" + i);
+            libraryBuild.setRootProjectName("ext");
             if (libraryCount == 1) {
                 libraryBuild.setSettings(new Settings(1, 1));
                 libraryBuild.setProjectInitializer(new LibraryRootProjectInitializer("Ext", buildInitAction));
@@ -49,7 +52,6 @@ public class HttpRepoModelStructureAssembler implements BuildTreeAssembler {
             libraryBuild.publishAs(new PublicationTarget(httpRepository));
             libraryBuild.setTypeNamePrefix("Ext");
             libraryBuild.setVersion(i + ".0.0");
-            model.addBuild(libraryBuild);
 
             if (i == versionCount) {
                 model.getMainBuild().dependsOn(libraryBuild);

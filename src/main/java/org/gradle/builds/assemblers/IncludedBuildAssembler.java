@@ -18,12 +18,14 @@ public class IncludedBuildAssembler implements BuildTreeAssembler {
         for (int i = 1; i <= builds; i++) {
             String name = "child" + i;
             String typeName = "Child" + i;
-            BuildSettingsBuilder childBuild = new BuildSettingsBuilder(model.getRootDir().resolve(name), "included build " + i, name);
+            BuildSettingsBuilder childBuild = model.addBuild(model.getRootDir().resolve(name));
+            childBuild.setDisplayName("included build " + i);
+            childBuild.setRootProjectName(name);
             childBuild.setSettings(new Settings(3, settings.getSourceFileCount()));
             childBuild.setProjectInitializer(initializer);
             childBuild.setTypeNamePrefix(typeName);
             childBuild.publishAs(new PublicationTarget(null));
-            model.addBuild(childBuild);
+
             model.getMainBuild().includeBuild(childBuild);
             model.getMainBuild().dependsOn(childBuild);
         }

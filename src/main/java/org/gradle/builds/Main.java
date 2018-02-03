@@ -3,7 +3,6 @@ package org.gradle.builds;
 import io.airlift.airline.*;
 import org.gradle.builds.assemblers.*;
 import org.gradle.builds.generators.*;
-import org.gradle.builds.model.BuildSettingsBuilder;
 import org.gradle.builds.model.BuildTreeBuilder;
 import org.gradle.builds.model.MacroIncludes;
 import org.gradle.builds.model.Model;
@@ -92,7 +91,7 @@ public class Main {
             Settings settings = createSettings();
 
             // Create build tree
-            BuildTreeBuilder buildTree = new BuildTreeBuilder(rootDir, new BuildSettingsBuilder(rootDir, "main build", "testApp"));
+            BuildTreeBuilder buildTree = new BuildTreeBuilder(rootDir);
             createModelStructureAssembler().attachBuilds(settings, buildTree);
 
             // Configure projects

@@ -11,6 +11,8 @@ public class MainBuildModelStructureAssembler implements BuildTreeAssembler {
 
     @Override
     public void attachBuilds(Settings settings, BuildTreeBuilder model) {
+        model.getMainBuild().setDisplayName("main build");
+        model.getMainBuild().setRootProjectName("testApp");
         model.getMainBuild().setSettings(settings);
         model.getMainBuild().setProjectInitializer(projectInitializer);
     }

@@ -16,10 +16,9 @@ public class BuildTreeBuilder {
     private final BuildSettingsBuilder build;
     private final List<BuildSettingsBuilder> builds = new ArrayList<>();
 
-    public BuildTreeBuilder(Path rootDir, BuildSettingsBuilder build) {
+    public BuildTreeBuilder(Path rootDir) {
         this.rootDir = rootDir;
-        this.build = build;
-        builds.add(build);
+        this.build = addBuild(rootDir);
     }
 
     /**
@@ -39,8 +38,10 @@ public class BuildTreeBuilder {
     /**
      * Adds a build to this tree.
      */
-    public void addBuild(BuildSettingsBuilder build) {
+    public BuildSettingsBuilder addBuild(Path rootDir) {
+        BuildSettingsBuilder build = new BuildSettingsBuilder(rootDir);
         builds.add(build);
+        return build;
     }
 
     public List<BuildSettingsBuilder> getBuilds() {

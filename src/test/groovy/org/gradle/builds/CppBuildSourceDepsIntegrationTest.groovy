@@ -23,8 +23,6 @@ class CppBuildSourceDepsIntegrationTest extends AbstractIntegrationTest {
         child.project(":srclib1api").isCppLibrary()
         child.project(":srclib2api").isCppLibrary()
 
-        println file("settings.gradle").text
-
         build.buildSucceeds(":installDebug")
 
         def app = build.app("build/install/main/debug/testApp")
