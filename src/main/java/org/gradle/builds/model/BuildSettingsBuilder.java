@@ -44,7 +44,7 @@ public class BuildSettingsBuilder {
 
     private void assertNotNull(String name, @Nullable Object value) {
         if (value == null) {
-            throw new IllegalStateException(String.format("No value specified for property '%s", name));
+            throw new IllegalStateException(String.format("No value specified for property '%s'", name));
         }
     }
 
