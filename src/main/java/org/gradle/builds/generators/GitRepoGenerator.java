@@ -35,6 +35,16 @@ public class GitRepoGenerator implements Generator<Model> {
             // XCode
             writer.println("*.xcodeproj");
             writer.println("*.xcworkspace");
+            // Visual studio
+            writer.println(".vs");
+            writer.println("*.sln");
+            writer.println("*.sdf");
+            writer.println("*.vcxproj");
+            writer.println("*.vcxproj.filters");
+            // IDEA
+            writer.println("*.ipr");
+            writer.println("*.iws");
+            writer.println("*.iml");
 
             Set<String> dirs = new LinkedHashSet<>();
             for (Build other : model.getBuilds()) {
