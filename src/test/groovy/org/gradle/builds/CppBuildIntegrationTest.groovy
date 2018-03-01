@@ -240,13 +240,13 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
         build.project(":").isCppApplication()
-        build.project(":").file("src/main/headers").list() == ["app.h", "app_defs1.h"]
-        build.project(":").file("src/main/cpp").list().findAll { it.endsWith('.h') } == ["app_private.h", "app_private_defs1.h"]
+        build.project(":").file("src/main/headers").list().sort() == ["app.h", "app_defs1.h"]
+        build.project(":").file("src/main/cpp").list().sort().findAll { it.endsWith('.h') } == ["app_private.h", "app_private_defs1.h"]
 
         build.project(":lib1api").isCppLibrary()
         build.project(":lib1api").file("src/main/public").list() == ["lib1api.h"]
-        build.project(":lib1api").file("src/main/headers").list() == ["lib1api_impl.h", "lib1api_impl_defs1.h"]
-        build.project(":lib1api").file("src/main/cpp").list().findAll { it.endsWith('.h') } == ["lib1api_private.h"]
+        build.project(":lib1api").file("src/main/headers").list().sort() == ["lib1api_impl.h", "lib1api_impl_defs1.h"]
+        build.project(":lib1api").file("src/main/cpp").list().sort().findAll { it.endsWith('.h') } == ["lib1api_private.h"]
 
         build.buildSucceeds(":installDebug")
         build.app("build/install/main/debug/testApp").succeeds()
@@ -261,13 +261,13 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
         build.project(":").isCppApplication()
-        build.project(":").file("src/main/headers").list() == ["app.h", "app_defs1.h", "app_defs2.h", "app_defs3.h"]
-        build.project(":").file("src/main/cpp").list().findAll { it.endsWith('.h') } == ["app_private.h", "app_private_defs1.h", "app_private_defs2.h", "app_private_defs3.h"]
+        build.project(":").file("src/main/headers").list().sort() == ["app.h", "app_defs1.h", "app_defs2.h", "app_defs3.h"]
+        build.project(":").file("src/main/cpp").list().sort().findAll { it.endsWith('.h') } == ["app_private.h", "app_private_defs1.h", "app_private_defs2.h", "app_private_defs3.h"]
 
         build.project(":lib1api").isCppLibrary()
-        build.project(":lib1api").file("src/main/public").list() == ["lib1api.h", "lib1api_defs1.h"]
-        build.project(":lib1api").file("src/main/headers").list() == ["lib1api_impl.h", "lib1api_impl_defs1.h", "lib1api_impl_defs2.h"]
-        build.project(":lib1api").file("src/main/cpp").list().findAll { it.endsWith('.h') } == ["lib1api_private.h", "lib1api_private_defs1.h", "lib1api_private_defs2.h"]
+        build.project(":lib1api").file("src/main/public").list().sort() == ["lib1api.h", "lib1api_defs1.h"]
+        build.project(":lib1api").file("src/main/headers").list().sort() == ["lib1api_impl.h", "lib1api_impl_defs1.h", "lib1api_impl_defs2.h"]
+        build.project(":lib1api").file("src/main/cpp").list().sort().findAll { it.endsWith('.h') } == ["lib1api_private.h", "lib1api_private_defs1.h", "lib1api_private_defs2.h"]
 
         build.buildSucceeds(":installDebug")
         build.app("build/install/main/debug/testApp").succeeds()
