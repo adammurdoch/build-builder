@@ -25,8 +25,8 @@ public class CppModelAssembler extends AbstractModelAssembler {
     protected void rootProject(Project rootProject) {
         rootProject.getBuildScript().requirePlugin("swiftpm-export", "4.6");
 
+        addIdePlugins(rootProject);
         BlockWithProjectTarget allProjects = rootProject.getBuildScript().allProjects();
-        allProjects.requirePlugin("xcode");
         allProjects.requirePlugin("maven-publish");
         allProjects.property("group", "test");
         allProjects.property("version", rootProject.getVersion());

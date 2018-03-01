@@ -6,7 +6,7 @@ public class SwiftModelAssembler extends AbstractModelAssembler {
     @Override
     protected void rootProject(Project rootProject) {
         rootProject.getBuildScript().requirePlugin("swiftpm-export", "4.6");
-        rootProject.getBuildScript().allProjects().requirePlugin("xcode");
+        addIdePlugins(rootProject);
     }
 
     @Override

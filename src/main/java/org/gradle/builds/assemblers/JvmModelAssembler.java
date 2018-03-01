@@ -13,6 +13,7 @@ public abstract class JvmModelAssembler extends AbstractModelAssembler {
     protected void rootProject(Project rootProject) {
         BlockWithProjectTarget allProjects = rootProject.getBuildScript().allProjects();
         allProjects.jcenter();
+        addIdePlugins(rootProject);
         allProjects.block("tasks.withType(JavaCompile)").property("options.incremental", "true");
     }
 
