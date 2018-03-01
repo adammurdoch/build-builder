@@ -15,6 +15,7 @@ public class BuildFileGenerator extends ProjectFileGenerator {
         BuildScript buildScript = project.getBuildScript();
         fileGenerator.generate(buildFile, printWriter -> {
             printWriter.println("// GENERATED BUILD SCRIPT");
+            printWriter.println("import org.gradle.util.GradleVersion");
             if (!buildScript.getBuildScriptClasspath().isEmpty()) {
                 printWriter.println();
                 printWriter.println("buildscript {");
@@ -81,8 +82,6 @@ public class BuildFileGenerator extends ProjectFileGenerator {
             printWriter.print(indent);
             printWriter.println("apply plugin: '" + plugin.getId() + "'");
         } else {
-            printWriter.println(indent);
-            printWriter.println("import org.gradle.util.GradleVersion");
             printWriter.print(indent);
             printWriter.print("if (GradleVersion.current().baseVersion >= GradleVersion.version('" + plugin.getMinVersion() + "')");
             if (plugin.getMaxVersion() != null) {
