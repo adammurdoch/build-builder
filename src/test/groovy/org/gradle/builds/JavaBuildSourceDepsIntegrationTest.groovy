@@ -2,7 +2,7 @@ package org.gradle.builds
 
 class JavaBuildSourceDepsIntegrationTest extends AbstractIntegrationTest {
     def setup() {
-        gradleVersion = "4.6-20180129223723+0000"
+        gradleVersion = "4.6"
     }
 
     def "can generate build with source dependencies"() {
