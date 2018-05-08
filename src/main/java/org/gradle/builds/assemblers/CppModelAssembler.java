@@ -70,12 +70,14 @@ public class CppModelAssembler extends AbstractModelAssembler {
 
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("cpp-library");
+            buildScript.requirePlugin("cpp-unit-test");
             addPublishing(project, lib, project.getBuildScript());
             addDependencies(project, lib, buildScript);
             maybeAddBoost(privateHeader, buildScript);
 
             addApiHeaders(lib, apiHeader);
             addSource(project, lib, apiClass, apiSourceFile, implHeader, privateHeader);
+            addTests(project, lib, implHeader);
             lib.setMacroIncludes(macroIncludes);
         } else if (project.component(CppApplication.class) != null) {
             CppApplication app = project.component(CppApplication.class);
@@ -104,11 +106,13 @@ public class CppModelAssembler extends AbstractModelAssembler {
             BuildScript buildScript = project.getBuildScript();
             buildScript.requirePlugin("cpp-executable", "4.2", "4.4");
             buildScript.requirePlugin("cpp-application", "4.5");
+            buildScript.requirePlugin("cpp-unit-test");
             addDependencies(project, app, buildScript);
             maybeAddBoost(privateHeader, buildScript);
 
             addApiHeaders(app, implHeader);
             addSource(project, app, appClass, mainSourceFile, implHeader, privateHeader);
+            addTests(project, app, implHeader);
             app.setMacroIncludes(macroIncludes);
         }
     }
@@ -186,6 +190,26 @@ public class CppModelAssembler extends AbstractModelAssembler {
             }
             return cppClass;
         });
+    }
+
+    private void addTests(Project project, HasCppSource component, CppHeaderFile header) {
+        CppHeaderFile testHeaderFile = component.addTestHeaderFile(project.getFileNameFor() + "_test.h");
+        testHeaderFile.includeHeader(header);
+
+        CppSourceFile testMain = component.addTestFile(new CppSourceFile("test_main.cpp"));
+        testMain.includeHeader(testHeaderFile);
+
+        for (CppSourceFile cppSourceFile : component.getSourceFiles()) {
+            for (CppClass cppClass : cppSourceFile.getClasses()) {
+                CppSourceFile sourceFile = new CppSourceFile(cppClass.getName().toLowerCase() + "_test.cpp");
+                component.addTestFile(sourceFile);
+                sourceFile.includeHeader(testHeaderFile);
+                CppClass testClass = new CppClass(cppClass.getName() + "Test");
+                testHeaderFile.addClass(testClass);
+                sourceFile.addClass(testClass);
+                testMain.addMainFunction(testClass);
+            }
+        }
     }
 
     private void addIncomingApiDependencies(HasCppSource component, CppClass cppClass, CppSourceFile sourceFile) {

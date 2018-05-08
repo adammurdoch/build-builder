@@ -4,7 +4,7 @@ import spock.lang.Unroll
 
 class CppBuildIntegrationTest extends AbstractIntegrationTest {
     def setup() {
-        gradleVersion = "4.4"
+        gradleVersion = "4.8-20180507235951+0000"
     }
 
     def "can generate single project build"() {
@@ -14,11 +14,20 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
         build.project(":").isCppApplication()
-        build.project(":").file("src/main/headers").list() as Set == ["app.h", "app_defs1.h"] as Set
+
+        def privateHeaderDir = build.project(":").file("src/main/headers")
+        privateHeaderDir.list() as Set == ["app.h", "app_defs1.h"] as Set
+
         def srcDir = build.project(":").file("src/main/cpp")
         srcDir.list() as Set == ["app.cpp", "app_private.h", "appimpl1api.cpp", "appimpl2api.cpp"] as Set
         new File(srcDir, "app.cpp").text.contains("AppImpl1Api")
         new File(srcDir, "appimpl1api.cpp").text.contains("AppImpl2Api")
+
+        def testHeaderDir = build.project(":").file("src/test/headers")
+        testHeaderDir.list() as Set == ["app_test.h"] as Set
+
+        def testDir = build.project(":").file("src/test/cpp")
+        testDir.list() as Set == ["test_main.cpp", "app_test.cpp", "appimpl1api_test.cpp", "appimpl2api_test.cpp"] as Set
 
         build.project(":").file("performance.scenarios").text.contains('apply-h-change-to = "src/main/headers/app.h"')
         build.project(":").file("performance.scenarios").text.contains('apply-cpp-change-to = "src/main/cpp/app.cpp"')
@@ -62,11 +71,15 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         def srcDir = build.project(":").file("src/main/cpp")
         srcDir.list() as Set == ["app.cpp", "app_private.h", "appimpl1api.cpp", "appimpl2api.cpp"] as Set
         new File(srcDir, "appimpl1api.cpp").text.contains("Lib1Api")
+        build.project(":").file("src/test/headers").list() as Set == ["app_test.h"] as Set
+        build.project(":").file("src/test/cpp").list() as Set == ["test_main.cpp", "app_test.cpp", "appimpl1api_test.cpp", "appimpl2api_test.cpp"] as Set
 
         build.project(":lib1api").isCppLibrary()
         build.project(":lib1api").file("src/main/public").list() as Set == ["lib1api.h"] as Set
         build.project(":lib1api").file("src/main/headers").list() as Set == ["lib1api_impl.h"] as Set
         build.project(":lib1api").file("src/main/cpp").list() as Set == ["lib1api.cpp", "lib1api_private.h", "lib1apiimpl1api.cpp", "lib1apiimpl2api.cpp"] as Set
+        build.project(":lib1api").file("src/test/headers").list() as Set == ["lib1api_test.h"] as Set
+        build.project(":lib1api").file("src/test/cpp").list() as Set == ["test_main.cpp", "lib1api_test.cpp",  "lib1apiimpl1api_test.cpp", "lib1apiimpl2api_test.cpp"] as Set
 
         build.project(":").file("performance.scenarios").text.contains('apply-h-change-to = "lib1api/src/main/public/lib1api.h"')
         build.project(":").file("performance.scenarios").text.contains('apply-cpp-change-to = "lib1api/src/main/cpp/lib1api.cpp"')

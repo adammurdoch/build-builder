@@ -7,6 +7,7 @@ public class HasCppSource extends HasSource<CppSourceFile, CppLibraryApi> {
     private final List<CppHeaderFile> implHeaders = new ArrayList<>();
     private final List<CppHeaderFile> publicHeaders = new ArrayList<>();
     private final List<CppHeaderFile> privateHeaders = new ArrayList<>();
+    private final List<CppHeaderFile> testHeaders = new ArrayList<>();
     private MacroIncludes macroIncludes = MacroIncludes.none;
 
     public List<CppHeaderFile> getPublicHeaderFiles() {
@@ -36,6 +37,16 @@ public class HasCppSource extends HasSource<CppSourceFile, CppLibraryApi> {
     public CppHeaderFile addPrivateHeaderFile(String name) {
         CppHeaderFile headerFile = new CppHeaderFile(name);
         privateHeaders.add(headerFile);
+        return headerFile;
+    }
+
+    public List<CppHeaderFile> getTestHeaders() {
+        return testHeaders;
+    }
+
+    public CppHeaderFile addTestHeaderFile(String name) {
+        CppHeaderFile headerFile = new CppHeaderFile(name);
+        testHeaders.add(headerFile);
         return headerFile;
     }
 

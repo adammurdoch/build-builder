@@ -2,7 +2,7 @@ package org.gradle.builds
 
 class CppBuildHttpRepoIntegrationTest extends AbstractIntegrationTest {
     def setup() {
-        gradleVersion = "4.5-20171218235901+0000"
+        gradleVersion = "4.8-20180507235951+0000"
     }
 
     def "can generate single project build with http repo"() {

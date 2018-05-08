@@ -30,6 +30,14 @@ public class CppSourceGenerator extends ProjectComponentSpecificGenerator<HasCpp
             Path sourceFile = project.getProjectDir().resolve("src/main/cpp/" + cppHeader.getName());
             writeHeader(cppHeader, sourceFile, false, macroIncludes, fileGenerator);
         }
+        for (CppHeaderFile cppHeader : component.getTestHeaders()) {
+            Path sourceFile = project.getProjectDir().resolve("src/test/headers/" + cppHeader.getName());
+            writeHeader(cppHeader, sourceFile, false, macroIncludes, fileGenerator);
+        }
+        for (CppSourceFile cppSource : component.getTestFiles()) {
+            Path sourceFile = project.getProjectDir().resolve("src/test/cpp/" + cppSource.getName());
+            writeSourceFile(cppSource, sourceFile, fileGenerator);
+        }
     }
 
     private void writeSourceFile(CppSourceFile cppSource, Path sourceFile, FileGenerator fileGenerator) throws IOException {
@@ -85,7 +93,8 @@ public class CppSourceGenerator extends ProjectComponentSpecificGenerator<HasCpp
         });
     }
 
-    private void writeHeader(CppHeaderFile cppHeader, Path sourceFile, boolean exported, MacroIncludes macroIncludes, FileGenerator fileGenerator) throws IOException {
+    private void writeHeader(CppHeaderFile cppHeader, Path sourceFile, boolean exported, MacroIncludes macroIncludes, FileGenerator fileGenerator)
+            throws IOException {
         fileGenerator.generate(sourceFile, printWriter -> {
             String typeName = cppHeader.getName().replace(".h", "");
             String guardMacro = "__" + typeName.toUpperCase() + "__";
