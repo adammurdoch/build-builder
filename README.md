@@ -110,7 +110,7 @@ Here's an example:
     - No multi-dex, multi-apk splits, instant app, etc
 - C++ application    
     - There are no external dependencies
-    - There are no tests
+    - Add Google tests
     - Very simple header dependency graph
     - API dependencies of classes do not appear on the API 
     - Incremental performance scenarios should mutate deepest header and source files for the target project
@@ -120,7 +120,7 @@ Here's an example:
     - No implementation dependencies
 - JVM applications
     - No annotation processors are used.
-    - No Java 8 or 9 source.
+    - No Java 8, 9, 10 source.
     - Only a single Java resource is generated for each project.
     - No incremental performance scenarios
     - No API dependencies
