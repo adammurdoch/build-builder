@@ -5,7 +5,7 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.InitCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
-import org.gradle.builds.model.Build;
+import org.gradle.builds.model.GitRepo;
 import org.gradle.builds.model.Model;
 
 import java.io.IOException;
@@ -18,14 +18,20 @@ import java.util.Set;
 public class GitRepoGenerator implements Generator<Model> {
     @Override
     public void generate(Model model, FileGenerator fileGenerator) throws IOException {
-        for (Build build : model.getBuilds()) {
-            generate(model, build, fileGenerator);
+        List<GitRepo> repos = model.getRepos();
+        for (GitRepo repo : repos) {
+            generate(repo, repos, fileGenerator);
         }
     }
 
-    private void generate(Model model, Build build, FileGenerator fileGenerator) throws IOException {
-        Path rootDir = build.getRootDir();
-        List<Build> ignored = new ArrayList<>(model.getBuilds().size());
+    private void generate(GitRepo repo, List<GitRepo> allRepos, FileGenerator fileGenerator) throws IOException {
+        Path rootDir = repo.getRootDir();
+        List<GitRepo> children = new ArrayList<>();
+        for (GitRepo other : allRepos) {
+            if (other != repo && other.getRootDir().startsWith(rootDir)) {
+                children.add(other);
+            }
+        }
 
         fileGenerator.generate(rootDir.resolve(".gitignore"), writer -> {
             writer.println("build");
@@ -47,12 +53,9 @@ public class GitRepoGenerator implements Generator<Model> {
             writer.println("*.iml");
 
             Set<String> dirs = new LinkedHashSet<>();
-            for (Build other : model.getBuilds()) {
-                if (other.getRootDir().startsWith(rootDir) && !other.getRootDir().equals(rootDir)) {
-                    ignored.add(other);
-                    Path relativePath = rootDir.relativize(other.getRootDir());
-                    dirs.add(relativePath.getName(0).toString());
-                }
+            for (GitRepo other : children) {
+                Path relativePath = rootDir.relativize(other.getRootDir());
+                dirs.add(relativePath.getName(0).toString());
             }
             for (String dir : dirs) {
                 writer.println(dir);
@@ -70,7 +73,7 @@ public class GitRepoGenerator implements Generator<Model> {
                         continue;
                     }
                     boolean skip = false;
-                    for (Build other : ignored) {
+                    for (GitRepo other : children) {
                         if (generatedFile.startsWith(other.getRootDir())) {
                             skip = true;
                             break;
@@ -84,11 +87,11 @@ public class GitRepoGenerator implements Generator<Model> {
                 addCommand.call();
 
                 git.commit().setMessage("Initial version").call();
-                git.tagDelete().setTags(build.getVersion()).call();
-                git.tag().setName(build.getVersion()).call();
+                git.tagDelete().setTags(repo.getVersion()).call();
+                git.tag().setName(repo.getVersion()).call();
             }
         } catch (GitAPIException e) {
-            throw new RuntimeException("Could not create Git repository.", e);
+            throw new RuntimeException(String.format("Could not create Git repository in %s.", rootDir), e);
         }
     }
 }
