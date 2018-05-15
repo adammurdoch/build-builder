@@ -1,5 +1,7 @@
-/build
-/.gradle
-/.idea
-/home
-out
+build
+.gradle
+
+.idea
+*.iml
+
+.DS_Store
