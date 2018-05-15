@@ -2,6 +2,7 @@ package org.gradle.builds.assemblers;
 
 import org.gradle.builds.model.BuildSettingsBuilder;
 import org.gradle.builds.model.BuildTreeBuilder;
+import org.gradle.builds.model.Dependency;
 import org.gradle.builds.model.PublicationTarget;
 
 public class SourceDependencyBuildAssembler implements BuildTreeAssembler {
@@ -16,16 +17,27 @@ public class SourceDependencyBuildAssembler implements BuildTreeAssembler {
     @Override
     public void attachBuilds(Settings settings, BuildTreeBuilder model) {
         if (sourceDependencies > 0) {
-            BuildSettingsBuilder childBuild = model.addBuild(model.getRootDir().resolve("external/source"));
-            childBuild.setDisplayName("source dependency build");
-            childBuild.setRootProjectName("src");
-            childBuild.setSettings(new Settings(sourceDependencies + 1, 1));
-            childBuild.setProjectInitializer(initializer);
-            childBuild.setTypeNamePrefix("Src");
-            childBuild.publishAs(new PublicationTarget(null));
-
-            model.getMainBuild().sourceDependency(childBuild);
-            model.getMainBuild().dependsOn(childBuild);
+            Graph graph = new GraphAssembler().arrange(sourceDependencies + 1);
+            graph.visit((Graph.Visitor<BuildSettingsBuilder>) (node, dependencies) -> {
+                BuildSettingsBuilder build;
+                if (node.getLayer() == 0) {
+                    build = model.getMainBuild();
+                } else {
+                    BuildSettingsBuilder childBuild = model.addBuild(model.getRootDir().resolve("external/source" + node.getNameSuffix()));
+                    childBuild.setDisplayName("source dependency build");
+                    childBuild.setRootProjectName("src" + node.getNameSuffix());
+                    childBuild.setSettings(new Settings(3, settings.getSourceFileCount()));
+                    childBuild.setProjectInitializer(initializer);
+                    childBuild.setTypeNamePrefix("Src" + node.getNameSuffix());
+                    childBuild.publishAs(new PublicationTarget(null));
+                    build = childBuild;
+                }
+                for (Dependency<BuildSettingsBuilder> childBuild : dependencies) {
+                    build.sourceDependency(childBuild.getTarget());
+                    build.dependsOn(childBuild.getTarget());
+                }
+                return build;
+            });
         }
     }
 }

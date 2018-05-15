@@ -27,7 +27,7 @@ Generates a git repository for each build.
 
 Generates a [gradle-profiler](https://www.github.com/gradle/gradle-profiler) scenario file for the build.
 
-Generates a Graphiz `dot` file that shows the dependencies between projects.
+Generates an HTML file that shows the dependencies between builds and projects.
 
 ### Command line usage
 
@@ -149,8 +149,3 @@ Here's an example:
 - Implementation classes are public.
 - Improve project and source file names, particularly test files.
 - No build cache performance scenarios
-
-#### Adding source to an existing build
-
-- Adding source to an existing build does not consider project dependencies.
-- Adding source to a native build does nothing.

@@ -16,7 +16,8 @@ class CppBuildComplexCompositionIntegrationTest extends AbstractIntegrationTest 
         build.isBuild()
 
         build(file('external/v1')).isBuild()
-        build(file('external/source')).isBuild()
+        build(file('external/source1Api')).isBuild()
+        build(file('external/source2Api')).isBuild()
         build(file('child1')).isBuild()
         build(file('child2')).isBuild()
 

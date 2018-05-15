@@ -8,7 +8,6 @@ public class StructureAssembler {
     public void arrangeClasses(Build build) {
         Settings settings = build.getSettings();
         Graph classGraph = new GraphAssembler().arrange(settings.getSourceFileCount());
-        System.out.println("* Arranging source files in " + classGraph.getLayers() + " layers per project.");
         for (Project project : build.getProjects()) {
             project.setClassGraph(classGraph);
         }
@@ -17,7 +16,6 @@ public class StructureAssembler {
     public void arrangeProjects(Build build, ProjectInitializer projectInitializer) {
         Settings settings = build.getSettings();
         Graph projectGraph = new GraphAssembler().arrange(settings.getProjectCount());
-        System.out.println("* Arranging projects in " + projectGraph.getLayers() + " layers.");
 
         projectGraph.visit((Graph.Visitor<Project>) (nodeDetails, dependencies) -> {
             Project project;
