@@ -14,11 +14,12 @@ public class DotGenerator implements Generator<Model> {
             writer.println("<html>");
             writer.println("<head>");
             writer.println("<style>");
-            writer.println(".body { font-family: sans-serif; }");
-            writer.println(".mermaid {  }");
+            writer.println("body { font-family: sans-serif; margin: 40px; }");
+            writer.println("div.mermaid { margin-bottom: 40px; }");
             writer.println("</style>");
             writer.println("</head>");
             writer.println("<body>");
+
             writer.println("<h2>Build dependencies</h2>");
             writer.println("<div class=\"mermaid\">");
             writer.println("graph LR");
@@ -34,6 +35,7 @@ public class DotGenerator implements Generator<Model> {
                 }
             }
             writer.println("</div>");
+
             writer.println("<h2>Project dependencies</h2>");
             writer.println("<div class=\"mermaid\">");
             writer.println("graph LR");
