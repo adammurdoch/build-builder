@@ -309,16 +309,18 @@ abstract class AbstractIntegrationTest extends Specification {
             assert headerDir.list().findAll { it.endsWith(".h") }
         }
 
-        void isCppApplication() {
+        CppProject isCppApplication() {
             isCppProject()
             appliesPlugin("cpp-application")
             doesNotApplyPlugin("cpp-library")
+            return new CppProject(path, projectDir, rootDir)
         }
 
-        void isCppLibrary() {
+        CppProject isCppLibrary() {
             isCppProject()
             appliesPlugin("cpp-library")
             doesNotApplyPlugin("cpp-application")
+            return new CppProject(path, projectDir, rootDir)
         }
 
         // TODO - add more checks
@@ -363,6 +365,46 @@ abstract class AbstractIntegrationTest extends Specification {
 
         private File getBuildFile() {
             return file("build.gradle")
+        }
+    }
+
+    static class TestDir extends File {
+        TestDir(File parent, String path) {
+            super(parent, path)
+        }
+
+        File file(String name) {
+            return new File(this, name)
+        }
+
+        void contains(String... files) {
+            assert list() as Set == files as Set
+        }
+    }
+
+    static class CppProject extends ProjectLayout {
+        CppProject(String path, File projectDir, File rootDir) {
+            super(path, projectDir, rootDir)
+        }
+
+        TestDir getHeaders() {
+            return new TestDir(projectDir, "src/main/headers")
+        }
+
+        TestDir getPublicHeaders() {
+            return new TestDir(projectDir, "src/main/public")
+        }
+
+        TestDir getSrc() {
+            return new TestDir(projectDir, "src/main/cpp")
+        }
+
+        TestDir getTestHeaders() {
+            return new TestDir(projectDir, "src/test/headers")
+        }
+
+        TestDir getTestSrc() {
+            return new TestDir(projectDir, "src/test/cpp")
         }
     }
 }

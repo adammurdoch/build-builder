@@ -21,10 +21,10 @@ class CppBuildHttpRepoIntegrationTest extends AbstractIntegrationTest {
         buildFile.text.contains("implementation 'org.gradle.example:extlib1api2:1.0.0'")
         buildFile.text.contains("implementation 'org.gradle.example:extlib2api:1.0.0'")
 
-        def srcDir = build.project(":").file("src/main/cpp")
-        new File(srcDir, "appimpl1api.cpp").text.contains("ExtLib1Api1")
-        new File(srcDir, "appimpl1api.cpp").text.contains("ExtLib1Api2")
-        new File(srcDir, "appimpl1api.cpp").text.contains("ExtLib2Api")
+        def srcDir = build.project(":").isCppApplication().src
+        srcDir.file("appimpl1api.cpp").text.contains("ExtLib1Api1")
+        srcDir.file("appimpl1api.cpp").text.contains("ExtLib1Api2")
+        srcDir.file("appimpl1api.cpp").text.contains("ExtLib2Api")
 
         def repoBuild = build(file('external/v1'))
         repoBuild.isBuild()
@@ -67,8 +67,8 @@ class CppBuildHttpRepoIntegrationTest extends AbstractIntegrationTest {
         build.isBuild()
         build.project(":").isCppApplication()
 
-        def srcDir = build.project(":").file("src/main/cpp")
-        new File(srcDir, "appimpl1api.cpp").text.contains("Ext ext;")
+        def rootProject = build.project(":").isCppApplication()
+        rootProject.src.file("appimpl1api.cpp").text.contains("Ext ext;")
 
         def repoBuild = build(file('external/v1'))
         repoBuild.isBuild()
@@ -102,17 +102,18 @@ class CppBuildHttpRepoIntegrationTest extends AbstractIntegrationTest {
 
         then:
         build.isBuild()
-        build.project(":").isCppApplication()
 
-        def buildFile = build.project(":").file("build.gradle")
+        def rootProject = build.project(":").isCppApplication()
+
+        def buildFile = rootProject.file("build.gradle")
         buildFile.text.contains("implementation 'org.gradle.example:extlib1api1:3.0.0'")
         buildFile.text.contains("implementation 'org.gradle.example:extlib1api2:3.0.0'")
         buildFile.text.contains("implementation 'org.gradle.example:extlib2api:3.0.0'")
 
-        def srcDir = build.project(":").file("src/main/cpp")
-        new File(srcDir, "appimpl1api.cpp").text.contains("ExtLib1Api1")
-        new File(srcDir, "appimpl1api.cpp").text.contains("ExtLib1Api2")
-        new File(srcDir, "appimpl1api.cpp").text.contains("ExtLib2Api")
+        def srcDir = rootProject.src
+        srcDir.file("appimpl1api.cpp").text.contains("ExtLib1Api1")
+        srcDir.file("appimpl1api.cpp").text.contains("ExtLib1Api2")
+        srcDir.file("appimpl1api.cpp").text.contains("ExtLib2Api")
 
         def repoBuildV1 = build(file('external/v1'))
         repoBuildV1.isBuild()

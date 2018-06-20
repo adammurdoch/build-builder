@@ -12,19 +12,19 @@ class CppBuildSourceDepsIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
 
-        build.project(":").isCppApplication()
-        def srcDir = build.project(":").file("src/main/cpp")
-        new File(srcDir, "appimpl1api.cpp").text.contains("Src1ApiLib1Api")
-        new File(srcDir, "appimpl1api.cpp").text.contains("Src1ApiLib2Api")
+        def rootProject = build.project(":").isCppApplication()
+        def srcDir = rootProject.src
+        srcDir.file("appimpl1api.cpp").text.contains("Src1ApiLib1Api")
+        srcDir.file("appimpl1api.cpp").text.contains("Src1ApiLib2Api")
 
         def child1 = build(file("external/source1Api"))
         child1.isBuild()
         child1.project(":").isEmptyProject()
         child1.project(":src1apilib1api").isCppLibrary()
-        child1.project(":src1apilib2api").isCppLibrary()
-        def srcDir1 = child1.project(":src1apilib2api").file("src/main/cpp")
-        new File(srcDir1, "src1apilib2apiimpl1api.cpp").text.contains("Src2ApiLib1Api")
-        new File(srcDir1, "src1apilib2apiimpl1api.cpp").text.contains("Src2ApiLib1Api")
+        def lib2 = child1.project(":src1apilib2api").isCppLibrary()
+        def lib2SrcDir = lib2.src
+        lib2SrcDir.file("src1apilib2apiimpl1api.cpp").text.contains("Src2ApiLib1Api")
+        lib2SrcDir.file("src1apilib2apiimpl1api.cpp").text.contains("Src2ApiLib1Api")
 
         def child2 = build(file("external/source2Api"))
         child2.isBuild()
