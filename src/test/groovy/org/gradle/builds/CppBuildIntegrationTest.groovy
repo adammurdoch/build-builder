@@ -28,6 +28,8 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
 
         rootProject.testSrc.contains("test_main.cpp", "app_test.cpp", "appimpl1api_test.cpp", "appimpl2api_test.cpp")
 
+        rootProject.dependsOn()
+
         rootProject.file("performance.scenarios").text.contains('apply-h-change-to = "src/main/headers/app.h"')
         rootProject.file("performance.scenarios").text.contains('apply-cpp-change-to = "src/main/cpp/app.cpp"')
 
@@ -84,6 +86,9 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         lib1.src.contains("lib1api.cpp", "lib1api_private.h", "lib1apiimpl1api.cpp", "lib1apiimpl2api.cpp")
         lib1.testHeaders.contains("lib1api_test.h")
         lib1.testSrc.contains("test_main.cpp", "lib1api_test.cpp",  "lib1apiimpl1api_test.cpp", "lib1apiimpl2api_test.cpp")
+
+        rootProject.dependsOn(lib1)
+        lib1.dependsOn()
 
         rootProject.file("performance.scenarios").text.contains('apply-h-change-to = "lib1api/src/main/public/lib1api.h"')
         rootProject.file("performance.scenarios").text.contains('apply-cpp-change-to = "lib1api/src/main/cpp/lib1api.cpp"')
@@ -216,6 +221,32 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         build.buildSucceeds("build")
     }
 
+    def "can generate 3 project build"() {
+        when:
+        new Main().run("cpp", "--dir", projectDir.absolutePath, "--projects", "3")
+
+        then:
+        build.isBuild()
+
+        def rootProject = build.project(":").isCppApplication()
+        def lib1 = build.project(":lib1api").isCppLibrary()
+        def lib2 = build.project(":lib2api").isCppLibrary()
+
+        rootProject.dependsOn(lib1)
+        lib1.dependsOn(lib2)
+        lib2.dependsOn()
+
+        build.buildSucceeds(":installDebug")
+        build.app("build/install/main/debug/testApp").succeeds()
+
+        build.buildSucceeds("build")
+
+        build.buildSucceeds("publish")
+        file("repo/test/testApp/1.0.0/testApp-1.0.0.pom").file
+        file("repo/test/lib1api/1.0.0/lib1api-1.0.0.pom").file
+        file("repo/test/lib2api/1.0.0/lib2api-1.0.0.pom").file
+    }
+
     @Unroll
     def "can generate #projects project build"() {
         when:
@@ -237,7 +268,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         file("repo/test/testApp/1.0.0/testApp-1.0.0.pom").file
 
         where:
-        projects << ["3", "4", "5", "10", "20"]
+        projects << ["4", "5", "10", "20"]
     }
 
     @Unroll
@@ -338,15 +369,16 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         build.isBuild()
 
         def rootProject = build.project(":").isCppApplication()
-        def srcDir = rootProject.src
-        srcDir.file("appimpl1api.cpp").text.contains("Child1ApiLib1Api")
-        srcDir.file("appimpl1api.cpp").text.contains("Child1ApiLib2Api")
 
         def child = build(file("child1api"))
         child.isBuild()
         child.project(":").isEmptyProject()
-        child.project(":child1apilib1api").isCppLibrary()
-        child.project(":child1apilib2api").isCppLibrary()
+        def lib1 = child.project(":child1apilib1api").isCppLibrary()
+        def lib2 = child.project(":child1apilib2api").isCppLibrary()
+
+        rootProject.dependsOn(lib1, lib2)
+        lib1.dependsOn(lib2)
+        lib2.dependsOn()
 
         build.buildSucceeds(":installDebug")
 

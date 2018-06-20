@@ -9,6 +9,7 @@ import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
 import java.util.function.Consumer
+import java.util.regex.Pattern
 
 abstract class AbstractIntegrationTest extends Specification {
     @Rule
@@ -200,11 +201,27 @@ abstract class AbstractIntegrationTest extends Specification {
         final String path
         final File projectDir
         final File rootDir
+        private String name
 
         ProjectLayout(String path, File projectDir, File rootDir) {
             this.path = path
             this.projectDir = projectDir
             this.rootDir = rootDir
+        }
+
+        String getName() {
+            if (name == null) {
+                if (path == ':') {
+                    def settings = file("settings.gradle").text
+                    def matcher = Pattern.compile("rootProject.name = '(.+)'").matcher(settings)
+                    assert matcher.find()
+                    name = matcher.group(1)
+                    if (name == 'testApp') { name = 'app' }
+                } else {
+                    name = path.substring(1)
+                }
+            }
+            return name
         }
 
         File file(String path) {
@@ -405,6 +422,23 @@ abstract class AbstractIntegrationTest extends Specification {
 
         TestDir getTestSrc() {
             return new TestDir(projectDir, "src/test/cpp")
+        }
+
+        void dependsOn(CppProject... projects) {
+            def files = src.list().findAll { it.endsWith(".cpp") }
+            def srcFile = files.size() == 1 ? files[0] : files.find { it.endsWith("impl1api.cpp") }
+            def srcText = src.file(srcFile).text
+            def pattern = Pattern.compile("(\\w+)\\.doSomething\\(\\);")
+            def matcher = pattern.matcher(srcText)
+            def libs = []
+            while (matcher.find()) {
+                def varName = matcher.group(1)
+                if (!srcText.contains("#include \"${varName}.h\"")) {
+                    continue
+                }
+                libs << varName
+            }
+            assert libs as Set == projects.name as Set
         }
     }
 }

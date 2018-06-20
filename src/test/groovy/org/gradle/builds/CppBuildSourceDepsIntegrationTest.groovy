@@ -13,24 +13,24 @@ class CppBuildSourceDepsIntegrationTest extends AbstractIntegrationTest {
         build.isBuild()
 
         def rootProject = build.project(":").isCppApplication()
-        def srcDir = rootProject.src
-        srcDir.file("appimpl1api.cpp").text.contains("Src1ApiLib1Api")
-        srcDir.file("appimpl1api.cpp").text.contains("Src1ApiLib2Api")
 
         def child1 = build(file("external/source1Api"))
         child1.isBuild()
         child1.project(":").isEmptyProject()
-        child1.project(":src1apilib1api").isCppLibrary()
-        def lib2 = child1.project(":src1apilib2api").isCppLibrary()
-        def lib2SrcDir = lib2.src
-        lib2SrcDir.file("src1apilib2apiimpl1api.cpp").text.contains("Src2ApiLib1Api")
-        lib2SrcDir.file("src1apilib2apiimpl1api.cpp").text.contains("Src2ApiLib1Api")
+        def child1lib1 = child1.project(":src1apilib1api").isCppLibrary()
+        def child1lib2 = child1.project(":src1apilib2api").isCppLibrary()
 
         def child2 = build(file("external/source2Api"))
         child2.isBuild()
         child2.project(":").isEmptyProject()
-        child2.project(":src2apilib1api").isCppLibrary()
-        child2.project(":src2apilib1api").isCppLibrary()
+        def child2lib1 = child2.project(":src2apilib1api").isCppLibrary()
+        def child2lib2 = child2.project(":src2apilib2api").isCppLibrary()
+
+        rootProject.dependsOn(child1lib1, child1lib2)
+        child1lib1.dependsOn(child1lib2, child2lib1, child2lib2)
+        child1lib2.dependsOn(child2lib1, child2lib2)
+        child2lib1.dependsOn(child2lib2)
+        child2lib2.dependsOn()
 
         build.buildSucceeds(":installDebug")
 
@@ -47,24 +47,34 @@ class CppBuildSourceDepsIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
 
-        build.project(":").isCppApplication()
+        def rootProject = build.project(":").isCppApplication()
 
         def child1 = build(file("external/source1Api1"))
         child1.isBuild()
         child1.project(":").isEmptyProject()
-        child1.project(":src1api1lib1api").isCppLibrary()
+        def child1lib1 = child1.project(":src1api1lib1api").isCppLibrary()
+        def child1lib2 = child1.project(":src1api1lib2api").isCppLibrary()
 
         def child2 = build(file("external/source1Api2"))
         child2.isBuild()
-        child2.project(":src1api2lib1api").isCppLibrary()
+        def child2lib1 = child2.project(":src1api2lib1api").isCppLibrary()
+        def child2lib2 = child2.project(":src1api2lib2api").isCppLibrary()
 
         def child3 = build(file("external/source1Core"))
         child3.isBuild()
-        child3.project(":src1corelib1api").isCppLibrary()
+        def child3lib1 = child3.project(":src1corelib1api").isCppLibrary()
+        def child3lib2 = child3.project(":src1corelib2api").isCppLibrary()
 
         def child4 = build(file("external/source2Api"))
         child4.isBuild()
-        child4.project(":src2apilib1api").isCppLibrary()
+        def child4lib1 = child4.project(":src2apilib1api").isCppLibrary()
+        def child4lib2 = child4.project(":src2apilib2api").isCppLibrary()
+
+        rootProject.dependsOn(child1lib1, child1lib2, child2lib1, child2lib2)
+        child1lib1.dependsOn(child1lib2, child3lib1, child3lib2, child4lib1, child4lib2)
+        child2lib1.dependsOn(child2lib2, child3lib1, child3lib2, child4lib1, child4lib2)
+        child3lib1.dependsOn(child3lib2)
+        child4lib1.dependsOn(child4lib2)
 
         build.buildSucceeds(":installDebug")
 

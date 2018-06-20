@@ -14,24 +14,25 @@ class CppBuildHttpRepoIntegrationTest extends AbstractIntegrationTest {
 
         then:
         build.isBuild()
-        build.project(":").isCppApplication()
 
-        def buildFile = build.project(":").file("build.gradle")
+        def rootProject = build.project(":").isCppApplication()
+
+        def buildFile = rootProject.file("build.gradle")
         buildFile.text.contains("implementation 'org.gradle.example:extlib1api1:1.0.0'")
         buildFile.text.contains("implementation 'org.gradle.example:extlib1api2:1.0.0'")
         buildFile.text.contains("implementation 'org.gradle.example:extlib2api:1.0.0'")
 
-        def srcDir = build.project(":").isCppApplication().src
-        srcDir.file("appimpl1api.cpp").text.contains("ExtLib1Api1")
-        srcDir.file("appimpl1api.cpp").text.contains("ExtLib1Api2")
-        srcDir.file("appimpl1api.cpp").text.contains("ExtLib2Api")
-
         def repoBuild = build(file('external/v1'))
         repoBuild.isBuild()
         repoBuild.project(':').isEmptyProject()
-        repoBuild.project(':extlib1api1').isCppLibrary()
-        repoBuild.project(':extlib1api2').isCppLibrary()
-        repoBuild.project(':extlib2api').isCppLibrary()
+        def lib1 = repoBuild.project(':extlib1api1').isCppLibrary()
+        def lib2 = repoBuild.project(':extlib1api2').isCppLibrary()
+        def lib3 = repoBuild.project(':extlib2api').isCppLibrary()
+
+        rootProject.dependsOn(lib1, lib2, lib3)
+        lib1.dependsOn(lib3)
+        lib2.dependsOn(lib3)
+        lib3.dependsOn()
 
         def serverBuild = build(file('repo-server'))
         serverBuild.buildSucceeds("installDist")
@@ -65,14 +66,15 @@ class CppBuildHttpRepoIntegrationTest extends AbstractIntegrationTest {
 
         then:
         build.isBuild()
-        build.project(":").isCppApplication()
 
         def rootProject = build.project(":").isCppApplication()
-        rootProject.src.file("appimpl1api.cpp").text.contains("Ext ext;")
 
         def repoBuild = build(file('external/v1'))
         repoBuild.isBuild()
-        repoBuild.project(':').isCppLibrary()
+        def lib1 = repoBuild.project(':').isCppLibrary()
+
+        rootProject.dependsOn(lib1)
+        lib1.dependsOn()
 
         def serverBuild = build(file('repo-server'))
         serverBuild.buildSucceeds("installDist")
@@ -110,11 +112,6 @@ class CppBuildHttpRepoIntegrationTest extends AbstractIntegrationTest {
         buildFile.text.contains("implementation 'org.gradle.example:extlib1api2:3.0.0'")
         buildFile.text.contains("implementation 'org.gradle.example:extlib2api:3.0.0'")
 
-        def srcDir = rootProject.src
-        srcDir.file("appimpl1api.cpp").text.contains("ExtLib1Api1")
-        srcDir.file("appimpl1api.cpp").text.contains("ExtLib1Api2")
-        srcDir.file("appimpl1api.cpp").text.contains("ExtLib2Api")
-
         def repoBuildV1 = build(file('external/v1'))
         repoBuildV1.isBuild()
         repoBuildV1.project(':').isEmptyProject()
@@ -132,9 +129,14 @@ class CppBuildHttpRepoIntegrationTest extends AbstractIntegrationTest {
         def repoBuildV3 = build(file('external/v3'))
         repoBuildV3.isBuild()
         repoBuildV3.project(':').isEmptyProject()
-        repoBuildV3.project(':extlib1api1').isCppLibrary()
-        repoBuildV3.project(':extlib1api2').isCppLibrary()
-        repoBuildV3.project(':extlib2api').isCppLibrary()
+        def lib1 = repoBuildV3.project(':extlib1api1').isCppLibrary()
+        def lib2 = repoBuildV3.project(':extlib1api2').isCppLibrary()
+        def lib3 = repoBuildV3.project(':extlib2api').isCppLibrary()
+
+        rootProject.dependsOn(lib1, lib2, lib3)
+        lib1.dependsOn(lib3)
+        lib2.dependsOn(lib3)
+        lib3.dependsOn()
 
         def serverBuild = build(file('repo-server'))
         serverBuild.buildSucceeds("installDist")
