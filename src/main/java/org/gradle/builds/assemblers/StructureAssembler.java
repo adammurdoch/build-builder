@@ -5,9 +5,16 @@ import org.gradle.builds.model.Dependency;
 import org.gradle.builds.model.Project;
 
 public class StructureAssembler {
+
+    private final GraphAssembler graphAssembler;
+
+    public StructureAssembler(GraphAssembler graphAssembler) {
+        this.graphAssembler = graphAssembler;
+    }
+
     public void arrangeClasses(Build build) {
         Settings settings = build.getSettings();
-        Graph classGraph = new GraphAssembler().arrange(settings.getSourceFileCount());
+        Graph classGraph = graphAssembler.arrange(settings.getSourceFileCount());
         for (Project project : build.getProjects()) {
             project.setClassGraph(classGraph);
         }
@@ -15,7 +22,7 @@ public class StructureAssembler {
 
     public void arrangeProjects(Build build, ProjectInitializer projectInitializer) {
         Settings settings = build.getSettings();
-        Graph projectGraph = new GraphAssembler().arrange(settings.getProjectCount());
+        Graph projectGraph = graphAssembler.arrange(settings.getProjectCount());
 
         projectGraph.visit((Graph.Visitor<Project>) (nodeDetails, dependencies) -> {
             Project project;
@@ -33,6 +40,9 @@ public class StructureAssembler {
                 } else {
                     projectInitializer.initLibraryProject(project);
                 }
+            }
+            if (layer == 1 || settings.getProjectCount() == 1) {
+                build.exportProject(project);
             }
             for (Dependency<Project> dep : dependencies) {
                 project.requiresProject(dep);

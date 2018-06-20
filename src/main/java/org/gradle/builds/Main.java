@@ -14,6 +14,8 @@ import java.util.Collections;
 import java.util.concurrent.Callable;
 
 public class Main {
+    private static final GraphAssembler graphAssembler = new GraphAssembler();
+
     public static void main(String[] args) {
         try {
             new Main().run(args);
@@ -136,7 +138,8 @@ public class Main {
                                     new CompositeProjectConfigurer(
                                             new AttachDependenciesConfigurer(),
                                             new HttpServerModelAssembler(),
-                                            createModelAssembler()))));
+                                            createModelAssembler())),
+                            graphAssembler));
         }
 
         private Generator<Model> createModelGenerator() {
@@ -169,9 +172,8 @@ public class Main {
             ProjectInitializer projectInitializer = createProjectInitializer();
             BuildTreeAssembler mainBuildAssembler = new CompositeModelStructureAssembler(
                     new MainBuildModelStructureAssembler(projectInitializer),
-                    new IncludedBuildAssembler(projectInitializer,
-                            getBuilds()),
-                    new SourceDependencyBuildAssembler(projectInitializer, sourceDeps));
+                    new IncludedBuildAssembler(projectInitializer, graphAssembler, getBuilds()),
+                    new SourceDependencyBuildAssembler(projectInitializer, graphAssembler, sourceDeps));
             if (isHttpRepo()) {
                 return new CompositeModelStructureAssembler(
                         mainBuildAssembler,

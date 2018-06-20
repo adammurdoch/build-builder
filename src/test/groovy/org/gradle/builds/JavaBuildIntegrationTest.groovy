@@ -130,18 +130,17 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
 
-        build.project(":").isJavaApplication()
-        def srcDir = build.project(":").file("src/main/java/org/gradle/example/app")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1apilib1api.Child1ApiLib1Api.getSomeValue()")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1apilib1api.Child1ApiLib1Api.INT_CONST")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1apilib2api.Child1ApiLib2Api.getSomeValue()")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1apilib2api.Child1ApiLib2Api.INT_CONST")
+        def rootProject = build.project(":").isJavaApplication()
 
         def child = build(file("child1api"))
         child.isBuild()
         child.project(":").isEmptyProject()
-        child.project(":child1apilib1api").isJavaLibrary()
-        child.project(":child1apilib2api").isJavaLibrary()
+        def lib1 = child.project(":child1apilib1api").isJavaLibrary()
+        def lib2 = child.project(":child1apilib2api").isJavaLibrary()
+
+        rootProject.dependsOn(lib1)
+        lib1.dependsOn(lib2)
+        lib2.dependsOn()
 
         build.buildSucceeds(":installDist")
 
@@ -160,31 +159,25 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
 
-        build.project(":").isJavaApplication()
-
-        def srcDir = build.project(":").file("src/main/java/org/gradle/example/app")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1apilib1api.Child1ApiLib1Api.getSomeValue()")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1apilib1api.Child1ApiLib1Api.INT_CONST")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1apilib2api.Child1ApiLib2Api.getSomeValue()")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1apilib2api.Child1ApiLib2Api.INT_CONST")
+        def rootProject = build.project(":").isJavaApplication()
 
         def child1 = build(file("child1api"))
         child1.isBuild()
         child1.project(":").isEmptyProject()
-        child1.project(":child1apilib1api").isJavaLibrary()
-        child1.project(":child1apilib2api").isJavaLibrary()
-
-        def child1SrcDir = child1.project(":child1apilib1api").file("src/main/java/org/gradle/example/child1apilib1api")
-        new File(child1SrcDir, "Child1ApiLib1ApiImpl1Api.java").text.contains("org.gradle.example.child2apilib1api.Child2ApiLib1Api.getSomeValue()")
-        new File(child1SrcDir, "Child1ApiLib1ApiImpl1Api.java").text.contains("org.gradle.example.child2apilib1api.Child2ApiLib1Api.INT_CONST")
-        new File(child1SrcDir, "Child1ApiLib1ApiImpl1Api.java").text.contains("org.gradle.example.child2apilib2api.Child2ApiLib2Api.getSomeValue()")
-        new File(child1SrcDir, "Child1ApiLib1ApiImpl1Api.java").text.contains("org.gradle.example.child2apilib2api.Child2ApiLib2Api.INT_CONST")
+        def child1lib1 = child1.project(":child1apilib1api").isJavaLibrary()
+        def child1lib2 = child1.project(":child1apilib2api").isJavaLibrary()
 
         def child2 = build(file("child2api"))
         child2.isBuild()
         child2.project(":").isEmptyProject()
-        child2.project(":child2apilib1api").isJavaLibrary()
-        child2.project(":child2apilib2api").isJavaLibrary()
+        def child2lib1 = child2.project(":child2apilib1api").isJavaLibrary()
+        def child2lib2 = child2.project(":child2apilib2api").isJavaLibrary()
+
+        rootProject.dependsOn(child1lib1)
+        child1lib1.dependsOn(child1lib2, child2lib1)
+        child1lib2.dependsOn(child2lib1)
+        child2lib1.dependsOn(child2lib2)
+        child2lib2.dependsOn()
 
         build.buildSucceeds(":installDist")
 

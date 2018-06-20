@@ -30,15 +30,15 @@ public class BuildSettingsBuilder {
         this.rootDir = rootDir;
     }
 
-    public Build toModel(Function<BuildSettingsBuilder, Build> buildFactory) {
+    public Build toModel(Function<BuildSettingsBuilder, Build> otherBuildLookup) {
         assertNotNull("displayName", displayName);
         assertNotNull("rootProjectName", rootProjectName);
         assertNotNull("settings", settings);
         assertNotNull("projectInitializer", projectInitializer);
 
-        List<Build> dependsOnBuilds = dependsOn.stream().map(buildFactory).collect(Collectors.toList());
-        List<Build> includedBuilds = this.includedBuilds.stream().map(buildFactory).collect(Collectors.toList());
-        List<Build> sourceBuilds = this.sourceBuilds.stream().map(buildFactory).collect(Collectors.toList());
+        List<Build> dependsOnBuilds = dependsOn.stream().map(otherBuildLookup).collect(Collectors.toList());
+        List<Build> includedBuilds = this.includedBuilds.stream().map(otherBuildLookup).collect(Collectors.toList());
+        List<Build> sourceBuilds = this.sourceBuilds.stream().map(otherBuildLookup).collect(Collectors.toList());
         return new Build(rootDir, displayName, rootProjectName, settings, publicationTarget, typeNamePrefix, projectInitializer, version, dependsOnBuilds, includedBuilds, sourceBuilds);
     }
 

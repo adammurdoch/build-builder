@@ -8,16 +8,18 @@ import org.gradle.builds.model.PublicationTarget;
 public class IncludedBuildAssembler implements BuildTreeAssembler {
     private final ProjectInitializer initializer;
     private final int includedBuilds;
+    private final GraphAssembler graphAssembler;
 
-    public IncludedBuildAssembler(ProjectInitializer initializer, int includedBuilds) {
+    public IncludedBuildAssembler(ProjectInitializer initializer, GraphAssembler graphAssembler, int includedBuilds) {
         this.initializer = new EmptyRootProjectInitializer(initializer);
         this.includedBuilds = includedBuilds;
+        this.graphAssembler = graphAssembler;
     }
 
     @Override
     public void attachBuilds(Settings settings, BuildTreeBuilder model) {
         if (includedBuilds > 0) {
-            Graph graph = new GraphAssembler().arrange(includedBuilds + 1);
+            Graph graph = graphAssembler.arrange(includedBuilds + 1);
             graph.visit((Graph.Visitor<BuildSettingsBuilder>) (node, dependencies) -> {
                 BuildSettingsBuilder build;
                 if (node.getLayer() == 0) {

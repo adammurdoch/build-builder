@@ -26,9 +26,9 @@ class CppBuildSourceDepsIntegrationTest extends AbstractIntegrationTest {
         def child2lib1 = child2.project(":src2apilib1api").isCppLibrary()
         def child2lib2 = child2.project(":src2apilib2api").isCppLibrary()
 
-        rootProject.dependsOn(child1lib1, child1lib2)
-        child1lib1.dependsOn(child1lib2, child2lib1, child2lib2)
-        child1lib2.dependsOn(child2lib1, child2lib2)
+        rootProject.dependsOn(child1lib1)
+        child1lib1.dependsOn(child1lib2, child2lib1)
+        child1lib2.dependsOn(child2lib1)
         child2lib1.dependsOn(child2lib2)
         child2lib2.dependsOn()
 
@@ -70,9 +70,9 @@ class CppBuildSourceDepsIntegrationTest extends AbstractIntegrationTest {
         def child4lib1 = child4.project(":src2apilib1api").isCppLibrary()
         def child4lib2 = child4.project(":src2apilib2api").isCppLibrary()
 
-        rootProject.dependsOn(child1lib1, child1lib2, child2lib1, child2lib2)
-        child1lib1.dependsOn(child1lib2, child3lib1, child3lib2, child4lib1, child4lib2)
-        child2lib1.dependsOn(child2lib2, child3lib1, child3lib2, child4lib1, child4lib2)
+        rootProject.dependsOn(child1lib1, child2lib1)
+        child1lib1.dependsOn(child1lib2, child3lib1, child4lib1)
+        child2lib1.dependsOn(child2lib2, child3lib1, child4lib1)
         child3lib1.dependsOn(child3lib2)
         child4lib1.dependsOn(child4lib2)
 

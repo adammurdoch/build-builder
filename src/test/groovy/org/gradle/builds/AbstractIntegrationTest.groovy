@@ -1,5 +1,6 @@
 package org.gradle.builds
 
+import groovy.io.FileType
 import junit.framework.AssertionFailedError
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder
@@ -275,15 +276,17 @@ abstract class AbstractIntegrationTest extends Specification {
         }
 
         // TODO - add more checks
-        void isJavaLibrary() {
+        JavaProject isJavaLibrary() {
             isJavaProject()
             doesNotApplyPlugin('application')
+            return new JavaProject(path, projectDir, rootDir)
         }
 
         // TODO - add more checks
-        void isJavaApplication() {
+        JavaProject isJavaApplication() {
             isJavaProject()
             appliesPlugin('application')
+            return new JavaProject(path, projectDir, rootDir)
         }
 
         // TODO - add more checks
@@ -394,12 +397,82 @@ abstract class AbstractIntegrationTest extends Specification {
             return new File(this, name)
         }
 
+        List<File> listAll() {
+            List<File> files = []
+            eachFileRecurse(FileType.FILES) { files << it }
+            return files
+        }
+
         void contains(String... files) {
             assert list() as Set == files as Set
         }
     }
 
-    static class CppProject extends ProjectLayout {
+    static abstract class TypedProjectLayout extends ProjectLayout {
+        TypedProjectLayout(String path, File projectDir, File rootDir) {
+            super(path, projectDir, rootDir)
+        }
+
+        abstract TestDir getSrc()
+
+        protected File findImplSourceFile(String extension) {
+            def files = src.listAll().findAll { it.name.endsWith(extension) }
+            def srcFile = files.size() == 1 ? files[0] : files.find { it.name.toLowerCase().endsWith("impl1api${extension}") }
+            return srcFile
+        }
+
+        protected List<String> extractDependenciesFromBuildScript() {
+            def result = []
+            def externalDependency = Pattern.compile("(implementation|api|compile)\\s+'org.gradle.example:(.+):(.+)'")
+            def matcher = externalDependency.matcher(file("build.gradle").text)
+            while (matcher.find()) {
+                result.add(matcher.group(2))
+            }
+            def projectDependency = Pattern.compile("(implementation|api|compile)\\s+project\\(':(.+)'\\)")
+            matcher = projectDependency.matcher(file("build.gradle").text)
+            while (matcher.find()) {
+                result.add(matcher.group(2))
+            }
+            return result
+        }
+    }
+
+    static class JavaProject extends TypedProjectLayout {
+        JavaProject(String path, File projectDir, File rootDir) {
+            super(path, projectDir, rootDir)
+        }
+
+        @Override
+        TestDir getSrc() {
+            return new TestDir(projectDir, "src/main/java")
+        }
+
+        void dependsOn(JavaProject... projects) {
+            def srcFile = findImplSourceFile(".java")
+            def srcText = srcFile.text
+            def pattern = Pattern.compile("org\\.gradle\\.example\\.(\\w+)\\.(\\w+)\\.getSomeValue\\(\\);")
+            def matcher = pattern.matcher(srcText)
+            def libs = []
+            while (matcher.find()) {
+                def packageName = matcher.group(1)
+                if (packageName == name) {
+                    continue
+                }
+                def className = matcher.group(2)
+                if (className.toLowerCase() != packageName) {
+                    continue
+                }
+                if (!srcText.contains("${packageName}.${className}.INT_CONST")) {
+                    continue
+                }
+                libs << packageName
+            }
+            assert libs as Set == projects.name as Set
+            assert extractDependenciesFromBuildScript() as Set == projects.name as Set
+        }
+    }
+
+    static class CppProject extends TypedProjectLayout {
         CppProject(String path, File projectDir, File rootDir) {
             super(path, projectDir, rootDir)
         }
@@ -412,6 +485,7 @@ abstract class AbstractIntegrationTest extends Specification {
             return new TestDir(projectDir, "src/main/public")
         }
 
+        @Override
         TestDir getSrc() {
             return new TestDir(projectDir, "src/main/cpp")
         }
@@ -424,10 +498,17 @@ abstract class AbstractIntegrationTest extends Specification {
             return new TestDir(projectDir, "src/test/cpp")
         }
 
+        String getApiClassName() {
+            def headerText = publicHeaders.file("${name}.h").text
+            def classPattern = Pattern.compile("class\\s+(\\w+)\\s+\\{")
+            def classMatcher = classPattern.matcher(headerText)
+            assert classMatcher.find()
+            return classMatcher.group(1)
+        }
+
         void dependsOn(CppProject... projects) {
-            def files = src.list().findAll { it.endsWith(".cpp") }
-            def srcFile = files.size() == 1 ? files[0] : files.find { it.endsWith("impl1api.cpp") }
-            def srcText = src.file(srcFile).text
+            def srcFile = findImplSourceFile(".cpp")
+            def srcText = srcFile.text
             def pattern = Pattern.compile("(\\w+)\\.doSomething\\(\\);")
             def matcher = pattern.matcher(srcText)
             def libs = []
@@ -439,6 +520,10 @@ abstract class AbstractIntegrationTest extends Specification {
                 libs << varName
             }
             assert libs as Set == projects.name as Set
+            assert extractDependenciesFromBuildScript() as Set == projects.name as Set
+            projects.each { project ->
+                assert srcText.contains("$project.apiClassName $project.name;")
+            }
         }
     }
 }

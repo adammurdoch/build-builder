@@ -7,7 +7,7 @@ import spock.lang.Specification
 import java.nio.file.Paths
 
 class StructureAssemblerTest extends Specification {
-    def assembler = new StructureAssembler()
+    def assembler = new StructureAssembler(new GraphAssembler())
     def initializer = new ProjectInitializer() {
         @Override
         void initRootProject(Project project) {

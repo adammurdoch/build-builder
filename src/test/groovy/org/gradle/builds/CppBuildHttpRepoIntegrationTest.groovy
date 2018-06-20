@@ -20,7 +20,6 @@ class CppBuildHttpRepoIntegrationTest extends AbstractIntegrationTest {
         def buildFile = rootProject.file("build.gradle")
         buildFile.text.contains("implementation 'org.gradle.example:extlib1api1:1.0.0'")
         buildFile.text.contains("implementation 'org.gradle.example:extlib1api2:1.0.0'")
-        buildFile.text.contains("implementation 'org.gradle.example:extlib2api:1.0.0'")
 
         def repoBuild = build(file('external/v1'))
         repoBuild.isBuild()
@@ -29,7 +28,7 @@ class CppBuildHttpRepoIntegrationTest extends AbstractIntegrationTest {
         def lib2 = repoBuild.project(':extlib1api2').isCppLibrary()
         def lib3 = repoBuild.project(':extlib2api').isCppLibrary()
 
-        rootProject.dependsOn(lib1, lib2, lib3)
+        rootProject.dependsOn(lib1, lib2)
         lib1.dependsOn(lib3)
         lib2.dependsOn(lib3)
         lib3.dependsOn()
@@ -110,7 +109,6 @@ class CppBuildHttpRepoIntegrationTest extends AbstractIntegrationTest {
         def buildFile = rootProject.file("build.gradle")
         buildFile.text.contains("implementation 'org.gradle.example:extlib1api1:3.0.0'")
         buildFile.text.contains("implementation 'org.gradle.example:extlib1api2:3.0.0'")
-        buildFile.text.contains("implementation 'org.gradle.example:extlib2api:3.0.0'")
 
         def repoBuildV1 = build(file('external/v1'))
         repoBuildV1.isBuild()
@@ -133,7 +131,7 @@ class CppBuildHttpRepoIntegrationTest extends AbstractIntegrationTest {
         def lib2 = repoBuildV3.project(':extlib1api2').isCppLibrary()
         def lib3 = repoBuildV3.project(':extlib2api').isCppLibrary()
 
-        rootProject.dependsOn(lib1, lib2, lib3)
+        rootProject.dependsOn(lib1, lib2)
         lib1.dependsOn(lib3)
         lib2.dependsOn(lib3)
         lib3.dependsOn()

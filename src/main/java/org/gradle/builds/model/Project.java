@@ -51,7 +51,7 @@ public class Project {
      */
     public String getQualifiedNamespaceFor() {
         if (parent == null) {
-            return "org.gradle.example.app";
+            return "org.gradle.example." + getTypeNameFor().toLowerCase();
         }
         return "org.gradle.example" + mapName(name, (src, startOffset, endOffset, dest) -> {
             String element = src.substring(startOffset, endOffset).toLowerCase();

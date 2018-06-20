@@ -1,16 +1,24 @@
 package org.gradle.builds.assemblers;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class GraphAssembler {
+    private final Map<Integer, Graph> graphs = new HashMap<>();
+
     /**
      * Attempts to create 3 layers, then attempts to keep between 3 and 6 nodes in each layer.
      * A node depends on every node in the next layer.
      */
     public Graph arrange(int nodes) {
+        Graph graph = graphs.get(nodes);
+        if (graph == null) {
+            graph = doArrange(nodes);
+            graphs.put(nodes, graph);
+        }
+        return graph;
+    }
+
+    private Graph doArrange(int nodes) {
         List<Layer> layers = new ArrayList<>();
         layers.add(new Layer(layers.size(), 1));
         int remaining = nodes - 1;

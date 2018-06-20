@@ -8,16 +8,18 @@ import org.gradle.builds.model.PublicationTarget;
 public class SourceDependencyBuildAssembler implements BuildTreeAssembler {
     private final ProjectInitializer initializer;
     private final int sourceDependencyBuilds;
+    private final GraphAssembler graphAssembler;
 
-    public SourceDependencyBuildAssembler(ProjectInitializer initializer, int sourceDependencyBuilds) {
+    public SourceDependencyBuildAssembler(ProjectInitializer initializer, GraphAssembler graphAssembler, int sourceDependencyBuilds) {
         this.initializer = new EmptyRootProjectInitializer(initializer);
         this.sourceDependencyBuilds = sourceDependencyBuilds;
+        this.graphAssembler = graphAssembler;
     }
 
     @Override
     public void attachBuilds(Settings settings, BuildTreeBuilder model) {
         if (sourceDependencyBuilds > 0) {
-            Graph graph = new GraphAssembler().arrange(sourceDependencyBuilds + 1);
+            Graph graph = graphAssembler.arrange(sourceDependencyBuilds + 1);
             graph.visit((Graph.Visitor<BuildSettingsBuilder>) (node, dependencies) -> {
                 BuildSettingsBuilder build;
                 if (node.getLayer() == 0) {

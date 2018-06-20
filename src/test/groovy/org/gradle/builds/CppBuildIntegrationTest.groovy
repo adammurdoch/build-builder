@@ -376,7 +376,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         def lib1 = child.project(":child1apilib1api").isCppLibrary()
         def lib2 = child.project(":child1apilib2api").isCppLibrary()
 
-        rootProject.dependsOn(lib1, lib2)
+        rootProject.dependsOn(lib1)
         lib1.dependsOn(lib2)
         lib2.dependsOn()
 

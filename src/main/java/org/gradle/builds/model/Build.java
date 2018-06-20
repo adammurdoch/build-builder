@@ -15,7 +15,7 @@ public class Build {
     private final List<Build> dependsOn;
     private final List<Build> includedBuilds;
     private final List<Build> sourceBuilds;
-    private final List<PublishedLibrary<?>> publishedLibraries = new ArrayList<>();
+    private final List<Project> exportedProjects = new ArrayList<>();
     private final Settings settings;
     private final PublicationTarget publicationTarget;
     private final String typeNamePrefix;
@@ -105,12 +105,8 @@ public class Build {
         return settings;
     }
 
-    public List<PublishedLibrary<?>> getPublishedLibraries() {
-        return publishedLibraries;
-    }
-
-    public void publishLibrary(PublishedLibrary<?> library) {
-        publishedLibraries.add(library);
+    public List<PublishedLibrary<?>> getExportedLibraries() {
+        return exportedProjects.stream().flatMap(project -> project.getPublishedLibraries().stream()).collect(Collectors.toList());
     }
 
     public PublicationTarget getPublicationTarget() {
@@ -147,5 +143,9 @@ public class Build {
 
     public List<Build> getSourceBuilds() {
         return sourceBuilds;
+    }
+
+    public void exportProject(Project project) {
+        exportedProjects.add(project);
     }
 }
