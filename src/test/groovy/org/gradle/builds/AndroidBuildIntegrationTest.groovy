@@ -182,20 +182,17 @@ class AndroidBuildIntegrationTest extends AbstractAndroidIntegrationTest {
         then:
         build.isBuild()
 
-        build.project(":").isAndroidApplication()
-        def srcDir = build.project(":").file("src/main/java/org/gradle/example/app")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1apilib1api.Child1ApiLib1ApiActivity.getSomeValue()")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1apilib1api.Child1ApiLib1ApiActivity.INT_CONST")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1apilib1api.R.string.child1apilib1api_string")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1apilib2api.Child1ApiLib2ApiActivity.getSomeValue()")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1apilib2api.Child1ApiLib2ApiActivity.INT_CONST")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1apilib2api.R.string.child1apilib2api_string")
+        def rootProject = build.project(":").isAndroidApplication()
 
         def child = build(file("child1api"))
         child.isBuild()
         child.project(":").isEmptyProject()
-        child.project(":child1apilib1api").isAndroidLibrary()
-        child.project(":child1apilib2api").isAndroidLibrary()
+        def lib1 = child.project(":child1apilib1api").isAndroidLibrary()
+        def lib2 = child.project(":child1apilib2api").isAndroidLibrary()
+
+        rootProject.dependsOn(lib1)
+        lib1.dependsOn(lib2)
+        lib2.dependsOn()
 
         build.buildSucceeds(":assembleDebug")
         file("build/outputs/apk/debug/testApp-debug.apk").exists()

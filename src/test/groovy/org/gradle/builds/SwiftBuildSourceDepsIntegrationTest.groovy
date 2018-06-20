@@ -12,24 +12,25 @@ class SwiftBuildSourceDepsIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
 
-        build.project(":").isSwiftApplication()
-        def srcDir = build.project(":").file("src/main/swift")
-        new File(srcDir, "AppImpl1Api.swift").text.contains("import Src1apilib1api")
-        new File(srcDir, "AppImpl1Api.swift").text.contains("let src1apilib1api = Src1ApiLib1Api()")
-        new File(srcDir, "AppImpl1Api.swift").text.contains("import Src1apilib2api")
-        new File(srcDir, "AppImpl1Api.swift").text.contains("let src1apilib2api = Src1ApiLib2Api()")
+        def rootProject = build.project(":").isSwiftApplication()
 
         def child1 = build(file("external/source1Api"))
         child1.isBuild()
         child1.project(":").isEmptyProject()
-        child1.project(":src1apilib1api").isSwiftLibrary()
-        child1.project(":src1apilib2api").isSwiftLibrary()
+        def child1lib1 = child1.project(":src1apilib1api").isSwiftLibrary()
+        def child1lib2 = child1.project(":src1apilib2api").isSwiftLibrary()
 
         def child2 = build(file("external/source2Api"))
         child2.isBuild()
         child2.project(":").isEmptyProject()
-        child2.project(":src2apilib1api").isSwiftLibrary()
-        child2.project(":src2apilib2api").isSwiftLibrary()
+        def child2lib1 = child2.project(":src2apilib1api").isSwiftLibrary()
+        def child2lib2 = child2.project(":src2apilib2api").isSwiftLibrary()
+
+        rootProject.dependsOn(child1lib1)
+        child1lib1.dependsOn(child1lib2, child2lib1)
+        child1lib2.dependsOn(child2lib1)
+        child2lib1.dependsOn(child2lib2)
+        child2lib2.dependsOn()
 
         build.buildSucceeds(":installDebug")
 

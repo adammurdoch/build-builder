@@ -11,24 +11,19 @@ class AndroidBuildHttpRepoIntegrationTest extends AbstractAndroidIntegrationTest
         then:
         build.isBuild()
 
-        build.project(":").isAndroidApplication()
-        def srcDir = build.project(":").file("src/main/java/org/gradle/example/app")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.extlib1api1.ExtLib1Api1Activity.getSomeValue()")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.extlib1api1.ExtLib1Api1Activity.INT_CONST")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.extlib1api1.R.string.extlib1api1_string")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.extlib1api2.ExtLib1Api2Activity.getSomeValue()")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.extlib1api2.ExtLib1Api2Activity.INT_CONST")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.extlib1api2.R.string.extlib1api2_string")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.extlib2api.ExtLib2ApiActivity.getSomeValue()")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.extlib2api.ExtLib2ApiActivity.INT_CONST")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.extlib2api.R.string.extlib2api_string")
+        def rootProject = build.project(":").isAndroidApplication()
 
         def repoBuild = build(file('external/v1'))
         repoBuild.isBuild()
         repoBuild.project(':').isEmptyProject()
-        repoBuild.project(':extlib1api1').isAndroidLibrary()
-        repoBuild.project(':extlib1api2').isAndroidLibrary()
-        repoBuild.project(':extlib2api').isAndroidLibrary()
+        def lib1 = repoBuild.project(':extlib1api1').isAndroidLibrary()
+        def lib2 = repoBuild.project(':extlib1api2').isAndroidLibrary()
+        def lib3 = repoBuild.project(':extlib2api').isAndroidLibrary()
+
+        rootProject.dependsOn(lib1, lib2)
+        lib1.dependsOn(lib3)
+        lib2.dependsOn(lib3)
+        lib3.dependsOn()
 
         def serverBuild = build(file('repo-server'))
         serverBuild.buildSucceeds("installDist")
@@ -48,7 +43,7 @@ class AndroidBuildHttpRepoIntegrationTest extends AbstractAndroidIntegrationTest
         server?.kill()
     }
 
-    def "can generate single project build with http repo and Java libraries"() {
+    def "can generate multi project build with http repo and Java libraries"() {
         given:
         useIsolatedUserHome()
 
@@ -58,25 +53,24 @@ class AndroidBuildHttpRepoIntegrationTest extends AbstractAndroidIntegrationTest
         then:
         build.isBuild()
 
-        build.project(":").isAndroidApplication()
-        def srcDir = build.project(":").file("src/main/java/org/gradle/example/app")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.extlib1api1.ExtLib1Api1Activity.getSomeValue()")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.extlib1api1.ExtLib1Api1Activity.INT_CONST")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.extlib1api1.R.string.extlib1api1_string")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.extlib1api2.ExtLib1Api2.getSomeValue()")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.extlib1api2.ExtLib1Api2.INT_CONST")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.extlib2api.ExtLib2Api.getSomeValue()")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.extlib2api.ExtLib2Api.INT_CONST")
+        def rootProject = build.project(":").isAndroidApplication()
 
-        build.project(":lib1api").isAndroidLibrary()
-        build.project(":lib2api").isJavaLibrary()
+        def lib1 = build.project(":lib1api").isAndroidLibrary()
+        def lib2 = build.project(":lib2api").isJavaLibrary()
 
         def repoBuild = build(file('external/v1'))
         repoBuild.isBuild()
         repoBuild.project(':').isEmptyProject()
-        repoBuild.project(':extlib1api1').isAndroidLibrary()
-        repoBuild.project(':extlib1api2').isJavaLibrary()
-        repoBuild.project(':extlib2api').isJavaLibrary()
+        def extlib1 = repoBuild.project(':extlib1api1').isAndroidLibrary()
+        def extlib2 = repoBuild.project(':extlib1api2').isJavaLibrary()
+        def extlib3 = repoBuild.project(':extlib2api').isJavaLibrary()
+
+        rootProject.dependsOn(lib1, extlib1, extlib2)
+        lib1.dependsOn(lib2, extlib1, extlib2)
+        lib2.dependsOn(extlib2)
+        extlib1.dependsOn(extlib3)
+        extlib2.dependsOn(extlib3)
+        extlib3.dependsOn()
 
         def serverBuild = build(file('repo-server'))
         serverBuild.buildSucceeds("installDist")

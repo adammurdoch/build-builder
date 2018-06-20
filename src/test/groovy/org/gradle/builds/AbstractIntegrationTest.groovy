@@ -132,7 +132,6 @@ abstract class AbstractIntegrationTest extends Specification {
             } finally {
                 repository.close()
             }
-
         }
 
         // TODO - add more checks
@@ -217,7 +216,9 @@ abstract class AbstractIntegrationTest extends Specification {
                     def matcher = Pattern.compile("rootProject.name = '(.+)'").matcher(settings)
                     assert matcher.find()
                     name = matcher.group(1)
-                    if (name == 'testApp') { name = 'app' }
+                    if (name == 'testApp') {
+                        name = 'app'
+                    }
                 } else {
                     name = path.substring(1)
                 }
@@ -244,7 +245,11 @@ abstract class AbstractIntegrationTest extends Specification {
         void containsFilesWithExtension(File dir, String extension) {
             assert dir.directory
             List<File> found = []
-            dir.eachFileRecurse { f -> if (f.name.endsWith("." + extension)) { found.add(f) } }
+            dir.eachFileRecurse { f ->
+                if (f.name.endsWith("." + extension)) {
+                    found.add(f)
+                }
+            }
             assert !found.empty
         }
 
@@ -304,17 +309,19 @@ abstract class AbstractIntegrationTest extends Specification {
         }
 
         // TODO - add more checks
-        void isAndroidLibrary() {
+        AndroidProject isAndroidLibrary() {
             isAndroidProject()
             appliesPlugin('com.android.library')
             doesNotApplyPlugin('com.android.application')
+            return new AndroidProject(path, projectDir, rootDir)
         }
 
         // TODO - add more checks
-        void isAndroidApplication() {
+        AndroidProject isAndroidApplication() {
             isAndroidProject()
             doesNotApplyPlugin('com.android.library')
             appliesPlugin('com.android.application')
+            return new AndroidProject(path, projectDir, rootDir)
         }
 
         // TODO - add more checks
@@ -356,29 +363,31 @@ abstract class AbstractIntegrationTest extends Specification {
             assert testDir.list().findAll { it.endsWith(".swift") }
         }
 
-        void isSwiftApplication() {
+        SwiftProject isSwiftApplication() {
             isSwiftProject()
             appliesPlugin('swift-application')
             doesNotApplyPlugin('swift-library')
             def srcDir = file("src/main/swift")
             assert new File(srcDir, "main.swift").file
+            return new SwiftProject(path, projectDir, rootDir)
         }
 
-        void isSwiftLibrary() {
+        SwiftProject isSwiftLibrary() {
             isSwiftProject()
             appliesPlugin('swift-library')
             doesNotApplyPlugin('swift-application')
+            return new SwiftProject(path, projectDir, rootDir)
         }
 
         // TODO - add more checks
         void isSwiftPMProject() {
             isProject()
 
-            def srcDir = new File(rootDir,"Sources/" + (path == ':' ? 'testApp' : path.substring(1)))
+            def srcDir = new File(rootDir, "Sources/" + (path == ':' ? 'testApp' : path.substring(1)))
             assert srcDir.directory
             assert srcDir.list().findAll { it.endsWith(".swift") }
 
-            def testDir = new File(rootDir,"Tests/" + (path == ':' ? 'testApp' : path.substring(1)) + "Tests")
+            def testDir = new File(rootDir, "Tests/" + (path == ':' ? 'testApp' : path.substring(1)) + "Tests")
             assert testDir.directory
             assert testDir.list().findAll { it.endsWith(".swift") }
         }
@@ -417,7 +426,13 @@ abstract class AbstractIntegrationTest extends Specification {
 
         protected File findImplSourceFile(String extension) {
             def files = src.listAll().findAll { it.name.endsWith(extension) }
-            def srcFile = files.size() == 1 ? files[0] : files.find { it.name.toLowerCase().endsWith("impl1api${extension}") }
+            def srcFile = files.size() == 1 ? files[0] : files.find { it.name.toLowerCase() == "${name}impl1api${extension}" }
+            return srcFile
+        }
+
+        protected File findApiSourceFile(String extension) {
+            def files = src.listAll().findAll { it.name.endsWith(extension) }
+            def srcFile = files.size() == 1 ? files[0] : files.find { it.name.toLowerCase() == "${name}${extension}" }
             return srcFile
         }
 
@@ -437,14 +452,20 @@ abstract class AbstractIntegrationTest extends Specification {
         }
     }
 
-    static class JavaProject extends TypedProjectLayout {
-        JavaProject(String path, File projectDir, File rootDir) {
+    static abstract class JvmProject extends TypedProjectLayout {
+        JvmProject(String path, File projectDir, File rootDir) {
             super(path, projectDir, rootDir)
         }
 
         @Override
         TestDir getSrc() {
             return new TestDir(projectDir, "src/main/java")
+        }
+    }
+
+    static class JavaProject extends JvmProject {
+        JavaProject(String path, File projectDir, File rootDir) {
+            super(path, projectDir, rootDir)
         }
 
         void dependsOn(JavaProject... projects) {
@@ -469,6 +490,81 @@ abstract class AbstractIntegrationTest extends Specification {
             }
             assert libs as Set == projects.name as Set
             assert extractDependenciesFromBuildScript() as Set == projects.name as Set
+        }
+    }
+
+    static class AndroidProject extends JvmProject {
+        AndroidProject(String path, File projectDir, File rootDir) {
+            super(path, projectDir, rootDir)
+        }
+
+        void dependsOn(JvmProject... projects) {
+            def srcFile = findImplSourceFile(".java")
+            def srcText = srcFile.text
+            def pattern = Pattern.compile("org\\.gradle\\.example\\.(\\w+)\\.(\\w+)\\.getSomeValue\\(\\);")
+            def matcher = pattern.matcher(srcText)
+            def libs = []
+            while (matcher.find()) {
+                def packageName = matcher.group(1)
+                if (packageName == name) {
+                    continue
+                }
+                def className = matcher.group(2)
+                if (!className.toLowerCase().startsWith(packageName)) {
+                    continue
+                }
+                if (!srcText.contains("${packageName}.${className}.INT_CONST")) {
+                    continue
+                }
+                libs << packageName
+            }
+            assert libs as Set == projects.name as Set
+            assert extractDependenciesFromBuildScript() as Set == projects.name as Set
+            projects.each { project ->
+                if (project instanceof AndroidProject) {
+                    assert srcText.contains("${project.name}.R.string.${project.name}_string")
+                }
+            }
+        }
+    }
+
+    static class SwiftProject extends TypedProjectLayout {
+        SwiftProject(String path, File projectDir, File rootDir) {
+            super(path, projectDir, rootDir)
+        }
+
+        @Override
+        TestDir getSrc() {
+            return new TestDir(projectDir, "src/main/swift")
+        }
+
+        String getApiClassName() {
+            def sourceText = findApiSourceFile(".swift").text
+            def classPattern = Pattern.compile("class\\s+(\\w+)\\s+\\{")
+            def classMatcher = classPattern.matcher(sourceText)
+            assert classMatcher.find()
+            return classMatcher.group(1)
+        }
+
+        void dependsOn(SwiftProject... projects) {
+            def srcFile = findImplSourceFile(".swift")
+            def srcText = srcFile.text
+            def pattern = Pattern.compile("(\\w+)\\.doSomething\\(\\)")
+            def matcher = pattern.matcher(srcText)
+            def libs = []
+            while (matcher.find()) {
+                def varName = matcher.group(1)
+                if (varName.startsWith(name)) {
+                    continue
+                }
+                libs << varName
+            }
+            assert libs as Set == projects.name as Set
+            assert extractDependenciesFromBuildScript() as Set == projects.name as Set
+            projects.each { project ->
+                assert srcText.contains("import ${project.name.capitalize()}")
+                assert srcText.contains("let ${project.name} = ${project.apiClassName}()")
+            }
         }
     }
 
@@ -521,8 +617,7 @@ abstract class AbstractIntegrationTest extends Specification {
             }
             assert libs as Set == projects.name as Set
             assert extractDependenciesFromBuildScript() as Set == projects.name as Set
-            projects.each { project ->
-                assert srcText.contains("$project.apiClassName $project.name;")
+            projects.each { project -> assert srcText.contains("$project.apiClassName $project.name;")
             }
         }
     }
