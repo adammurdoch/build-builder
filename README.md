@@ -53,7 +53,7 @@ The `--http-repo-libraries` option specifies the number of libraries to include 
 
 The `--http-repo-versions` option specifies the number of versions for each library to include in the HTTP repository. Default is 1.
 
-The `--source-dep-libraries` option specifies the number of libraries to include as source dependencies. Default is 0.
+The `--source-dep-builds` option specifies the number of additional builds to include as source dependencies. Default is 0.
 
 #### Android specific options
 
