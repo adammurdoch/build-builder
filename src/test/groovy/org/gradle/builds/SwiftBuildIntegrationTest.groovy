@@ -138,16 +138,16 @@ class SwiftBuildIntegrationTest extends AbstractIntegrationTest {
 
         build.project(":").isSwiftApplication()
         def srcDir = build.project(":").file("src/main/swift")
-        new File(srcDir, "AppImpl1Api.swift").text.contains("import Child1lib1api")
-        new File(srcDir, "AppImpl1Api.swift").text.contains("let child1lib1api = Child1Lib1Api()")
-        new File(srcDir, "AppImpl1Api.swift").text.contains("import Child1lib2api")
-        new File(srcDir, "AppImpl1Api.swift").text.contains("let child1lib2api = Child1Lib2Api()")
+        new File(srcDir, "AppImpl1Api.swift").text.contains("import Child1apilib1api")
+        new File(srcDir, "AppImpl1Api.swift").text.contains("let child1apilib1api = Child1ApiLib1Api()")
+        new File(srcDir, "AppImpl1Api.swift").text.contains("import Child1apilib2api")
+        new File(srcDir, "AppImpl1Api.swift").text.contains("let child1apilib2api = Child1ApiLib2Api()")
 
-        def child = build(file("child1"))
+        def child = build(file("child1api"))
         child.isBuild()
         child.project(":").isEmptyProject()
-        child.project(":child1lib1api").isSwiftLibrary()
-        child.project(":child1lib2api").isSwiftLibrary()
+        child.project(":child1Apilib1api").isSwiftLibrary()
+        child.project(":child1Apilib2api").isSwiftLibrary()
 
         build.buildSucceeds(":installDebug")
 

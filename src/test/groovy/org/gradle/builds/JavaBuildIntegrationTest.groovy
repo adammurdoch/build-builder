@@ -132,22 +132,22 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
 
         build.project(":").isJavaApplication()
         def srcDir = build.project(":").file("src/main/java/org/gradle/example/app")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1lib1api.Child1Lib1Api.getSomeValue()")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1lib1api.Child1Lib1Api.INT_CONST")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1lib2api.Child1Lib2Api.getSomeValue()")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1lib2api.Child1Lib2Api.INT_CONST")
+        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1apilib1api.Child1ApiLib1Api.getSomeValue()")
+        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1apilib1api.Child1ApiLib1Api.INT_CONST")
+        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1apilib2api.Child1ApiLib2Api.getSomeValue()")
+        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1apilib2api.Child1ApiLib2Api.INT_CONST")
 
-        def child = build(file("child1"))
+        def child = build(file("child1api"))
         child.isBuild()
         child.project(":").isEmptyProject()
-        child.project(":child1lib1api").isJavaLibrary()
-        child.project(":child1lib2api").isJavaLibrary()
+        child.project(":child1apilib1api").isJavaLibrary()
+        child.project(":child1apilib2api").isJavaLibrary()
 
         build.buildSucceeds(":installDist")
 
         def app = build.app("build/install/testApp/bin/testApp")
         app.isApp()
-        app.libDir.list() as Set == ["child1lib1api-1.0.0.jar", "child1lib2api-1.0.0.jar", "slf4j-api-1.7.25.jar", "testApp.jar"] as Set
+        app.libDir.list() as Set == ["child1apilib1api-1.0.0.jar", "child1apilib2api-1.0.0.jar", "slf4j-api-1.7.25.jar", "testApp.jar"] as Set
         app.succeeds()
 
         build.buildSucceeds("build")
@@ -163,32 +163,34 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":").isJavaApplication()
 
         def srcDir = build.project(":").file("src/main/java/org/gradle/example/app")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1lib1api.Child1Lib1Api.getSomeValue()")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1lib1api.Child1Lib1Api.INT_CONST")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1lib2api.Child1Lib2Api.getSomeValue()")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1lib2api.Child1Lib2Api.INT_CONST")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child2lib1api.Child2Lib1Api.getSomeValue()")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child2lib1api.Child2Lib1Api.INT_CONST")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child2lib2api.Child2Lib2Api.getSomeValue()")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child2lib2api.Child2Lib2Api.INT_CONST")
+        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1apilib1api.Child1ApiLib1Api.getSomeValue()")
+        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1apilib1api.Child1ApiLib1Api.INT_CONST")
+        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1apilib2api.Child1ApiLib2Api.getSomeValue()")
+        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.child1apilib2api.Child1ApiLib2Api.INT_CONST")
 
-        def child1 = build(file("child1"))
+        def child1 = build(file("child1api"))
         child1.isBuild()
         child1.project(":").isEmptyProject()
-        child1.project(":child1lib1api").isJavaLibrary()
-        child1.project(":child1lib2api").isJavaLibrary()
+        child1.project(":child1apilib1api").isJavaLibrary()
+        child1.project(":child1apilib2api").isJavaLibrary()
 
-        def child2 = build(file("child2"))
+        def child1SrcDir = child1.project(":child1apilib1api").file("src/main/java/org/gradle/example/child1apilib1api")
+        new File(child1SrcDir, "Child1ApiLib1ApiImpl1Api.java").text.contains("org.gradle.example.child2apilib1api.Child2ApiLib1Api.getSomeValue()")
+        new File(child1SrcDir, "Child1ApiLib1ApiImpl1Api.java").text.contains("org.gradle.example.child2apilib1api.Child2ApiLib1Api.INT_CONST")
+        new File(child1SrcDir, "Child1ApiLib1ApiImpl1Api.java").text.contains("org.gradle.example.child2apilib2api.Child2ApiLib2Api.getSomeValue()")
+        new File(child1SrcDir, "Child1ApiLib1ApiImpl1Api.java").text.contains("org.gradle.example.child2apilib2api.Child2ApiLib2Api.INT_CONST")
+
+        def child2 = build(file("child2api"))
         child2.isBuild()
         child2.project(":").isEmptyProject()
-        child2.project(":child2lib1api").isJavaLibrary()
-        child2.project(":child2lib2api").isJavaLibrary()
+        child2.project(":child2apilib1api").isJavaLibrary()
+        child2.project(":child2apilib2api").isJavaLibrary()
 
         build.buildSucceeds(":installDist")
 
         def app = build.app("build/install/testApp/bin/testApp")
         app.isApp()
-        app.libDir.list() as Set == ["child1lib1api-1.0.0.jar", "child1lib2api-1.0.0.jar", "child2lib1api-1.0.0.jar", "child2lib2api-1.0.0.jar", "slf4j-api-1.7.25.jar", "testApp.jar"] as Set
+        app.libDir.list() as Set == ["child1apilib1api-1.0.0.jar", "child1apilib2api-1.0.0.jar", "child2apilib1api-1.0.0.jar", "child2apilib2api-1.0.0.jar", "slf4j-api-1.7.25.jar", "testApp.jar"] as Set
         app.succeeds()
 
         build.buildSucceeds("build")

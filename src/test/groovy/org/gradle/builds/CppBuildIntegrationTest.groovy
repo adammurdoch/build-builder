@@ -318,14 +318,14 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
 
         build.project(":").isCppApplication()
         def srcDir = build.project(":").file("src/main/cpp")
-        new File(srcDir, "appimpl1api.cpp").text.contains("Child1Lib1Api")
-        new File(srcDir, "appimpl1api.cpp").text.contains("Child1Lib2Api")
+        new File(srcDir, "appimpl1api.cpp").text.contains("Child1ApiLib1Api")
+        new File(srcDir, "appimpl1api.cpp").text.contains("Child1ApiLib2Api")
 
-        def child = build(file("child1"))
+        def child = build(file("child1api"))
         child.isBuild()
         child.project(":").isEmptyProject()
-        child.project(":child1lib1api").isCppLibrary()
-        child.project(":child1lib2api").isCppLibrary()
+        child.project(":child1apilib1api").isCppLibrary()
+        child.project(":child1apilib2api").isCppLibrary()
 
         build.buildSucceeds(":installDebug")
 
