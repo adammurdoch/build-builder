@@ -7,7 +7,7 @@ class JavaBuildSourceDepsIntegrationTest extends AbstractIntegrationTest {
 
     def "can generate build with source dependencies"() {
         when:
-        new Main().run("java", "--dir", projectDir.absolutePath, "--source-dep-libraries", "2")
+        new Main().run("java", "--dir", projectDir.absolutePath, "--source-dep-builds", "2")
 
         then:
         build.isBuild()

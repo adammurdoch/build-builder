@@ -7,7 +7,7 @@ class CppBuildSourceDepsIntegrationTest extends AbstractIntegrationTest {
 
     def "can generate build with source dependencies"() {
         when:
-        new Main().run("cpp", "--dir", projectDir.absolutePath, "--source-dep-libraries", "2")
+        new Main().run("cpp", "--dir", projectDir.absolutePath, "--source-dep-builds", "2")
 
         then:
         build.isBuild()
@@ -42,7 +42,7 @@ class CppBuildSourceDepsIntegrationTest extends AbstractIntegrationTest {
 
     def "can generate build with 4 source dependencies"() {
         when:
-        new Main().run("cpp", "--dir", projectDir.absolutePath, "--source-dep-libraries", "4")
+        new Main().run("cpp", "--dir", projectDir.absolutePath, "--source-dep-builds", "4")
 
         then:
         build.isBuild()

@@ -72,7 +72,7 @@ public class Main {
         @Option(name = "--included-builds", description = "The number of included builds to generate (default: 0)")
         int builds = 0;
 
-        @Option(name = "--source-dep-libraries", description = "The number of source dependency libraries to generate (default: 0)")
+        @Option(name = "--source-dep-builds", description = "The number of source dependency builds to generate (default: 0)")
         int sourceDeps = 0;
 
         @Override

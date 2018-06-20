@@ -10,7 +10,7 @@ class CppBuildComplexCompositionIntegrationTest extends AbstractIntegrationTest 
         useIsolatedUserHome()
 
         when:
-        new Main().run("cpp", "--http-repo", "--included-builds", "2", "--source-dep-libraries", "2", "--dir", projectDir.absolutePath)
+        new Main().run("cpp", "--http-repo", "--included-builds", "2", "--source-dep-builds", "2", "--dir", projectDir.absolutePath)
 
         then:
         build.isBuild()
@@ -18,8 +18,8 @@ class CppBuildComplexCompositionIntegrationTest extends AbstractIntegrationTest 
         build(file('external/v1')).isBuild()
         build(file('external/source1Api')).isBuild()
         build(file('external/source2Api')).isBuild()
-        build(file('child1')).isBuild()
-        build(file('child2')).isBuild()
+        build(file('child1api')).isBuild()
+        build(file('child2api')).isBuild()
 
         def serverBuild = build(file('repo-server'))
         serverBuild.buildSucceeds("installDist")

@@ -7,28 +7,30 @@ import org.gradle.builds.model.PublicationTarget;
 
 public class SourceDependencyBuildAssembler implements BuildTreeAssembler {
     private final ProjectInitializer initializer;
-    private final int sourceDependencies;
+    private final int sourceDependencyBuilds;
 
-    public SourceDependencyBuildAssembler(ProjectInitializer initializer, int sourceDependencies) {
+    public SourceDependencyBuildAssembler(ProjectInitializer initializer, int sourceDependencyBuilds) {
         this.initializer = new EmptyRootProjectInitializer(initializer);
-        this.sourceDependencies = sourceDependencies;
+        this.sourceDependencyBuilds = sourceDependencyBuilds;
     }
 
     @Override
     public void attachBuilds(Settings settings, BuildTreeBuilder model) {
-        if (sourceDependencies > 0) {
-            Graph graph = new GraphAssembler().arrange(sourceDependencies + 1);
+        if (sourceDependencyBuilds > 0) {
+            Graph graph = new GraphAssembler().arrange(sourceDependencyBuilds + 1);
             graph.visit((Graph.Visitor<BuildSettingsBuilder>) (node, dependencies) -> {
                 BuildSettingsBuilder build;
                 if (node.getLayer() == 0) {
                     build = model.getMainBuild();
                 } else {
+                    String name = "src" + node.getNameSuffix();
+                    String typeName = "Src" + node.getNameSuffix();
                     BuildSettingsBuilder childBuild = model.addBuild(model.getRootDir().resolve("external/source" + node.getNameSuffix()));
-                    childBuild.setDisplayName("source dependency build");
-                    childBuild.setRootProjectName("src" + node.getNameSuffix());
+                    childBuild.setDisplayName("source dependency build " + name);
+                    childBuild.setRootProjectName(name);
                     childBuild.setSettings(new Settings(3, settings.getSourceFileCount()));
                     childBuild.setProjectInitializer(initializer);
-                    childBuild.setTypeNamePrefix("Src" + node.getNameSuffix());
+                    childBuild.setTypeNamePrefix(typeName);
                     childBuild.publishAs(new PublicationTarget(null));
                     build = childBuild;
                 }
