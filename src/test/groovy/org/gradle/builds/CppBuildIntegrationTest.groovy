@@ -89,8 +89,8 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         rootProject.dependsOn(lib1)
         lib1.dependsOn()
 
-        rootProject.file("performance.scenarios").text.contains('apply-h-change-to = "lib1api/src/main/public/lib1api.h"')
-        rootProject.file("performance.scenarios").text.contains('apply-cpp-change-to = "lib1api/src/main/cpp/lib1api.cpp"')
+        rootProject.file("performance.scenarios").text.contains('apply-h-change-to = "lib/src/main/public/lib.h"')
+        rootProject.file("performance.scenarios").text.contains('apply-cpp-change-to = "lib/src/main/cpp/lib.cpp"')
 
         build.buildSucceeds(":installDebug")
         build.app("build/install/main/debug/testApp").succeeds()
@@ -99,7 +99,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
 
         build.buildSucceeds("publish")
         file("repo/test/testApp/1.0.0/testApp-1.0.0.pom").file
-        file("repo/test/lib1api/1.0.0/lib1api-1.0.0.pom").file
+        file("repo/test/lib/1.0.0/lib-1.0.0.pom").file
     }
 
     def "can generate build with API dependencies between projects"() {
@@ -128,13 +128,13 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         build.isBuild()
 
         def rootProject = build.project(":").isCppApplication()
-        rootProject.headers.file("app.h").text.contains("void doSomethingWith(AppImpl2Api1& p);")
+        rootProject.headers.file("app.h").text.contains("void doSomethingWith(AppImpl2& p);")
 
         def lib1 = build.project(":lib1api1").isCppLibrary()
-        lib1.headers.file("lib1api1_impl.h").text.contains("void doSomethingWith(Lib1Api1Impl2Api1& p);")
+        lib1.headers.file("lib1api1_impl.h").text.contains("void doSomethingWith(Lib1Api1Impl2& p);")
 
         def lib2 = build.project(":lib1api2").isCppLibrary()
-        lib2.headers.file("lib1api2_impl.h").text.contains("void doSomethingWith(Lib1Api2Impl2Api1& p);")
+        lib2.headers.file("lib1api2_impl.h").text.contains("void doSomethingWith(Lib1Api2Impl2& p);")
 
         build.buildSucceeds(":installDebug")
         build.app("build/install/main/debug/testApp").succeeds()
@@ -203,8 +203,8 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         def rootProject = build.project(":").isCppApplication()
         rootProject.src.file("app_private.h").text.contains('#include <boost/asio.hpp>')
 
-        def lib1 = build.project(":lib1api").isCppLibrary()
-        lib1.src.file("lib1api_private.h").text.contains('#include <boost/asio.hpp>')
+        def lib1 = build.project(":lib").isCppLibrary()
+        lib1.src.file("lib_private.h").text.contains('#include <boost/asio.hpp>')
 
         build.buildSucceeds(":installDebug")
         build.app("build/install/main/debug/testApp").succeeds()
@@ -220,8 +220,8 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         build.isBuild()
 
         def rootProject = build.project(":").isCppApplication()
-        def lib1 = build.project(":lib1api").isCppLibrary()
-        def lib2 = build.project(":lib2api").isCppLibrary()
+        def lib1 = build.project(":libapi").isCppLibrary()
+        def lib2 = build.project(":libcore").isCppLibrary()
 
         rootProject.dependsOn(lib1)
         lib1.dependsOn(lib2)
@@ -234,8 +234,8 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
 
         build.buildSucceeds("publish")
         file("repo/test/testApp/1.0.0/testApp-1.0.0.pom").file
-        file("repo/test/lib1api/1.0.0/lib1api-1.0.0.pom").file
-        file("repo/test/lib2api/1.0.0/lib2api-1.0.0.pom").file
+        file("repo/test/libapi/1.0.0/libapi-1.0.0.pom").file
+        file("repo/test/libcore/1.0.0/libcore-1.0.0.pom").file
     }
 
     @Unroll
@@ -296,12 +296,12 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         build.isBuild()
         def rootProject = build.project(":").isCppApplication()
         rootProject.headers.contains("app.h", "app_defs1.h")
-        rootProject.src.contains("app_private.h", "app_private_defs1.h", "app.cpp", "appimpl1api.cpp", "appimpl2api.cpp")
+        rootProject.src.contains("app_private.h", "app_private_defs1.h", "app.cpp", "appimplapi.cpp", "appimplcore.cpp")
 
-        def lib1 = build.project(":lib1api").isCppLibrary()
-        lib1.publicHeaders.contains("lib1api.h")
-        lib1.headers.contains("lib1api_impl.h", "lib1api_impl_defs1.h")
-        lib1.src.contains("lib1api_private.h", "lib1api.cpp", "lib1apiimpl1api.cpp", "lib1apiimpl2api.cpp")
+        def lib1 = build.project(":lib").isCppLibrary()
+        lib1.publicHeaders.contains("lib.h")
+        lib1.headers.contains("lib_impl.h", "lib_impl_defs1.h")
+        lib1.src.contains("lib_private.h", "lib.cpp", "libimplapi.cpp", "libimplcore.cpp")
 
         build.buildSucceeds(":installDebug")
         build.app("build/install/main/debug/testApp").succeeds()
@@ -318,12 +318,12 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
 
         def rootProject = build.project(":").isCppApplication()
         rootProject.headers.contains("app.h", "app_defs1.h", "app_defs2.h", "app_defs3.h")
-        rootProject.src.contains("app_private.h", "app_private_defs1.h", "app_private_defs2.h", "app_private_defs3.h", "app.cpp", "appimpl1api.cpp", "appimpl2api.cpp")
+        rootProject.src.contains("app_private.h", "app_private_defs1.h", "app_private_defs2.h", "app_private_defs3.h", "app.cpp", "appimplapi.cpp", "appimplcore.cpp")
 
-        def lib1 = build.project(":lib1api").isCppLibrary()
-        lib1.publicHeaders.contains("lib1api.h", "lib1api_defs1.h")
-        lib1.headers.contains("lib1api_impl.h", "lib1api_impl_defs1.h", "lib1api_impl_defs2.h")
-        lib1.src.contains("lib1api_private.h", "lib1api_private_defs1.h", "lib1api_private_defs2.h", "lib1api.cpp", "lib1apiimpl1api.cpp", "lib1apiimpl2api.cpp")
+        def lib1 = build.project(":lib").isCppLibrary()
+        lib1.publicHeaders.contains("lib.h", "lib_defs1.h")
+        lib1.headers.contains("lib_impl.h", "lib_impl_defs1.h", "lib_impl_defs2.h")
+        lib1.src.contains("lib_private.h", "lib_private_defs1.h", "lib_private_defs2.h", "lib.cpp", "libimplapi.cpp", "libimplcore.cpp")
 
         build.buildSucceeds(":installDebug")
         build.app("build/install/main/debug/testApp").succeeds()
@@ -361,11 +361,11 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
 
         def rootProject = build.project(":").isCppApplication()
 
-        def child = build(file("child1api"))
+        def child = build(file("child"))
         child.isBuild()
         child.project(":").isEmptyProject()
-        def lib1 = child.project(":child1apilib1api").isCppLibrary()
-        def lib2 = child.project(":child1apilib2api").isCppLibrary()
+        def lib1 = child.project(":childlibapi").isCppLibrary()
+        def lib2 = child.project(":childlibcore").isCppLibrary()
 
         rootProject.dependsOn(lib1)
         lib1.dependsOn(lib2)
@@ -386,7 +386,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
         build.project(":").isCppApplication()
-        build.project(":lib1api").isCppLibrary()
+        build.project(":lib").isCppLibrary()
 
         when:
         new Main().run("cpp", "--source-files", "1", "--dir", projectDir.absolutePath)

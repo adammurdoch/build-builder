@@ -74,9 +74,20 @@ public class Graph {
          */
         int getLayer();
 
+        /**
+         * Is this node exported outside the graph?
+         */
         boolean isExported();
 
+        /**
+         * Is this node the deepest in the graph?
+         */
         boolean isDeepest();
+
+        /**
+         * Should this node receive incoming dependencies from outside the graph?
+         */
+        boolean isReceiveIncoming();
 
         boolean isUseAlternate();
 

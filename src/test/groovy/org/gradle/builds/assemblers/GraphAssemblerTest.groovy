@@ -20,6 +20,7 @@ class GraphAssemblerTest extends Specification {
         root.layer == 0
         root.exported
         root.deepest
+        root.receiveIncoming
         root.nameSuffix == ''
         !root.useAlternate
     }
@@ -41,6 +42,7 @@ class GraphAssemblerTest extends Specification {
         root.implementationDependencies == [n1]
         root.layer == 0
         !root.exported
+        !root.receiveIncoming
         !root.deepest
         root.nameSuffix == ''
         !root.useAlternate
@@ -49,6 +51,7 @@ class GraphAssemblerTest extends Specification {
         n1.implementationDependencies.empty
         n1.layer == 1
         n1.exported
+        n1.receiveIncoming
         n1.deepest
         n1.nameSuffix == ''
         n1.useAlternate
@@ -72,6 +75,7 @@ class GraphAssemblerTest extends Specification {
         root.implementationDependencies == [n1]
         root.layer == 0
         !root.exported
+        !root.receiveIncoming
         !root.deepest
         root.nameSuffix == ''
         !root.useAlternate
@@ -80,6 +84,7 @@ class GraphAssemblerTest extends Specification {
         n1.implementationDependencies == [n2]
         n1.layer == 1
         n1.exported
+        n1.receiveIncoming
         !n1.deepest
         n1.nameSuffix == 'Api'
         !n1.useAlternate
@@ -88,6 +93,7 @@ class GraphAssemblerTest extends Specification {
         n2.implementationDependencies.empty
         n2.layer == 1
         !n2.exported
+        !n2.receiveIncoming
         n2.deepest
         n2.nameSuffix == 'Core'
         n2.useAlternate
@@ -113,6 +119,7 @@ class GraphAssemblerTest extends Specification {
         root.implementationDependencies == [n1, n2]
         root.layer == 0
         !root.exported
+        !root.receiveIncoming
         !root.deepest
         root.nameSuffix == ''
         !root.useAlternate
@@ -121,6 +128,7 @@ class GraphAssemblerTest extends Specification {
         n1.implementationDependencies == [n3]
         n1.layer == 1
         n1.exported
+        n1.receiveIncoming
         !n1.deepest
         n1.nameSuffix == 'Api1'
         !n1.useAlternate
@@ -129,6 +137,7 @@ class GraphAssemblerTest extends Specification {
         n2.implementationDependencies == [n3]
         n2.layer == 1
         n2.exported
+        n2.receiveIncoming
         !n2.deepest
         n2.nameSuffix == 'Api2'
         n2.useAlternate
@@ -137,6 +146,7 @@ class GraphAssemblerTest extends Specification {
         n3.implementationDependencies.empty
         n3.layer == 1
         !n3.exported
+        !n3.receiveIncoming
         n3.deepest
         n3.nameSuffix == 'Core'
         n3.useAlternate
@@ -164,12 +174,14 @@ class GraphAssemblerTest extends Specification {
         root.layer == 0
         root.nameSuffix == ''
         !root.exported
+        !root.receiveIncoming
         !root.useAlternate
 
         n1.apiDependencies.empty
         n1.implementationDependencies == [n3]
         n1.layer == 1
         n1.exported
+        n1.receiveIncoming
         !n1.deepest
         n1.nameSuffix == 'Api1'
         !n1.useAlternate
@@ -178,6 +190,7 @@ class GraphAssemblerTest extends Specification {
         n2.implementationDependencies == [n3]
         n2.layer == 1
         n2.exported
+        n2.receiveIncoming
         !n2.deepest
         n2.nameSuffix == 'Api2'
         !n2.useAlternate
@@ -186,6 +199,7 @@ class GraphAssemblerTest extends Specification {
         n3.implementationDependencies == [n4]
         n3.layer == 1
         !n3.exported
+        n3.receiveIncoming
         !n3.deepest
         n3.nameSuffix == 'Impl'
         !n3.useAlternate
@@ -194,6 +208,7 @@ class GraphAssemblerTest extends Specification {
         n4.implementationDependencies.empty
         n4.layer == 1
         !n4.exported
+        !n4.receiveIncoming
         n4.deepest
         n4.nameSuffix == 'Core'
         n4.useAlternate
@@ -220,6 +235,7 @@ class GraphAssemblerTest extends Specification {
         root.apiDependencies.empty
         root.implementationDependencies == [n1, n2]
         !root.exported
+        !root.receiveIncoming
         !root.deepest
         root.nameSuffix == ''
         !root.useAlternate
@@ -227,6 +243,7 @@ class GraphAssemblerTest extends Specification {
         n1.apiDependencies == [n5]
         n1.implementationDependencies == [n3]
         n1.exported
+        n1.receiveIncoming
         !n1.deepest
         n1.nameSuffix == '1Api1'
         !n1.useAlternate
@@ -234,6 +251,7 @@ class GraphAssemblerTest extends Specification {
         n2.apiDependencies.empty
         n2.implementationDependencies == [n3, n5]
         n2.exported
+        n2.receiveIncoming
         !n2.deepest
         n2.nameSuffix == '1Api2'
         !n2.useAlternate
@@ -241,6 +259,7 @@ class GraphAssemblerTest extends Specification {
         n3.apiDependencies.empty
         n3.implementationDependencies == [n4, n5]
         !n3.exported
+        n3.receiveIncoming
         !n3.deepest
         n3.nameSuffix == '1Impl'
         !n3.useAlternate
@@ -248,6 +267,7 @@ class GraphAssemblerTest extends Specification {
         n4.apiDependencies.empty
         n4.implementationDependencies.empty
         !n4.exported
+        !n4.receiveIncoming
         !n4.deepest
         n4.nameSuffix == '1Core'
         n4.useAlternate
@@ -255,6 +275,7 @@ class GraphAssemblerTest extends Specification {
         n5.apiDependencies.empty
         n5.implementationDependencies.empty
         !n5.exported
+        n5.receiveIncoming
         n5.deepest
         n5.nameSuffix == '2'
         n5.useAlternate
@@ -284,6 +305,7 @@ class GraphAssemblerTest extends Specification {
         root.apiDependencies.empty
         root.implementationDependencies == [n1, n2]
         !root.exported
+        !root.receiveIncoming
         !root.deepest
         root.nameSuffix == ''
         !root.useAlternate
@@ -291,6 +313,7 @@ class GraphAssemblerTest extends Specification {
         n1.apiDependencies == [n5]
         n1.implementationDependencies == [n3]
         n1.exported
+        n1.receiveIncoming
         !n1.deepest
         n1.nameSuffix == '1Api1'
         !n1.useAlternate
@@ -298,6 +321,7 @@ class GraphAssemblerTest extends Specification {
         n2.apiDependencies.empty
         n2.implementationDependencies == [n3, n5]
         n2.exported
+        n2.receiveIncoming
         !n2.deepest
         n2.nameSuffix == '1Api2'
         !n2.useAlternate
@@ -305,6 +329,7 @@ class GraphAssemblerTest extends Specification {
         n3.apiDependencies.empty
         n3.implementationDependencies == [n4, n5]
         !n3.exported
+        n3.receiveIncoming
         !n3.deepest
         n3.nameSuffix == '1Impl'
         !n3.useAlternate
@@ -312,6 +337,7 @@ class GraphAssemblerTest extends Specification {
         n4.apiDependencies.empty
         n4.implementationDependencies.empty
         !n4.exported
+        !n4.receiveIncoming
         !n4.deepest
         n4.nameSuffix == '1Core'
         n4.useAlternate
@@ -319,6 +345,7 @@ class GraphAssemblerTest extends Specification {
         n5.apiDependencies.empty
         n5.implementationDependencies == [n6]
         !n5.exported
+        n5.receiveIncoming
         !n5.deepest
         n5.nameSuffix == '2Api'
         !n5.useAlternate
@@ -326,6 +353,7 @@ class GraphAssemblerTest extends Specification {
         n6.apiDependencies.empty
         n6.implementationDependencies.empty
         !n6.exported
+        !n6.receiveIncoming
         n6.deepest
         n6.nameSuffix == '2Core'
         n6.useAlternate
@@ -357,48 +385,56 @@ class GraphAssemblerTest extends Specification {
         root.apiDependencies.empty
         root.implementationDependencies == [n1, n2, n3]
         !root.exported
+        !root.receiveIncoming
         !root.deepest
         root.nameSuffix == ''
 
         n1.apiDependencies == [n6]
         n1.implementationDependencies == [n4]
         n1.exported
+        n1.receiveIncoming
         !n1.deepest
         n1.nameSuffix == '1Api1'
 
         n2.apiDependencies.empty
         n2.implementationDependencies == [n4, n6]
         n2.exported
+        n2.receiveIncoming
         !n2.deepest
         n2.nameSuffix == '1Api2'
 
         n3.apiDependencies.empty
         n3.implementationDependencies == [n4, n6]
         n3.exported
+        n3.receiveIncoming
         !n3.deepest
         n3.nameSuffix == '1Api3'
 
         n4.apiDependencies.empty
         n4.implementationDependencies == [n5, n6]
         !n4.exported
+        n4.receiveIncoming
         !n4.deepest
         n4.nameSuffix == '1Impl'
 
         n5.apiDependencies.empty
         n5.implementationDependencies.empty
         !n5.exported
+        !n5.receiveIncoming
         !n5.deepest
         n5.nameSuffix == '1Core'
 
         n6.apiDependencies.empty
         n6.implementationDependencies == [n7]
         !n6.exported
+        n6.receiveIncoming
         !n6.deepest
         n6.nameSuffix == '2Api'
 
         n7.apiDependencies.empty
         n7.implementationDependencies.empty
         !n7.exported
+        !n7.receiveIncoming
         n7.deepest
         n7.nameSuffix == '2Core'
     }

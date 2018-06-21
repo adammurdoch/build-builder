@@ -154,7 +154,6 @@ public class CppModelAssembler extends AbstractModelAssembler {
 
     private void addSource(Project project, HasCppSource component, CppClass entryPoint, CppSourceFile entryPointSourceFile, CppHeaderFile implHeader,
                            CppHeaderFile privateHeader) {
-        int implLayer = Math.max(0, project.getClassGraph().getLayers() - 2);
         project.getClassGraph().visit((Graph.Visitor<CppClass>) (nodeDetails, dependencies) -> {
             CppClass cppClass;
             CppSourceFile cppSourceFile;
@@ -165,7 +164,7 @@ public class CppModelAssembler extends AbstractModelAssembler {
                 cppSourceFile = entryPointSourceFile;
                 // Incoming API/implementation dependencies should be encoded in the graph
                 addIncomingApiDependencies(component, cppClass, cppSourceFile);
-                if (layer == implLayer) {
+                if (nodeDetails.isReceiveIncoming()) {
                     addIncomingImplementationDependencies(component, cppClass, cppSourceFile);
                 }
                 for (Dependency<CppClass> dep : dependencies) {
@@ -179,7 +178,7 @@ public class CppModelAssembler extends AbstractModelAssembler {
                 cppSourceFile.includeHeader(privateHeader);
                 cppSourceFile.includeHeader(implHeader);
                 cppSourceFile.addClass(cppClass);
-                if (layer == implLayer) {
+                if (nodeDetails.isReceiveIncoming()) {
                     // Incoming API/implementation dependencies should be encoded in the graph
                     // Forcing to implementation should be encoded in the graph
                     addIncomingDependenciesAsImplementation(component, cppClass, cppSourceFile);

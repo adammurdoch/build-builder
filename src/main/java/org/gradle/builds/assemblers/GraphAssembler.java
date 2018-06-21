@@ -104,6 +104,11 @@ public class GraphAssembler {
         }
 
         @Override
+        public boolean isReceiveIncoming() {
+            return group.isReceiveIncoming();
+        }
+
+        @Override
         public String getNameSuffix() {
             return group.size == 1 ? group.getNamePrefix() : group.getNamePrefix() + (item + 1);
         }
@@ -239,11 +244,15 @@ public class GraphAssembler {
         public List<NodeImpl> getProtectedApi() {
             return getNodes();
         }
+
+        public boolean isReceiveIncoming() {
+            return layer.id != 0 || layer.next == null;
+        }
     }
 
     private static class ApiGroup extends Group {
-        public ApiGroup(Layer layer, String name, int size, Module nextGroup, List<? extends Module> requiredModules) {
-            super(layer, name, size, nextGroup, requiredModules);
+        ApiGroup(Layer layer, int size, Module nextGroup, List<? extends Module> requiredModules) {
+            super(layer, "Api", size, nextGroup, requiredModules);
         }
 
         @Override
@@ -259,6 +268,17 @@ public class GraphAssembler {
         @Override
         public boolean isExported() {
             return layer.id == 1 || layer.id == 0 && layer.next == null;
+        }
+    }
+
+    private static class CoreGroup extends Group {
+        public CoreGroup(Layer layer, int size) {
+            super(layer, "Core", size, Empty.INSTANCE, Collections.emptyList());
+        }
+
+        @Override
+        public boolean isReceiveIncoming() {
+            return false;
         }
     }
 
@@ -312,14 +332,14 @@ public class GraphAssembler {
                 int implSize = size - apiSize - noDepsSize;
                 Module noDeps = Empty.INSTANCE;
                 if (noDepsSize > 0) {
-                    noDeps = new Group(this, "Core", noDepsSize, Empty.INSTANCE, Collections.emptyList());
+                    noDeps = new CoreGroup(this, noDepsSize);
                 }
                 Module impl = Empty.INSTANCE;
                 if (implSize > 0) {
                     impl = new Group(this, "Impl", implSize, noDeps, Arrays.asList(noDeps, nextLayer));
                 }
                 Module apiNext = implSize > 0 ? impl : noDeps;
-                Module api = new ApiGroup(this, "Api", apiSize, apiNext, Arrays.asList(apiNext, nextLayer));
+                Module api = new ApiGroup(this, apiSize, apiNext, Arrays.asList(apiNext, nextLayer));
                 nodes.addAll(api.getNodes());
                 nodes.addAll(impl.getNodes());
                 nodes.addAll(noDeps.getNodes());

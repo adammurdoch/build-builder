@@ -70,7 +70,6 @@ public class SwiftModelAssembler extends AbstractModelAssembler {
     }
 
     private void addSource(Project project, HasSwiftSource component, SwiftClass entryPoint, SwiftSourceFile sourceFile) {
-        int implLayer = Math.max(0, project.getClassGraph().getLayers() - 2);
         project.getClassGraph().visit((Graph.Visitor<SwiftClass>) (nodeDetails, dependencies) -> {
             SwiftClass swiftClass;
             SwiftSourceFile swiftSourceFile;
@@ -83,7 +82,7 @@ public class SwiftModelAssembler extends AbstractModelAssembler {
                 swiftSourceFile = component.addSourceFile(swiftClass.getName() + ".swift");
                 swiftSourceFile.addClass(swiftClass);
             }
-            if (layer == implLayer) {
+            if (nodeDetails.isReceiveIncoming()) {
                 addReferences(component, swiftClass, swiftSourceFile);
             }
             for (Dependency<SwiftClass> dep : dependencies) {
