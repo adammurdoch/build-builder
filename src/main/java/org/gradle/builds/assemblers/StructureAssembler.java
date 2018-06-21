@@ -41,7 +41,7 @@ public class StructureAssembler {
                     projectInitializer.initLibraryProject(project);
                 }
             }
-            if (layer == 1 || settings.getProjectCount() == 1) {
+            if (nodeDetails.isExported()) {
                 build.exportProject(project);
             }
             for (Dependency<Project> dep : dependencies) {

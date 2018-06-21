@@ -23,30 +23,19 @@ public class GraphAssembler {
         layers.add(new Layer(layers.size(), 1));
         int remaining = nodes - 1;
         while (remaining > 0) {
-            if (remaining > 8) {
+            if (remaining <= 4) {
+                layers.add(new Layer(layers.size(), remaining));
+                remaining = 0;
+            }
+            if (remaining > 7) {
                 layers.add(new Layer(layers.size(), 6));
                 remaining -= 6;
                 continue;
             }
             switch (remaining) {
-                case 1:
-                    layers.add(new Layer(layers.size(), 1));
-                    break;
-                case 2:
-                    layers.add(new Layer(layers.size(), 1));
-                    layers.add(new Layer(layers.size(), 1));
-                    break;
-                case 3:
-                    layers.add(new Layer(layers.size(), 2));
-                    layers.add(new Layer(layers.size(), 1));
-                    break;
-                case 4:
-                    layers.add(new Layer(layers.size(), 3));
-                    layers.add(new Layer(layers.size(), 1));
-                    break;
                 case 5:
-                    layers.add(new Layer(layers.size(), 3));
-                    layers.add(new Layer(layers.size(), 2));
+                    layers.add(new Layer(layers.size(), 4));
+                    layers.add(new Layer(layers.size(), 1));
                     break;
                 case 6:
                     layers.add(new Layer(layers.size(), 4));
@@ -54,10 +43,6 @@ public class GraphAssembler {
                     break;
                 case 7:
                     layers.add(new Layer(layers.size(), 5));
-                    layers.add(new Layer(layers.size(), 2));
-                    break;
-                case 8:
-                    layers.add(new Layer(layers.size(), 6));
                     layers.add(new Layer(layers.size(), 2));
                     break;
             }
@@ -104,8 +89,13 @@ public class GraphAssembler {
         }
 
         @Override
+        public boolean isExported() {
+            return group.isExported();
+        }
+
+        @Override
         public boolean isDeepest() {
-            return group.layer.next == null && item == group.size - 1;
+            return group.isDeepest() && item == group.size - 1;
         }
 
         @Override
@@ -115,7 +105,7 @@ public class GraphAssembler {
 
         @Override
         public String getNameSuffix() {
-            return group.size == 1 ? group.toString() : group.toString() + (item + 1);
+            return group.size == 1 ? group.getNamePrefix() : group.getNamePrefix() + (item + 1);
         }
 
         @Override
@@ -130,12 +120,18 @@ public class GraphAssembler {
     }
 
     private interface Module {
+        boolean canExportApi();
         List<NodeImpl> getProtectedApi();
         List<NodeImpl> getNodes();
     }
 
     private static class Empty implements Module {
         static final Empty INSTANCE = new Empty();
+
+        @Override
+        public boolean canExportApi() {
+            return false;
+        }
 
         @Override
         public List<NodeImpl> getProtectedApi() {
@@ -149,22 +145,41 @@ public class GraphAssembler {
     }
 
     private static class Group implements Module {
-        private final Layer layer;
+        protected final Layer layer;
         private final String name;
         private final int size;
+        protected final Module nextGroup;
         private final List<? extends Module> requiredModules;
         private List<NodeImpl> nodes;
 
-        Group(Layer layer, String name, int size, List<? extends Module> requiredModules) {
+        Group(Layer layer, String name, int size, Module nextGroup, List<? extends Module> requiredModules) {
             this.layer = layer;
             this.name = name;
             this.size = size;
+            this.nextGroup = nextGroup;
             this.requiredModules = requiredModules;
         }
 
         @Override
         public String toString() {
-            return layer.id + name;
+            return "{group layer: " + layer + ", name: " + name + "}";
+        }
+
+        public String getNamePrefix() {
+            return layer.getNamePrefix() + name;
+        }
+
+        public boolean isDeepest() {
+            return layer.next == null && nextGroup.getNodes().isEmpty();
+        }
+
+        @Override
+        public boolean canExportApi() {
+            return false;
+        }
+
+        public boolean isExported() {
+            return false;
         }
 
         @Override
@@ -172,28 +187,40 @@ public class GraphAssembler {
             if (nodes == null) {
                 List<NodeImpl> implDeps = new ArrayList<>();
                 List<NodeImpl> apiDeps = new ArrayList<>();
+                List<NodeImpl> allDeps = new ArrayList<>();
                 for (Module module : requiredModules) {
                     List<NodeImpl> api = module.getProtectedApi();
-                    if (api.size() > 1) {
+                    if (!api.isEmpty() && (module.canExportApi() || !canExportApi())) {
                         apiDeps.add(api.get(0));
                         implDeps.addAll(api.subList(1, api.size()));
                     } else {
                         implDeps.addAll(api);
                     }
+                    allDeps.addAll(api);
                 }
                 nodes = new ArrayList<>(size);
                 for (int i = 0; i < size; i++) {
+                    List<NodeImpl> nodeImplDeps;
+                    List<NodeImpl> nodeApiDeps;
+                    if (i == 0 && size > 1) {
+                        // First item of group exports upstream
+                        nodeApiDeps = apiDeps;
+                        nodeImplDeps = implDeps;
+                    } else {
+                        nodeApiDeps = Collections.emptyList();
+                        nodeImplDeps = allDeps;
+                    }
                     boolean useAlternate;
-                    if (size > 1 && i == size - 1 && layer.canUseAlternate() && canUseAlternate(implDeps) && canUseAlternate(apiDeps)) {
+                    if (size > 1 && i == size - 1 && layer.canUseAlternate() && canUseAlternate(nodeImplDeps) && canUseAlternate(nodeApiDeps)) {
                         // Last item of this group and all dependencies use alternate
                         useAlternate = true;
-                    } else if (size == 1 && layer.canUseAlternate() && implDeps.isEmpty()) {
+                    } else if (size == 1 && layer.canUseAlternate() && nodeImplDeps.isEmpty()) {
                         // Single item group with no dependencies
                         useAlternate = true;
                     } else {
                         useAlternate = false;
                     }
-                    this.nodes.add(new NodeImpl(this, i, apiDeps, implDeps, useAlternate));
+                    this.nodes.add(new NodeImpl(this, i, nodeApiDeps, nodeImplDeps, useAlternate));
                 }
             }
             return nodes;
@@ -214,6 +241,27 @@ public class GraphAssembler {
         }
     }
 
+    private static class ApiGroup extends Group {
+        public ApiGroup(Layer layer, String name, int size, Module nextGroup, List<? extends Module> requiredModules) {
+            super(layer, name, size, nextGroup, requiredModules);
+        }
+
+        @Override
+        public String getNamePrefix() {
+            return layer.getNamePrefix() + (nextGroup.getNodes().isEmpty() ? "" : "Api");
+        }
+
+        @Override
+        public boolean canExportApi() {
+            return true;
+        }
+
+        @Override
+        public boolean isExported() {
+            return layer.id == 1 || layer.id == 0 && layer.next == null;
+        }
+    }
+
     private static class Layer implements Module {
         final int id;
         final int size;
@@ -224,6 +272,23 @@ public class GraphAssembler {
         Layer(int id, int size) {
             this.id = id;
             this.size = size;
+        }
+
+        @Override
+        public String toString() {
+            return "{layer id: " + id + "}";
+        }
+
+        String getNamePrefix() {
+            if (id == 0 || id == 1 && next == null) {
+                return "";
+            }
+            return String.valueOf(id);
+        }
+
+        @Override
+        public boolean canExportApi() {
+            return true;
         }
 
         @Override
@@ -242,12 +307,19 @@ public class GraphAssembler {
             if (this.nodes == null) {
                 Module nextLayer = next == null ? Empty.INSTANCE : next;
                 this.nodes = new ArrayList<>(size);
-                int apiSize = size < 3 ? size : (size + 1) / 2;
+                int apiSize = (size + 1) / 2;
                 int noDepsSize = (size - apiSize + 1) / 2;
                 int implSize = size - apiSize - noDepsSize;
-                Module noDeps = new Group(this, "Core", noDepsSize, Collections.emptyList());
-                Module impl = new Group(this, "Impl", implSize, Arrays.asList(noDeps, nextLayer));
-                Module api = new Group(this, "Api", apiSize, Arrays.asList(impl.getNodes().isEmpty() ? noDeps : impl, nextLayer));
+                Module noDeps = Empty.INSTANCE;
+                if (noDepsSize > 0) {
+                    noDeps = new Group(this, "Core", noDepsSize, Empty.INSTANCE, Collections.emptyList());
+                }
+                Module impl = Empty.INSTANCE;
+                if (implSize > 0) {
+                    impl = new Group(this, "Impl", implSize, noDeps, Arrays.asList(noDeps, nextLayer));
+                }
+                Module apiNext = implSize > 0 ? impl : noDeps;
+                Module api = new ApiGroup(this, "Api", apiSize, apiNext, Arrays.asList(apiNext, nextLayer));
                 nodes.addAll(api.getNodes());
                 nodes.addAll(impl.getNodes());
                 nodes.addAll(noDeps.getNodes());

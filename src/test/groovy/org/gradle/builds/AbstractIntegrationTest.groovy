@@ -426,7 +426,7 @@ abstract class AbstractIntegrationTest extends Specification {
 
         protected File findImplSourceFile(String extension) {
             def files = src.listAll().findAll { it.name.endsWith(extension) }
-            def srcFile = files.size() == 1 ? files[0] : files.find { it.name.toLowerCase() == "${name}impl1api${extension}" }
+            def srcFile = files.size() == 1 ? files[0] : files.find { it.name.toLowerCase() == "${name}implapi${extension}" }
             return srcFile
         }
 

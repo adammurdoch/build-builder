@@ -74,6 +74,8 @@ public class Graph {
          */
         int getLayer();
 
+        boolean isExported();
+
         boolean isDeepest();
 
         boolean isUseAlternate();
