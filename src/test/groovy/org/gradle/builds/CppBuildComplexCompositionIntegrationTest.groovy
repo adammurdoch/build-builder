@@ -16,10 +16,10 @@ class CppBuildComplexCompositionIntegrationTest extends AbstractIntegrationTest 
         build.isBuild()
 
         build(file('external/v1')).isBuild()
-        build(file('external/source1Api')).isBuild()
-        build(file('external/source2Api')).isBuild()
-        build(file('child1api')).isBuild()
-        build(file('child2api')).isBuild()
+        build(file('external/sourceApi')).isBuild()
+        build(file('external/sourceCore')).isBuild()
+        build(file('childApi')).isBuild()
+        build(file('childCore')).isBuild()
 
         def serverBuild = build(file('repo-server'))
         serverBuild.buildSucceeds("installDist")

@@ -14,17 +14,17 @@ class SwiftBuildSourceDepsIntegrationTest extends AbstractIntegrationTest {
 
         def rootProject = build.project(":").isSwiftApplication()
 
-        def child1 = build(file("external/source1Api"))
+        def child1 = build(file("external/sourceApi"))
         child1.isBuild()
         child1.project(":").isEmptyProject()
-        def child1lib1 = child1.project(":src1apilib1api").isSwiftLibrary()
-        def child1lib2 = child1.project(":src1apilib2api").isSwiftLibrary()
+        def child1lib1 = child1.project(":srcapilibapi").isSwiftLibrary()
+        def child1lib2 = child1.project(":srcapilibcore").isSwiftLibrary()
 
-        def child2 = build(file("external/source2Api"))
+        def child2 = build(file("external/sourceCore"))
         child2.isBuild()
         child2.project(":").isEmptyProject()
-        def child2lib1 = child2.project(":src2apilib1api").isSwiftLibrary()
-        def child2lib2 = child2.project(":src2apilib2api").isSwiftLibrary()
+        def child2lib1 = child2.project(":srccorelibapi").isSwiftLibrary()
+        def child2lib2 = child2.project(":srccorelibcore").isSwiftLibrary()
 
         rootProject.dependsOn(child1lib1)
         child1lib1.dependsOn(child1lib2, child2lib1)

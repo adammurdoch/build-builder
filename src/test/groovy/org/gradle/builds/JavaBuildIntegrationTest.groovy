@@ -12,12 +12,12 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
 
         build.project(":").isJavaApplication()
         def srcDir = build.project(":").file("src/main/java/org/gradle/example/app")
-        srcDir.list() as Set == ["App.java", "AppImpl1Api.java", "AppImpl2Api.java"] as Set
-        new File(srcDir, "App.java").text.contains("org.gradle.example.app.AppImpl1Api.getSomeValue()")
-        new File(srcDir, "App.java").text.contains("org.gradle.example.app.AppImpl1Api.INT_CONST")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.app.AppImpl2Api.getSomeValue()")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.app.AppImpl2Api.INT_CONST")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.slf4j.LoggerFactory.getLogger(\"abc\")")
+        srcDir.list() as Set == ["App.java", "AppImplApi.java", "AppImplCore.java"] as Set
+        new File(srcDir, "App.java").text.contains("org.gradle.example.app.AppImplApi.getSomeValue()")
+        new File(srcDir, "App.java").text.contains("org.gradle.example.app.AppImplApi.INT_CONST")
+        new File(srcDir, "AppImplApi.java").text.contains("org.gradle.example.app.AppImplCore.getSomeValue()")
+        new File(srcDir, "AppImplApi.java").text.contains("org.gradle.example.app.AppImplCore.INT_CONST")
+        new File(srcDir, "AppImplApi.java").text.contains("org.slf4j.LoggerFactory.getLogger(\"abc\")")
 
         build.buildSucceeds(":installDist")
 
@@ -58,18 +58,18 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         build.isBuild()
         build.project(":").isJavaApplication()
         def srcDir = build.project(":").file("src/main/java/org/gradle/example/app")
-        srcDir.list() as Set == ["App.java", "AppImpl1Api.java", "AppImpl2Api.java"] as Set
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.lib1api.Lib1Api.getSomeValue()")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.lib1api.Lib1Api.INT_CONST")
+        srcDir.list() as Set == ["App.java", "AppImplApi.java", "AppImplCore.java"] as Set
+        new File(srcDir, "AppImplApi.java").text.contains("org.gradle.example.lib.Lib.getSomeValue()")
+        new File(srcDir, "AppImplApi.java").text.contains("org.gradle.example.lib.Lib.INT_CONST")
 
-        build.project(":lib1api").isJavaLibrary()
-        build.project(":lib1api").file("src/main/java/org/gradle/example/lib1api").list() as Set == ["Lib1Api.java", "Lib1ApiImpl1Api.java", "Lib1ApiImpl2Api.java"] as Set
+        build.project(":lib").isJavaLibrary()
+        build.project(":lib").file("src/main/java/org/gradle/example/lib").list() as Set == ["Lib.java", "LibImplApi.java", "LibImplCore.java"] as Set
 
         build.buildSucceeds(":installDist")
 
         def app = build.app("build/install/testApp/bin/testApp")
         app.isApp()
-        app.libDir.list() as Set == ["lib1api.jar", "slf4j-api-1.7.25.jar", "testApp.jar"] as Set
+        app.libDir.list() as Set == ["lib.jar", "slf4j-api-1.7.25.jar", "testApp.jar"] as Set
         app.succeeds()
 
         build.buildSucceeds("build")
@@ -84,7 +84,7 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         build.isBuild()
 
         build.project(":").isJavaApplication()
-        build.project(":").file("src/main/java/org/gradle/example/app").list() as Set == ["App.java", "AppImpl1Api.java", "AppImpl2Api.java"] as Set
+        build.project(":").file("src/main/java/org/gradle/example/app").list() as Set == ["App.java", "AppImplApi.java", "AppImplCore.java"] as Set
 
         build.buildSucceeds(":installDist")
         build.app("build/install/testApp/bin/testApp").succeeds()
@@ -107,12 +107,12 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         build.project(":").file("src/main/java/org/gradle/example/app").list().size() == sourceFiles
         build.project(":").file("src/test/java/org/gradle/example/app").list().size() == sourceFiles
 
-        build.project(":lib1api1").isJavaLibrary()
-        build.project(":lib1api1").file("src/main/java/org/gradle/example/lib1api1").list().size() == sourceFiles
-        build.project(":lib1api1").file("src/test/java/org/gradle/example/lib1api1").list().size() == sourceFiles
+        build.project(":libapi1").isJavaLibrary()
+        build.project(":libapi1").file("src/main/java/org/gradle/example/libapi1").list().size() == sourceFiles
+        build.project(":libapi1").file("src/test/java/org/gradle/example/libapi1").list().size() == sourceFiles
 
-        build.project(":lib1api2").isJavaLibrary()
-        build.project(":lib2api").isJavaLibrary()
+        build.project(":libapi2").isJavaLibrary()
+        build.project(":libcore").isJavaLibrary()
 
         build.buildSucceeds(":installDist")
         build.app("build/install/testApp/bin/testApp").succeeds()
@@ -132,11 +132,11 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
 
         def rootProject = build.project(":").isJavaApplication()
 
-        def child = build(file("child1api"))
+        def child = build(file("child"))
         child.isBuild()
         child.project(":").isEmptyProject()
-        def lib1 = child.project(":child1apilib1api").isJavaLibrary()
-        def lib2 = child.project(":child1apilib2api").isJavaLibrary()
+        def lib1 = child.project(":childlibapi").isJavaLibrary()
+        def lib2 = child.project(":childlibcore").isJavaLibrary()
 
         rootProject.dependsOn(lib1)
         lib1.dependsOn(lib2)
@@ -146,7 +146,7 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
 
         def app = build.app("build/install/testApp/bin/testApp")
         app.isApp()
-        app.libDir.list() as Set == ["child1apilib1api-1.0.0.jar", "child1apilib2api-1.0.0.jar", "slf4j-api-1.7.25.jar", "testApp.jar"] as Set
+        app.libDir.list() as Set == ["childlibapi-1.0.0.jar", "childlibcore-1.0.0.jar", "slf4j-api-1.7.25.jar", "testApp.jar"] as Set
         app.succeeds()
 
         build.buildSucceeds("build")
@@ -161,17 +161,17 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
 
         def rootProject = build.project(":").isJavaApplication()
 
-        def child1 = build(file("child1api"))
+        def child1 = build(file("childapi"))
         child1.isBuild()
         child1.project(":").isEmptyProject()
-        def child1lib1 = child1.project(":child1apilib1api").isJavaLibrary()
-        def child1lib2 = child1.project(":child1apilib2api").isJavaLibrary()
+        def child1lib1 = child1.project(":childapilibapi").isJavaLibrary()
+        def child1lib2 = child1.project(":childapilibcore").isJavaLibrary()
 
-        def child2 = build(file("child2api"))
+        def child2 = build(file("childcore"))
         child2.isBuild()
         child2.project(":").isEmptyProject()
-        def child2lib1 = child2.project(":child2apilib1api").isJavaLibrary()
-        def child2lib2 = child2.project(":child2apilib2api").isJavaLibrary()
+        def child2lib1 = child2.project(":childcorelibapi").isJavaLibrary()
+        def child2lib2 = child2.project(":childcorelibcore").isJavaLibrary()
 
         rootProject.dependsOn(child1lib1)
         child1lib1.dependsOn(child1lib2, child2lib1)
@@ -183,7 +183,7 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
 
         def app = build.app("build/install/testApp/bin/testApp")
         app.isApp()
-        app.libDir.list() as Set == ["child1apilib1api-1.0.0.jar", "child1apilib2api-1.0.0.jar", "child2apilib1api-1.0.0.jar", "child2apilib2api-1.0.0.jar", "slf4j-api-1.7.25.jar", "testApp.jar"] as Set
+        app.libDir.list() as Set == ["childapilibapi-1.0.0.jar", "childapilibcore-1.0.0.jar", "childcorelibapi-1.0.0.jar", "childcorelibcore-1.0.0.jar", "slf4j-api-1.7.25.jar", "testApp.jar"] as Set
         app.succeeds()
 
         build.buildSucceeds("build")

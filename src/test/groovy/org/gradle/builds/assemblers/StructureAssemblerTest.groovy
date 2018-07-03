@@ -70,8 +70,8 @@ class StructureAssemblerTest extends Specification {
         build.subprojects.size() == 3
 
         def subprojects = build.subprojects as List
-        api(build.rootProject) == [subprojects[1]]
-        impl(build.rootProject) == [subprojects[2]]
+        api(build.rootProject).empty
+        impl(build.rootProject) == [subprojects[1], subprojects[2]]
         api(subprojects[1]).empty
         impl(subprojects[1]) == [subprojects[0]]
         api(subprojects[2]).empty
@@ -90,16 +90,16 @@ class StructureAssemblerTest extends Specification {
         build.subprojects.size() == 4
 
         def subprojects = build.subprojects as List
-        api(build.rootProject) == [subprojects[2]]
-        impl(build.rootProject) == [subprojects[3]]
+        api(build.rootProject).empty
+        impl(build.rootProject) == [subprojects[2], subprojects[3]]
         api(subprojects[2]).empty
-        impl(subprojects[2]) == [subprojects[0], subprojects[1]]
+        impl(subprojects[2]) == [subprojects[1]]
         api(subprojects[3]).empty
-        impl(subprojects[3]) == [subprojects[0], subprojects[1]]
+        impl(subprojects[3]) == [subprojects[1]]
         api(subprojects[0]).empty
         impl(subprojects[0]).empty
         api(subprojects[1]).empty
-        impl(subprojects[1]).empty
+        impl(subprojects[1]) == [subprojects[0]]
     }
 
     def projects(int p) {

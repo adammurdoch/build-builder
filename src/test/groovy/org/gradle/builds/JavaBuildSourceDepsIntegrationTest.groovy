@@ -14,30 +14,30 @@ class JavaBuildSourceDepsIntegrationTest extends AbstractIntegrationTest {
 
         build.project(":").isJavaApplication()
         def srcDir = build.project(":").file("src/main/java/org/gradle/example/app")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.src1apilib1api.Src1ApiLib1Api.getSomeValue()")
-        new File(srcDir, "AppImpl1Api.java").text.contains("org.gradle.example.src1apilib1api.Src1ApiLib1Api.INT_CONST")
+        new File(srcDir, "AppImplApi.java").text.contains("org.gradle.example.srcapilibapi.SrcApiLibApi.getSomeValue()")
+        new File(srcDir, "AppImplApi.java").text.contains("org.gradle.example.srcapilibapi.SrcApiLibApi.INT_CONST")
 
-        def child1 = build(file("external/source1Api"))
+        def child1 = build(file("external/sourceApi"))
         child1.isBuild()
         child1.project(":").isEmptyProject()
-        child1.project(":src1apilib1api").isJavaLibrary()
-        child1.project(":src1apilib2api").isJavaLibrary()
+        child1.project(":srcapilibapi").isJavaLibrary()
+        child1.project(":srcapilibcore").isJavaLibrary()
 
-        def child2 = build(file("external/source2Api"))
+        def child2 = build(file("external/sourceCore"))
         child2.isBuild()
         child2.project(":").isEmptyProject()
-        child2.project(":src2apilib1api").isJavaLibrary()
-        child2.project(":src2apilib2api").isJavaLibrary()
+        child2.project(":srccorelibapi").isJavaLibrary()
+        child2.project(":srccorelibcore").isJavaLibrary()
 
         build.buildSucceeds(":installDist")
 
         def app = build.app("build/install/testApp/bin/testApp")
         app.isApp()
         app.libDir.list() as Set == [
-                "src1apilib1api-1.0.0.jar",
-                "src1apilib2api-1.0.0.jar",
-                "src2apilib1api-1.0.0.jar",
-                "src2apilib2api-1.0.0.jar",
+                "srcapilibapi-1.0.0.jar",
+                "srcapilibcore-1.0.0.jar",
+                "srccorelibapi-1.0.0.jar",
+                "srccorelibcore-1.0.0.jar",
                 "slf4j-api-1.7.25.jar",
                 "testApp.jar"
         ] as Set
