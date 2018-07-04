@@ -26,26 +26,23 @@ public class HttpRepoModelStructureAssembler implements BuildTreeAssembler {
         HttpServerImplementation httpServerImplementation = new HttpServerImplementation(httpRepository);
 
         serverBuild.setSettings(new Settings(1, 1));
-        serverBuild.setProjectInitializer(new EmptyRootProjectInitializer(buildInitAction){
-            @Override
-            public void initRootProject(Project project) {
-                project.addComponent(httpServerImplementation);
-            }
+        serverBuild.getProjectInitializer().rootProject(project -> {
+            project.addComponent(httpServerImplementation);
         });
         serverBuild.publishAs(new PublicationTarget(httpRepository));
         serverBuild.setTypeNamePrefix("Repo");
 
-        for(int i = 1; i <= versionCount; i++) {
+        for (int i = 1; i <= versionCount; i++) {
             Path externalSourceDir = model.getRootDir().resolve("external/v" + i);
             BuildSettingsBuilder libraryBuild = model.addBuild(externalSourceDir);
             libraryBuild.setDisplayName("external libraries build v" + i);
             libraryBuild.setRootProjectName("ext");
             if (libraryCount == 1) {
                 libraryBuild.setSettings(new Settings(1, 1));
-                libraryBuild.setProjectInitializer(new LibraryRootProjectInitializer("Ext", buildInitAction));
+                libraryBuild.getProjectInitializer().add(new LibraryRootProjectInitializer("Ext", buildInitAction));
             } else {
                 libraryBuild.setSettings(new Settings(libraryCount + 1, 1));
-                libraryBuild.setProjectInitializer(new EmptyRootProjectInitializer(buildInitAction));
+                libraryBuild.getProjectInitializer().add(new EmptyRootProjectInitializer(buildInitAction));
             }
             libraryBuild.publishAs(new PublicationTarget(httpRepository));
             libraryBuild.setTypeNamePrefix("Ext");

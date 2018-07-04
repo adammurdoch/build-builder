@@ -30,7 +30,7 @@ public class IncludedBuildAssembler implements BuildTreeAssembler {
                 childBuild.setDisplayName("included build " + name);
                 childBuild.setRootProjectName(name);
                 childBuild.setSettings(new Settings(3, settings.getSourceFileCount()));
-                childBuild.setProjectInitializer(initializer);
+                childBuild.getProjectInitializer().add(initializer);
                 childBuild.setTypeNamePrefix(typeName);
                 childBuild.publishAs(new PublicationTarget(null));
 

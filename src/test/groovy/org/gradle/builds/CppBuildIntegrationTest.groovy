@@ -4,7 +4,7 @@ import spock.lang.Unroll
 
 class CppBuildIntegrationTest extends AbstractIntegrationTest {
     def setup() {
-        gradleVersion = "4.8-20180507235951+0000"
+        gradleVersion = "4.8"
     }
 
     def "can generate single project build"() {

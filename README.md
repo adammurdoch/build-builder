@@ -55,6 +55,8 @@ The `--http-repo-versions` option specifies the number of versions for each libr
 
 The `--source-dep-builds` option specifies the number of additional builds to include as source dependencies. Default is 0.
 
+The `--buildsrc` option enables generation of a `buildSrc` build. Default is false.
+
 #### Android specific options
 
 The `--java` option includes some Java libraries in an Android build. Default is false. 

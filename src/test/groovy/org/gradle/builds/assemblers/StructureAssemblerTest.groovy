@@ -106,7 +106,7 @@ class StructureAssemblerTest extends Specification {
         def builder = new BuildTreeBuilder(Paths.get("dir"))
         builder.mainBuild.displayName = 'test'
         builder.mainBuild.rootProjectName = 'test'
-        builder.mainBuild.projectInitializer = initializer
+        builder.mainBuild.projectInitializer.add(initializer)
         builder.mainBuild.settings = new Settings(p, 3)
         builder.toModel().build
     }

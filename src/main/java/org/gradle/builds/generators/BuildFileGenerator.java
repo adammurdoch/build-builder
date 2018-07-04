@@ -62,6 +62,14 @@ public class BuildFileGenerator extends ProjectFileGenerator {
                 writeBlockContents(allProjects, "    ", printWriter);
                 printWriter.println("}");
             }
+            if (!buildScript.getRepositories().isEmpty()) {
+                printWriter.println();
+                printWriter.println("repositories {");
+                for (ScriptBlock repoBlock : buildScript.getRepositories()) {
+                    writeBlock(repoBlock, "    ", printWriter);
+                }
+                printWriter.println("}");
+            }
             if (!buildScript.getDependencies().isEmpty()) {
                 printWriter.println();
                 printWriter.println("dependencies {");

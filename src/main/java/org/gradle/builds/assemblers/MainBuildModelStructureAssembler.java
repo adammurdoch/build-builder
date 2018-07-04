@@ -14,6 +14,6 @@ public class MainBuildModelStructureAssembler implements BuildTreeAssembler {
         model.getMainBuild().setDisplayName("main build");
         model.getMainBuild().setRootProjectName("testApp");
         model.getMainBuild().setSettings(settings);
-        model.getMainBuild().setProjectInitializer(projectInitializer);
+        model.getMainBuild().getProjectInitializer().add(projectInitializer);
     }
 }

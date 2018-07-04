@@ -2,7 +2,7 @@ package org.gradle.builds.assemblers;
 
 import org.gradle.builds.model.*;
 
-public class CppModelAssembler extends AbstractModelAssembler {
+public class CppModelAssembler extends LanguageSpecificProjectConfigurer<CppApplication, CppLibrary> {
     private final int appImplHeaders;
     private final int appPrivateHeaders;
     private final int libPublicHeaders;
@@ -12,6 +12,7 @@ public class CppModelAssembler extends AbstractModelAssembler {
     private final boolean boost;
 
     public CppModelAssembler(int headers, MacroIncludes macroIncludes, boolean boost) {
+        super(CppApplication.class, CppLibrary.class);
         appImplHeaders = (headers - 1) / 2;
         appPrivateHeaders = headers - appImplHeaders - 2;
         libPublicHeaders = (headers - 3) / 3;
@@ -22,7 +23,7 @@ public class CppModelAssembler extends AbstractModelAssembler {
     }
 
     @Override
-    protected void rootProject(Project rootProject) {
+    protected void rootProject(Settings settings, Project rootProject) {
         rootProject.getBuildScript().requirePlugin("swiftpm-export", "4.6");
 
         addIdePlugins(rootProject);
@@ -34,87 +35,84 @@ public class CppModelAssembler extends AbstractModelAssembler {
     }
 
     @Override
-    protected void populate(Settings settings, Project project) {
-        if (project.component(CppLibrary.class) != null) {
-            CppLibrary lib = project.component(CppLibrary.class);
+    protected void application(Settings settings, Project project, CppApplication app) {
+        CppClass appClass = new CppClass(project.getTypeNameFor());
 
-            CppClass apiClass = new CppClass(project.getTypeNameFor());
-            lib.setApiClass(apiClass);
-
-            CppHeaderFile apiHeader = lib.addPublicHeaderFile(project.getFileNameFor() + ".h");
-            apiHeader.addClass(apiClass);
-            lib.setApiHeader(apiHeader);
-
-            for (int i = 0; i < libPublicHeaders; i++) {
-                CppHeaderFile headerFile = lib.addPublicHeaderFile(project.getFileNameFor() + "_defs" + (i + 1) + ".h");
-                apiHeader.includeHeader(headerFile);
-            }
-
-            CppHeaderFile implHeader = lib.addImplementationHeaderFile(project.getFileNameFor() + "_impl.h");
-            implHeader.includeHeader(apiHeader);
-            for (int i = 0; i < libImplHeaders; i++) {
-                CppHeaderFile headerFile = lib.addImplementationHeaderFile(project.getFileNameFor() + "_impl_defs" + (i + 1) + ".h");
-                implHeader.includeHeader(headerFile);
-            }
-
-            CppHeaderFile privateHeader = lib.addPrivateHeaderFile(project.getFileNameFor() + "_private.h");
-            for (int i = 0; i < libPrivateHeaders; i++) {
-                CppHeaderFile headerFile = lib.addPrivateHeaderFile(project.getFileNameFor() + "_private_defs" + (i + 1) + ".h");
-                privateHeader.includeHeader(headerFile);
-            }
-
-            CppSourceFile apiSourceFile = lib.addSourceFile(project.getFileNameFor() + ".cpp");
-            apiSourceFile.includeHeader(implHeader);
-            apiSourceFile.includeHeader(privateHeader);
-            apiSourceFile.addClass(apiClass);
-
-            BuildScript buildScript = project.getBuildScript();
-            buildScript.requirePlugin("cpp-library");
-            buildScript.requirePlugin("cpp-unit-test");
-            addPublishing(project, lib, project.getBuildScript());
-            addDependencies(project, lib, buildScript);
-            maybeAddBoost(privateHeader, buildScript);
-
-            addApiHeaders(lib, apiHeader);
-            addSource(project, lib, apiClass, apiSourceFile, implHeader, privateHeader);
-            addTests(project, lib, implHeader);
-            lib.setMacroIncludes(macroIncludes);
-        } else if (project.component(CppApplication.class) != null) {
-            CppApplication app = project.component(CppApplication.class);
-
-            CppClass appClass = new CppClass(project.getTypeNameFor());
-
-            CppHeaderFile implHeader = app.addImplementationHeaderFile(project.getFileNameFor() + ".h");
-            implHeader.addClass(appClass);
-            for (int i = 0; i < appImplHeaders; i++) {
-                CppHeaderFile headerFile = app.addImplementationHeaderFile(project.getFileNameFor() + "_defs" + (i + 1) + ".h");
-                implHeader.includeHeader(headerFile);
-            }
-
-            CppHeaderFile privateHeader = app.addPrivateHeaderFile(project.getFileNameFor() + "_private.h");
-            for (int i = 0; i < appPrivateHeaders; i++) {
-                CppHeaderFile headerFile = app.addPrivateHeaderFile(project.getFileNameFor() + "_private_defs" + (i + 1) + ".h");
-                privateHeader.includeHeader(headerFile);
-            }
-
-            CppSourceFile mainSourceFile = app.addSourceFile(project.getFileNameFor() + ".cpp");
-            mainSourceFile.includeHeader(implHeader);
-            mainSourceFile.includeHeader(privateHeader);
-            mainSourceFile.addMainFunction(appClass);
-            mainSourceFile.addClass(appClass);
-
-            BuildScript buildScript = project.getBuildScript();
-            buildScript.requirePlugin("cpp-executable", "4.2", "4.4");
-            buildScript.requirePlugin("cpp-application", "4.5");
-            buildScript.requirePlugin("cpp-unit-test");
-            addDependencies(project, app, buildScript);
-            maybeAddBoost(privateHeader, buildScript);
-
-            addApiHeaders(app, implHeader);
-            addSource(project, app, appClass, mainSourceFile, implHeader, privateHeader);
-            addTests(project, app, implHeader);
-            app.setMacroIncludes(macroIncludes);
+        CppHeaderFile implHeader = app.addImplementationHeaderFile(project.getFileNameFor() + ".h");
+        implHeader.addClass(appClass);
+        for (int i = 0; i < appImplHeaders; i++) {
+            CppHeaderFile headerFile = app.addImplementationHeaderFile(project.getFileNameFor() + "_defs" + (i + 1) + ".h");
+            implHeader.includeHeader(headerFile);
         }
+
+        CppHeaderFile privateHeader = app.addPrivateHeaderFile(project.getFileNameFor() + "_private.h");
+        for (int i = 0; i < appPrivateHeaders; i++) {
+            CppHeaderFile headerFile = app.addPrivateHeaderFile(project.getFileNameFor() + "_private_defs" + (i + 1) + ".h");
+            privateHeader.includeHeader(headerFile);
+        }
+
+        CppSourceFile mainSourceFile = app.addSourceFile(project.getFileNameFor() + ".cpp");
+        mainSourceFile.includeHeader(implHeader);
+        mainSourceFile.includeHeader(privateHeader);
+        mainSourceFile.addMainFunction(appClass);
+        mainSourceFile.addClass(appClass);
+
+        BuildScript buildScript = project.getBuildScript();
+        buildScript.requirePlugin("cpp-executable", "4.2", "4.4");
+        buildScript.requirePlugin("cpp-application", "4.5");
+        buildScript.requirePlugin("cpp-unit-test");
+        addDependencies(project, app, buildScript);
+        maybeAddBoost(privateHeader, buildScript);
+
+        addApiHeaders(app, implHeader);
+        addSource(project, app, appClass, mainSourceFile, implHeader, privateHeader);
+        addTests(project, app, implHeader);
+        app.setMacroIncludes(macroIncludes);
+    }
+
+    @Override
+    protected void library(Settings settings, Project project, CppLibrary lib) {
+        CppClass apiClass = new CppClass(project.getTypeNameFor());
+        lib.setApiClass(apiClass);
+
+        CppHeaderFile apiHeader = lib.addPublicHeaderFile(project.getFileNameFor() + ".h");
+        apiHeader.addClass(apiClass);
+        lib.setApiHeader(apiHeader);
+
+        for (int i = 0; i < libPublicHeaders; i++) {
+            CppHeaderFile headerFile = lib.addPublicHeaderFile(project.getFileNameFor() + "_defs" + (i + 1) + ".h");
+            apiHeader.includeHeader(headerFile);
+        }
+
+        CppHeaderFile implHeader = lib.addImplementationHeaderFile(project.getFileNameFor() + "_impl.h");
+        implHeader.includeHeader(apiHeader);
+        for (int i = 0; i < libImplHeaders; i++) {
+            CppHeaderFile headerFile = lib.addImplementationHeaderFile(project.getFileNameFor() + "_impl_defs" + (i + 1) + ".h");
+            implHeader.includeHeader(headerFile);
+        }
+
+        CppHeaderFile privateHeader = lib.addPrivateHeaderFile(project.getFileNameFor() + "_private.h");
+        for (int i = 0; i < libPrivateHeaders; i++) {
+            CppHeaderFile headerFile = lib.addPrivateHeaderFile(project.getFileNameFor() + "_private_defs" + (i + 1) + ".h");
+            privateHeader.includeHeader(headerFile);
+        }
+
+        CppSourceFile apiSourceFile = lib.addSourceFile(project.getFileNameFor() + ".cpp");
+        apiSourceFile.includeHeader(implHeader);
+        apiSourceFile.includeHeader(privateHeader);
+        apiSourceFile.addClass(apiClass);
+
+        BuildScript buildScript = project.getBuildScript();
+        buildScript.requirePlugin("cpp-library");
+        buildScript.requirePlugin("cpp-unit-test");
+        addPublishing(project, lib, project.getBuildScript());
+        addDependencies(project, lib, buildScript);
+        maybeAddBoost(privateHeader, buildScript);
+
+        addApiHeaders(lib, apiHeader);
+        addSource(project, lib, apiClass, apiSourceFile, implHeader, privateHeader);
+        addTests(project, lib, implHeader);
+        lib.setMacroIncludes(macroIncludes);
     }
 
     private void maybeAddBoost(CppHeaderFile privateHeader, BuildScript buildScript) {

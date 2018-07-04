@@ -2,42 +2,44 @@ package org.gradle.builds.assemblers;
 
 import org.gradle.builds.model.*;
 
-public class JavaModelAssembler extends JvmModelAssembler {
+public class JavaModelAssembler extends JvmModelAssembler<JavaApplication, JavaLibrary> {
+    public JavaModelAssembler() {
+        super(JavaApplication.class, JavaLibrary.class);
+    }
+
     @Override
-    protected void populate(Settings settings, Project project) {
-        if (project.component(JavaLibrary.class) != null) {
-            JavaLibrary library = project.component(JavaLibrary.class);
+    protected void library(Settings settings, Project project, JavaLibrary library) {
+        project.requires(slfj4);
 
-            project.requires(slfj4);
+        JavaClass apiClass = library.addClass(project.getQualifiedNamespaceFor() + "." + project.getTypeNameFor());
+        library.setApiClass(apiClass);
 
-            JavaClass apiClass = library.addClass(project.getQualifiedNamespaceFor() + "." + project.getTypeNameFor());
-            library.setApiClass(apiClass);
+        BuildScript buildScript = project.getBuildScript();
+        buildScript.requirePlugin("java");
+        addPublishing(project, library.getApi(), buildScript);
+        addDependencies(project, library, buildScript);
+        addJavaVersion(library, buildScript);
 
-            BuildScript buildScript = project.getBuildScript();
-            buildScript.requirePlugin("java");
-            addPublishing(project, library.getApi(), buildScript);
-            addDependencies(project, library, buildScript);
-            addJavaVersion(library, buildScript);
+        addSource(project, library, apiClass, javaClass -> {
+        });
+        addTests(project, library);
+    }
 
-            addSource(project, library, apiClass, javaClass -> {});
-            addTests(project, library);
-        } else if (project.component(JavaApplication.class) != null) {
-            JavaApplication application = project.component(JavaApplication.class);
+    @Override
+    protected void application(Settings settings, Project project, JavaApplication application) {
+        project.requires(slfj4);
 
-            project.requires(slfj4);
+        JavaClass mainClass = application.addClass(project.getQualifiedNamespaceFor() + "." + project.getTypeNameFor());
+        mainClass.addRole(new AppEntryPoint());
 
-            JavaClass mainClass = application.addClass(project.getQualifiedNamespaceFor() + "." + project.getTypeNameFor());
-            mainClass.addRole(new AppEntryPoint());
+        BuildScript buildScript = project.getBuildScript();
+        buildScript.requirePlugin("application");
+        addDependencies(project, application, buildScript);
+        buildScript.property("mainClassName", mainClass.getName());
 
-            BuildScript buildScript = project.getBuildScript();
-            buildScript.requirePlugin("java");
-            buildScript.requirePlugin("application");
-            addDependencies(project, application, buildScript);
-            buildScript.property("mainClassName", mainClass.getName());
-
-            addSource(project, application, mainClass, javaClass -> {});
-            addTests(project, application);
-        }
+        addSource(project, application, mainClass, javaClass -> {
+        });
+        addTests(project, application);
     }
 
     private void addPublishing(Project project, JavaLibraryApi api, BuildScript buildScript) {
@@ -51,7 +53,8 @@ public class JavaModelAssembler extends JvmModelAssembler {
             if (project.getPublicationTarget().getHttpRepository() != null) {
                 buildScript.requirePlugin("maven");
                 ScriptBlock deployerBlock = buildScript.block("uploadArchives").block("repositories").block("mavenDeployer");
-                deployerBlock.statement("repository(url: new URI('" + project.getPublicationTarget().getHttpRepository().getRootDir().toUri() + "'))");
+                deployerBlock.statement(
+                        "repository(url: new URI('" + project.getPublicationTarget().getHttpRepository().getRootDir().toUri() + "'))");
                 buildScript.statement("task publish(dependsOn: uploadArchives)");
             }
         } else {

@@ -5,12 +5,16 @@ import org.gradle.builds.model.*;
 import java.util.Collections;
 import java.util.function.Consumer;
 
-public abstract class JvmModelAssembler extends AbstractModelAssembler {
+public abstract class JvmModelAssembler<A extends Component, L extends Component> extends LanguageSpecificProjectConfigurer<A, L> {
     private static final JavaLibraryApi slf4jApi = new JavaLibraryApi("slf4j", Collections.singletonList(JavaClassApi.method("org.slf4j.LoggerFactory", "getLogger(\"abc\")")));
     protected static final PublishedLibrary<JavaLibraryApi> slfj4 = new PublishedLibrary<>("slf4j", new ExternalDependencyDeclaration("org.slf4j:slf4j-api:1.7.25"), slf4jApi);
 
+    public JvmModelAssembler(Class<A> applicationType, Class<L> libraryType) {
+        super(applicationType, libraryType);
+    }
+
     @Override
-    protected void rootProject(Project rootProject) {
+    protected void rootProject(Settings settings, Project rootProject) {
         BlockWithProjectTarget allProjects = rootProject.getBuildScript().allProjects();
         allProjects.jcenter();
         addIdePlugins(rootProject);

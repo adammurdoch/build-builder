@@ -1,6 +1,6 @@
 package org.gradle.builds.model;
 
-import org.gradle.builds.assemblers.ProjectInitializer;
+import org.gradle.builds.assemblers.ComposableProjectInitializer;
 import org.gradle.builds.assemblers.Settings;
 
 import javax.annotation.Nullable;
@@ -18,7 +18,7 @@ public class BuildSettingsBuilder {
     private String displayName;
     private String rootProjectName;
     private Settings settings;
-    private ProjectInitializer projectInitializer;
+    private ComposableProjectInitializer projectInitializer = new ComposableProjectInitializer();
     private PublicationTarget publicationTarget;
     private String typeNamePrefix = "";
     private String version = "1.0.0";
@@ -72,11 +72,7 @@ public class BuildSettingsBuilder {
         return settings;
     }
 
-    public void setProjectInitializer(ProjectInitializer projectInitializer) {
-        this.projectInitializer = projectInitializer;
-    }
-
-    public ProjectInitializer getProjectInitializer() {
+    public ComposableProjectInitializer getProjectInitializer() {
         return projectInitializer;
     }
 

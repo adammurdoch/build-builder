@@ -5,15 +5,11 @@ import org.gradle.builds.model.JavaClass
 import org.gradle.builds.model.Project
 
 
-class GradlePluginModelAssembler : ProjectConfigurer {
-    override fun configure(settings: Settings, project: Project) {
-        val plugin = project.component(GradlePluginComponent::class.java)
-        if (plugin == null) {
-            return
-        }
-
+class GradlePluginModelAssembler : ComponentSpecificProjectConfigurer<GradlePluginComponent>(GradlePluginComponent::class.java) {
+    override fun configure(settings: Settings, project: Project, plugin: GradlePluginComponent) {
         val buildScript = project.buildScript
         buildScript.requirePlugin("java-gradle-plugin")
+        buildScript.jcenter()
         buildScript.dependsOnExternal("testCompile", "junit:junit:4.12")
 
         val id = plugin.id!!

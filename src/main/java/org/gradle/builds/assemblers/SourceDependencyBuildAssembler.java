@@ -30,7 +30,7 @@ public class SourceDependencyBuildAssembler implements BuildTreeAssembler {
                 childBuild.setDisplayName("source dependency build " + name);
                 childBuild.setRootProjectName(name);
                 childBuild.setSettings(new Settings(3, settings.getSourceFileCount()));
-                childBuild.setProjectInitializer(initializer);
+                childBuild.getProjectInitializer().add(initializer);
                 childBuild.setTypeNamePrefix(typeName);
                 childBuild.publishAs(new PublicationTarget(null));
                 build = childBuild;

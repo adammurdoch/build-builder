@@ -2,58 +2,60 @@ package org.gradle.builds.assemblers;
 
 import org.gradle.builds.model.*;
 
-public class SwiftModelAssembler extends AbstractModelAssembler {
+public class SwiftModelAssembler extends LanguageSpecificProjectConfigurer<SwiftApplication, SwiftLibrary> {
+    public SwiftModelAssembler() {
+        super(SwiftApplication.class, SwiftLibrary.class);
+    }
+
     @Override
-    protected void rootProject(Project rootProject) {
+    protected void rootProject(Settings settings, Project rootProject) {
         rootProject.getBuildScript().requirePlugin("swiftpm-export", "4.6");
         addIdePlugins(rootProject);
     }
 
     @Override
-    protected void populate(Settings settings, Project project) {
-        if (project.component(SwiftLibrary.class) != null) {
-            SwiftLibrary library = project.component(SwiftLibrary.class);
+    protected void application(Settings settings, Project project, SwiftApplication application) {
+        application.setModule(capitalize(project.getName()));
 
-            SwiftClass apiClass = new SwiftClass(project.getTypeNameFor());
-            library.setApiClass(apiClass);
-            library.setModule(capitalize(project.getName()));
+        SwiftClass appClass = new SwiftClass(project.getTypeNameFor());
 
-            SwiftSourceFile apiSourceFile = library.addSourceFile(apiClass.getName() + ".swift");
-            apiSourceFile.addClass(apiClass);
+        SwiftSourceFile mainSourceFile = application.addSourceFile("main.swift");
+        mainSourceFile.addMainFunction(appClass);
+        mainSourceFile.addClass(appClass);
 
-            BuildScript buildScript = project.getBuildScript();
-            buildScript.requirePlugin("swift-library");
-            buildScript.requirePlugin("xctest");
-            addPublishing(project, library, project.getBuildScript());
-            addDependencies(project, library, buildScript);
-            if (library.isSwiftPm()) {
-                buildScript.block("library").property("source.from", new Scope.Code("rootProject.file('Sources/" + project.getName() + "')"));
-            }
-
-            addSource(project, library, apiClass, apiSourceFile);
-            addTests(library);
-        } else if (project.component(SwiftApplication.class) != null) {
-            SwiftApplication application = project.component(SwiftApplication.class);
-            application.setModule(capitalize(project.getName()));
-
-            SwiftClass appClass = new SwiftClass(project.getTypeNameFor());
-
-            SwiftSourceFile mainSourceFile = application.addSourceFile("main.swift");
-            mainSourceFile.addMainFunction(appClass);
-            mainSourceFile.addClass(appClass);
-
-            BuildScript buildScript = project.getBuildScript();
-            buildScript.requirePlugin("swift-executable", "4.2", "4.4");
-            buildScript.requirePlugin("swift-application", "4.5");
-            buildScript.requirePlugin("xctest");
-            addDependencies(project, application, buildScript);
-            if (application.isSwiftPm()) {
-                buildScript.block("application").property("source.from", new Scope.Code("rootProject.file('Sources/" + project.getName() + "')"));
-            }
-
-            addSource(project, application, appClass, mainSourceFile);
-            addTests(application);
+        BuildScript buildScript = project.getBuildScript();
+        buildScript.requirePlugin("swift-executable", "4.2", "4.4");
+        buildScript.requirePlugin("swift-application", "4.5");
+        buildScript.requirePlugin("xctest");
+        addDependencies(project, application, buildScript);
+        if (application.isSwiftPm()) {
+            buildScript.block("application").property("source.from", new Scope.Code("rootProject.file('Sources/" + project.getName() + "')"));
         }
+
+        addSource(project, application, appClass, mainSourceFile);
+        addTests(application);
+    }
+
+    @Override
+    protected void library(Settings settings, Project project, SwiftLibrary library) {
+        SwiftClass apiClass = new SwiftClass(project.getTypeNameFor());
+        library.setApiClass(apiClass);
+        library.setModule(capitalize(project.getName()));
+
+        SwiftSourceFile apiSourceFile = library.addSourceFile(apiClass.getName() + ".swift");
+        apiSourceFile.addClass(apiClass);
+
+        BuildScript buildScript = project.getBuildScript();
+        buildScript.requirePlugin("swift-library");
+        buildScript.requirePlugin("xctest");
+        addPublishing(project, library, project.getBuildScript());
+        addDependencies(project, library, buildScript);
+        if (library.isSwiftPm()) {
+            buildScript.block("library").property("source.from", new Scope.Code("rootProject.file('Sources/" + project.getName() + "')"));
+        }
+
+        addSource(project, library, apiClass, apiSourceFile);
+        addTests(library);
     }
 
     private void addPublishing(Project project, SwiftLibrary library, BuildScript buildScript) {

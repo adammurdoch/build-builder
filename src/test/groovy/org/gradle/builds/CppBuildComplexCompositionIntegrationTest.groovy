@@ -2,7 +2,7 @@ package org.gradle.builds
 
 class CppBuildComplexCompositionIntegrationTest extends AbstractIntegrationTest {
     def setup() {
-        gradleVersion = "4.8-20180514143239+0000"
+        gradleVersion = "4.8"
     }
 
     def "can generate build"() {
