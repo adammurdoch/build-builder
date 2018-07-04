@@ -276,13 +276,13 @@ abstract class AbstractIntegrationTest extends Specification {
         // TODO - add more checks
         void isJavaProject() {
             isProject()
-            appliesPlugin('java')
             hasJavaSource()
         }
 
         // TODO - add more checks
         JavaProject isJavaLibrary() {
             isJavaProject()
+            appliesPlugin('java')
             doesNotApplyPlugin('application')
             return new JavaProject(path, projectDir, rootDir)
         }
@@ -291,6 +291,13 @@ abstract class AbstractIntegrationTest extends Specification {
         JavaProject isJavaApplication() {
             isJavaProject()
             appliesPlugin('application')
+            return new JavaProject(path, projectDir, rootDir)
+        }
+
+        // TODO - add more checks
+        JavaProject isJavaPlugin() {
+            isJavaProject()
+            appliesPlugin('java-gradle-plugin')
             return new JavaProject(path, projectDir, rootDir)
         }
 
@@ -413,7 +420,7 @@ abstract class AbstractIntegrationTest extends Specification {
         }
 
         void contains(String... files) {
-            assert list() as Set == files as Set
+            assert (listAll().collect { toPath().relativize(it.toPath()).toString() } as Set) == (files as Set)
         }
     }
 

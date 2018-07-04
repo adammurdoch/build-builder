@@ -2,14 +2,15 @@ package org.gradle.builds.assemblers;
 
 import org.gradle.builds.model.BuildTreeBuilder;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class CompositeModelStructureAssembler implements BuildTreeAssembler {
     private final List<BuildTreeAssembler> assemblers;
 
-    public CompositeModelStructureAssembler(BuildTreeAssembler... assemblers) {
-        this.assemblers = Arrays.asList(assemblers);
+    public CompositeModelStructureAssembler(Collection<? extends BuildTreeAssembler> assemblers) {
+        this.assemblers = new ArrayList<>(assemblers);
     }
 
     @Override

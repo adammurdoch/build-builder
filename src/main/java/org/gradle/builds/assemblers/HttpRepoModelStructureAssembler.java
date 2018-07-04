@@ -17,13 +17,11 @@ public class HttpRepoModelStructureAssembler implements BuildTreeAssembler {
 
     @Override
     public void attachBuilds(Settings settings, BuildTreeBuilder model) {
-        Path repoDir = model.getRootDir().resolve("http-repo");
-        Path serverDir = model.getRootDir().resolve("repo-server");
-
-        BuildSettingsBuilder serverBuild = model.addBuild(serverDir);
+        BuildSettingsBuilder serverBuild = model.addBuild("repo-server");
         serverBuild.setDisplayName("HTTP server build");
         serverBuild.setRootProjectName("repo");
 
+        Path repoDir = model.getRootDir().resolve("http-repo");
         HttpRepository httpRepository = new HttpRepository(repoDir, 5005);
         HttpServerImplementation httpServerImplementation = new HttpServerImplementation(httpRepository);
 

@@ -18,31 +18,29 @@ public class IncludedBuildAssembler implements BuildTreeAssembler {
 
     @Override
     public void attachBuilds(Settings settings, BuildTreeBuilder model) {
-        if (includedBuilds > 0) {
-            Graph graph = graphAssembler.arrange(includedBuilds + 1);
-            graph.visit((Graph.Visitor<BuildSettingsBuilder>) (node, dependencies) -> {
-                BuildSettingsBuilder build;
-                if (node.getLayer() == 0) {
-                    build = model.getMainBuild();
-                } else {
-                    String name = "child" + node.getNameSuffix();
-                    String typeName = "Child" + node.getNameSuffix();
-                    BuildSettingsBuilder childBuild = model.addBuild(model.getRootDir().resolve(name));
-                    childBuild.setDisplayName("included build " + name);
-                    childBuild.setRootProjectName(name);
-                    childBuild.setSettings(new Settings(3, settings.getSourceFileCount()));
-                    childBuild.setProjectInitializer(initializer);
-                    childBuild.setTypeNamePrefix(typeName);
-                    childBuild.publishAs(new PublicationTarget(null));
+        Graph graph = graphAssembler.arrange(includedBuilds + 1);
+        graph.visit((Graph.Visitor<BuildSettingsBuilder>) (node, dependencies) -> {
+            BuildSettingsBuilder build;
+            if (node.getLayer() == 0) {
+                build = model.getMainBuild();
+            } else {
+                String name = "child" + node.getNameSuffix();
+                String typeName = "Child" + node.getNameSuffix();
+                BuildSettingsBuilder childBuild = model.addBuild(name);
+                childBuild.setDisplayName("included build " + name);
+                childBuild.setRootProjectName(name);
+                childBuild.setSettings(new Settings(3, settings.getSourceFileCount()));
+                childBuild.setProjectInitializer(initializer);
+                childBuild.setTypeNamePrefix(typeName);
+                childBuild.publishAs(new PublicationTarget(null));
 
-                    model.getMainBuild().includeBuild(childBuild);
-                    build = childBuild;
-                }
-                for (Dependency<BuildSettingsBuilder> dependency : dependencies) {
-                    build.dependsOn(dependency.getTarget());
-                }
-                return build;
-            });
-        }
+                model.getMainBuild().includeBuild(childBuild);
+                build = childBuild;
+            }
+            for (Dependency<BuildSettingsBuilder> dependency : dependencies) {
+                build.dependsOn(dependency.getTarget());
+            }
+            return build;
+        });
     }
 }

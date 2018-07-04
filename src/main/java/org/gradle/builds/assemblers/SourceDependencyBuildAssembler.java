@@ -18,30 +18,28 @@ public class SourceDependencyBuildAssembler implements BuildTreeAssembler {
 
     @Override
     public void attachBuilds(Settings settings, BuildTreeBuilder model) {
-        if (sourceDependencyBuilds > 0) {
-            Graph graph = graphAssembler.arrange(sourceDependencyBuilds + 1);
-            graph.visit((Graph.Visitor<BuildSettingsBuilder>) (node, dependencies) -> {
-                BuildSettingsBuilder build;
-                if (node.getLayer() == 0) {
-                    build = model.getMainBuild();
-                } else {
-                    String name = "src" + node.getNameSuffix();
-                    String typeName = "Src" + node.getNameSuffix();
-                    BuildSettingsBuilder childBuild = model.addBuild(model.getRootDir().resolve("external/source" + node.getNameSuffix()));
-                    childBuild.setDisplayName("source dependency build " + name);
-                    childBuild.setRootProjectName(name);
-                    childBuild.setSettings(new Settings(3, settings.getSourceFileCount()));
-                    childBuild.setProjectInitializer(initializer);
-                    childBuild.setTypeNamePrefix(typeName);
-                    childBuild.publishAs(new PublicationTarget(null));
-                    build = childBuild;
-                }
-                for (Dependency<BuildSettingsBuilder> childBuild : dependencies) {
-                    build.sourceDependency(childBuild.getTarget());
-                    build.dependsOn(childBuild.getTarget());
-                }
-                return build;
-            });
-        }
+        Graph graph = graphAssembler.arrange(sourceDependencyBuilds + 1);
+        graph.visit((Graph.Visitor<BuildSettingsBuilder>) (node, dependencies) -> {
+            BuildSettingsBuilder build;
+            if (node.getLayer() == 0) {
+                build = model.getMainBuild();
+            } else {
+                String name = "src" + node.getNameSuffix();
+                String typeName = "Src" + node.getNameSuffix();
+                BuildSettingsBuilder childBuild = model.addBuild("external/source" + node.getNameSuffix());
+                childBuild.setDisplayName("source dependency build " + name);
+                childBuild.setRootProjectName(name);
+                childBuild.setSettings(new Settings(3, settings.getSourceFileCount()));
+                childBuild.setProjectInitializer(initializer);
+                childBuild.setTypeNamePrefix(typeName);
+                childBuild.publishAs(new PublicationTarget(null));
+                build = childBuild;
+            }
+            for (Dependency<BuildSettingsBuilder> childBuild : dependencies) {
+                build.sourceDependency(childBuild.getTarget());
+                build.dependsOn(childBuild.getTarget());
+            }
+            return build;
+        });
     }
 }

@@ -10,7 +10,9 @@ import org.gradle.builds.model.Model;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 public class Main {
@@ -59,12 +61,10 @@ public class Main {
     private static class SettingsNotAvailableException extends RuntimeException {
     }
 
-    public static abstract class SourceGenerationCommand implements Callable<Void> {
+    public static abstract class InitBuild implements Callable<Void> {
         @Option(name = "--source-files", description = "The number of source files to generate for each project (default: 3)")
         int sourceFiles = 3;
-    }
 
-    public static abstract class InitBuild extends SourceGenerationCommand {
         @Option(name = "--dir", description = "The directory to generate into (default: current directory)")
         String rootDir = ".";
 
@@ -76,6 +76,9 @@ public class Main {
 
         @Option(name = "--source-dep-builds", description = "The number of source dependency builds to generate (default: 0)")
         int sourceDeps = 0;
+
+        @Option(name = "--buildsrc", description = "Generate a buildSrc build? (default: false)")
+        boolean buildSrc;
 
         @Override
         public Void call() throws Exception {
@@ -138,6 +141,7 @@ public class Main {
                                     new CompositeProjectConfigurer(
                                             new AttachDependenciesConfigurer(),
                                             new HttpServerModelAssembler(),
+                                            new GradlePluginModelAssembler(),
                                             createModelAssembler())),
                             graphAssembler));
         }
@@ -161,6 +165,7 @@ public class Main {
                                     new SwiftSourceGenerator(),
                                     // TODO - remove this
                                     new XCTestInfoPlistGenerator(),
+                                    new GradlePluginSourceGenerator(),
                                     new HttpServerMainGenerator(),
                                     new ReadmeGenerator(),
                                     new ScenarioFileGenerator())),
@@ -170,17 +175,21 @@ public class Main {
 
         private BuildTreeAssembler createModelStructureAssembler() {
             ProjectInitializer projectInitializer = createProjectInitializer();
-            BuildTreeAssembler mainBuildAssembler = new CompositeModelStructureAssembler(
-                    new MainBuildModelStructureAssembler(projectInitializer),
-                    new IncludedBuildAssembler(projectInitializer, graphAssembler, getBuilds()),
-                    new SourceDependencyBuildAssembler(projectInitializer, graphAssembler, sourceDeps));
-            if (isHttpRepo()) {
-                return new CompositeModelStructureAssembler(
-                        mainBuildAssembler,
-                        new HttpRepoModelStructureAssembler(projectInitializer, getHttpRepoLibraries(), getHttpRepoVersions()));
-            } else {
-                return mainBuildAssembler;
+            List<BuildTreeAssembler> assemblers = new ArrayList<>();
+            assemblers.add(new MainBuildModelStructureAssembler(projectInitializer));
+            if (builds > 0) {
+                assemblers.add(new IncludedBuildAssembler(projectInitializer, graphAssembler, builds));
             }
+            if (sourceDeps > 0) {
+                assemblers.add(new SourceDependencyBuildAssembler(projectInitializer, graphAssembler, sourceDeps));
+            }
+            if (buildSrc) {
+                assemblers.add(new BuildSrcBuildAssembler());
+            }
+            if (isHttpRepo()) {
+                assemblers.add(new HttpRepoModelStructureAssembler(projectInitializer, getHttpRepoLibraries(), getHttpRepoVersions()));
+            }
+            return new CompositeModelStructureAssembler(assemblers);
         }
 
         private Path getRootDir() throws IOException {

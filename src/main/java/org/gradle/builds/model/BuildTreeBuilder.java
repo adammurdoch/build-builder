@@ -38,6 +38,13 @@ public class BuildTreeBuilder {
     /**
      * Adds a build to this tree.
      */
+    public BuildSettingsBuilder addBuild(String rootDir) {
+        return addBuild(this.rootDir.resolve(rootDir));
+    }
+
+    /**
+     * Adds a build to this tree.
+     */
     public BuildSettingsBuilder addBuild(Path rootDir) {
         BuildSettingsBuilder build = new BuildSettingsBuilder(rootDir);
         builds.add(build);

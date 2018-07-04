@@ -137,7 +137,7 @@ class AndroidBuildIntegrationTest extends AbstractAndroidIntegrationTest {
         build.project(":lib1api1").isAndroidLibrary()
         build.project(":lib1api2").isAndroidLibrary()
         build.project(":lib1impl").isAndroidLibrary()
-        build.project(":lib1core").isJavaProject()
+        build.project(":lib1core").isJavaLibrary()
         build.project(":lib2").isJavaLibrary()
 
         build.buildSucceeds(":assembleDebug")
