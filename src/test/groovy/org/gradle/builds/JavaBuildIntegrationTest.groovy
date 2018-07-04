@@ -9,6 +9,7 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
 
         then:
         build.isBuild()
+        build.isCleanGitRepo()
 
         build.project(":").isJavaApplication()
         def srcDir = build.project(":").file("src/main/java/org/gradle/example/app")

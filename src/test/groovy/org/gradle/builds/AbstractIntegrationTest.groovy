@@ -135,6 +135,7 @@ abstract class AbstractIntegrationTest extends Specification {
         }
 
         void isCleanGitRepo() {
+            assert file(".git").directory
             withGit { git ->
                 def status = git.status().call()
                 assert status.clean
