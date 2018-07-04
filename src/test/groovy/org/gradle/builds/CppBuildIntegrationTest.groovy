@@ -385,6 +385,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
 
         then:
         build.isBuild()
+        build.isCleanGitRepo()
         build.project(":").isCppApplication()
         build.project(":lib").isCppLibrary()
 
@@ -393,13 +394,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
 
         then:
         build.project(":").isCppApplication()
-        build.withGit { git ->
-            def status = git.status().call()
-            assert status.clean
-            assert !status.hasUncommittedChanges()
-            assert status.untracked.empty
-            assert status.untrackedFolders.empty
-        }
+        build.isCleanGitRepo()
     }
 
 }

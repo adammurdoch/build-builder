@@ -1,5 +1,7 @@
 package org.gradle.builds.model;
 
+import org.gradle.builds.assemblers.GitRepoBuilder;
+
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,10 +17,14 @@ public class BuildTreeBuilder {
     private final Path rootDir;
     private final BuildSettingsBuilder build;
     private final List<BuildSettingsBuilder> builds = new ArrayList<>();
+    private final List<GitRepoBuilder> repos = new ArrayList<>();
+    private final GitRepoBuilder repo;
 
     public BuildTreeBuilder(Path rootDir) {
         this.rootDir = rootDir;
         this.build = addBuild(rootDir);
+        repo = new GitRepoBuilder(rootDir);
+        repos.add(repo);
     }
 
     /**
@@ -56,11 +62,27 @@ public class BuildTreeBuilder {
     }
 
     /**
+     * Returns the main repo for this model.
+     */
+    public GitRepoBuilder getRepo() {
+        return repo;
+    }
+
+    public GitRepoBuilder addRepo(Path rootDir) {
+        GitRepoBuilder repo = new GitRepoBuilder(rootDir);
+        repos.add(repo);
+        return repo;
+    }
+
+    /**
      * Constructs the build tree from this builder.
      */
-    public Model toModel() {
+    public BuildTree toModel() {
         Function<BuildSettingsBuilder, Build> mapper = new BuildConstructor();
-        return new Model(mapper.apply(build), builds.stream().map(mapper).collect(Collectors.toList()));
+        Build mainBuild = mapper.apply(build);
+        List<Build> builds = this.builds.stream().map(mapper).collect(Collectors.toList());
+        List<GitRepo> repos = this.repos.stream().map(r -> new GitRepo(r.getRootDir(), r.getVersion())).collect(Collectors.toList());
+        return new BuildTree(mainBuild, builds, repos);
     }
 
     private static class BuildConstructor implements Function<BuildSettingsBuilder, Build> {

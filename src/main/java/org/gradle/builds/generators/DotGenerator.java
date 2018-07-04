@@ -5,9 +5,9 @@ import org.gradle.builds.model.*;
 import java.io.IOException;
 import java.nio.file.Path;
 
-public class DotGenerator implements Generator<Model> {
+public class DotGenerator implements Generator<BuildTree> {
     @Override
-    public void generate(Model model, FileGenerator fileGenerator) throws IOException {
+    public void generate(BuildTree model, FileGenerator fileGenerator) throws IOException {
         Path htmlFile = model.getBuild().getRootDir().resolve("dependencies.html");
         fileGenerator.generate(htmlFile, writer -> {
             writer.println("<!DOCTYPE html>");

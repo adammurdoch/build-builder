@@ -5,7 +5,7 @@ import org.gradle.builds.assemblers.*;
 import org.gradle.builds.generators.*;
 import org.gradle.builds.model.BuildTreeBuilder;
 import org.gradle.builds.model.MacroIncludes;
-import org.gradle.builds.model.Model;
+import org.gradle.builds.model.BuildTree;
 
 import java.io.File;
 import java.io.IOException;
@@ -100,7 +100,7 @@ public class Main {
             createModelStructureAssembler().attachBuilds(settings, buildTree);
 
             // Configure projects
-            Model model = buildTree.toModel();
+            BuildTree model = buildTree.toModel();
             createModelConfigurer().populate(model);
 
             // Generate files
@@ -146,7 +146,7 @@ public class Main {
                             graphAssembler));
         }
 
-        private Generator<Model> createModelGenerator() {
+        private Generator<BuildTree> createModelGenerator() {
             return new CompositeGenerator<>(
                     new DotGenerator(),
                     new ModelGenerator(

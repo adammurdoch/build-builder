@@ -1,15 +1,16 @@
 package org.gradle.builds.model;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class Model {
+public class BuildTree {
     private final Build build;
     private final List<Build> builds;
+    private final List<GitRepo> repos;
 
-    public Model(Build build, List<Build> builds) {
+    public BuildTree(Build build, List<Build> builds, List<GitRepo> repos) {
         this.build = build;
         this.builds = builds;
+        this.repos = repos;
     }
 
     /**
@@ -30,6 +31,6 @@ public class Model {
      * Returns the Git repositories to be generated.
      */
     public List<GitRepo> getRepos() {
-        return builds.stream().map(b -> new GitRepo(b.getRootDir(), b.getVersion())).collect(Collectors.toList());
+        return repos;
     }
 }

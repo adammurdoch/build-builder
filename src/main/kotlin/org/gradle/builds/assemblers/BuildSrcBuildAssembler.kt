@@ -10,7 +10,7 @@ class BuildSrcBuildAssembler : BuildTreeAssembler {
         plugin.id = "org.gradle.example.show"
 
         val build = model.addBuild("buildSrc")
-        build.displayName = "buildSrc"
+        build.displayName = "buildSrc build"
         build.rootProjectName = "buildSrc"
         build.settings = Settings(1, 1)
         build.projectInitializer.rootProject { project ->

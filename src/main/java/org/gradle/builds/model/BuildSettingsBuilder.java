@@ -48,6 +48,10 @@ public class BuildSettingsBuilder {
         }
     }
 
+    public Path getRootDir() {
+        return rootDir;
+    }
+
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
     }

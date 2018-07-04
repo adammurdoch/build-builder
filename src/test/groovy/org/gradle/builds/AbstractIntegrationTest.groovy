@@ -134,16 +134,23 @@ abstract class AbstractIntegrationTest extends Specification {
             }
         }
 
+        void isCleanGitRepo() {
+            withGit { git ->
+                def status = git.status().call()
+                assert status.clean
+                assert !status.hasUncommittedChanges()
+                assert status.untracked.empty
+                assert status.untrackedFolders.empty
+            }
+        }
+
         // TODO - add more checks
         void isBuild() {
             assert rootDir.directory
             assert file("settings.gradle").file
             project(':').isProject()
-            withGit { git ->
-                def status = git.status().call()
-                assert !status.hasUncommittedChanges()
-                assert status.untracked.empty
-                assert status.untrackedFolders.empty
+            if (file(".git").directory) {
+                isCleanGitRepo()
             }
         }
 

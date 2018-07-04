@@ -21,6 +21,8 @@ Can optionally generate a build that uses dependencies from a local HTTP reposit
 
 Can optionally generate a build with source dependencies.
 
+Can optionally generate a build with a `buildSrc` build.
+
 Can optionally generate a Swift Package Manager build for Swift projects.
 
 Generates a git repository for each build.

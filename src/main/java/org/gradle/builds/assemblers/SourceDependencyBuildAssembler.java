@@ -33,6 +33,8 @@ public class SourceDependencyBuildAssembler implements BuildTreeAssembler {
                 childBuild.getProjectInitializer().add(initializer);
                 childBuild.setTypeNamePrefix(typeName);
                 childBuild.publishAs(new PublicationTarget(null));
+                GitRepoBuilder childRepo = model.addRepo(childBuild.getRootDir());
+                childRepo.setVersion(childBuild.getVersion());
                 build = childBuild;
             }
             for (Dependency<BuildSettingsBuilder> childBuild : dependencies) {
