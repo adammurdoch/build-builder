@@ -1,9 +1,6 @@
 package org.gradle.builds.generators;
 
-import org.gradle.builds.model.Build;
-import org.gradle.builds.model.CppSourceFile;
-import org.gradle.builds.model.HasCppSource;
-import org.gradle.builds.model.Project;
+import org.gradle.builds.model.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -17,12 +14,12 @@ public class ScenarioFileGenerator implements Generator<Build> {
         fileGenerator.generate(scenarioFile, printWriter -> {
             printWriter.println("// GENERATED SCENARIO FILE");
             if (build.getRootProject().component(HasCppSource.class) != null) {
-                scenario("assemble", printWriter, false, p ->{
-                    printWriter.println("    tasks = [\":linkDebug\", \":linkRelease\"]");
+                scenario("assemble", printWriter, false, p -> {
+                    p.println("    tasks = [\":linkDebug\", \":linkRelease\"]");
                 });
-                scenario("cleanAssemble", printWriter, true, p ->{
-                    printWriter.println("    cleanup-tasks = [\"clean\"]");
-                    printWriter.println("    tasks = [\":linkDebug\", \":linkRelease\"]");
+                scenario("cleanAssemble", printWriter, true, p -> {
+                    p.println("    cleanup-tasks = [\"clean\"]");
+                    p.println("    tasks = [\":linkDebug\", \":linkRelease\"]");
                 });
                 Project deepestProject = build.getDeepestProject();
                 HasCppSource component = deepestProject.component(HasCppSource.class);
@@ -38,20 +35,27 @@ public class ScenarioFileGenerator implements Generator<Build> {
                     projectDir = projectDir + "/";
                 }
                 String finalProjectDir = projectDir;
-                scenario("abiAssemble", printWriter, false, p ->{
-                    printWriter.println("    tasks = [\":linkDebug\", \":linkRelease\"]");
-                    printWriter.print("    apply-h-change-to = \"");
-                    printWriter.print(finalProjectDir);
-                    printWriter.print(header);
-                    printWriter.println("\"");
+                scenario("abiAssemble", printWriter, false, p -> {
+                    p.println("    tasks = [\":linkDebug\", \":linkRelease\"]");
+                    p.print("    apply-h-change-to = \"");
+                    p.print(finalProjectDir);
+                    p.print(header);
+                    p.println("\"");
                 });
                 scenario("nonAbiAssemble", printWriter, false, p -> {
-                    printWriter.println("    tasks = [\":linkDebug\", \":linkRelease\"]");
-                    printWriter.print("    apply-cpp-change-to = \"");
-                    printWriter.print(finalProjectDir);
-                    printWriter.print("src/main/cpp/");
-                    printWriter.print(sourceFile.getName());
-                    printWriter.println("\"");
+                    p.println("    tasks = [\":linkDebug\", \":linkRelease\"]");
+                    p.print("    apply-cpp-change-to = \"");
+                    p.print(finalProjectDir);
+                    p.print("src/main/cpp/");
+                    p.print(sourceFile.getName());
+                    p.println("\"");
+                });
+            } else if (build.getRootProject().component(HasJavaSource.class) != null) {
+                scenario("assemble", printWriter, false, p -> {
+                    p.println("    tasks = [\"assemble\"]");
+                });
+                scenario("build", printWriter, false, p -> {
+                    p.println("    tasks = [\"build\"]");
                 });
             }
 
@@ -65,10 +69,15 @@ public class ScenarioFileGenerator implements Generator<Build> {
         body.accept(printWriter);
         printWriter.println("}");
         printWriter.println();
+        printWriter.println(name + "InstantExecution {");
+        printWriter.println("    gradle-args = [\"-Dorg.gradle.unsafe.instant-execution=true\"]");
+        body.accept(printWriter);
+        printWriter.println("}");
         printWriter.println(name + "Parallel {");
         printWriter.println("    gradle-args = [\"--parallel\"]");
         body.accept(printWriter);
         printWriter.println("}");
+        printWriter.println();
         if (cache) {
             printWriter.println();
             printWriter.println(name + "ParallelCache {");
