@@ -2,12 +2,11 @@ plugins {
     id("java")
     id("groovy")
     id("application")
-    id("org.jetbrains.kotlin.jvm").version("1.2.50")
+    id("org.jetbrains.kotlin.jvm").version("1.3.31")
 }
 
 repositories {
     jcenter()
-    maven { url = uri("https://repo.gradle.org/gradle/repo") }
 }
 
 configurations.all {
@@ -20,10 +19,9 @@ configurations.all {
 
 dependencies {
     compile("io.airlift:airline:0.7")
-//    compile("org.gradle:gradle-tooling-api:3.3")
     compile("org.eclipse.jgit:org.eclipse.jgit:4.9.1.201712030800-r")
-    compile("org.jetbrains.kotlin:kotlin-stdlib:1.2.50")
-    compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.50")
+    compile("org.jetbrains.kotlin:kotlin-stdlib")
+    compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
     runtime("org.slf4j:slf4j-simple:1.7.25")
 
