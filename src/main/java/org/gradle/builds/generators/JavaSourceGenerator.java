@@ -54,6 +54,7 @@ public class JavaSourceGenerator extends ProjectFileGenerator {
             printWriter.println();
             printWriter.println("    public String string1 = STRING_CONST;");
             printWriter.println("    private boolean field1 = true;");
+            printWriter.println("    private static boolean visited;");
             printWriter.println();
             printWriter.println("    private int calculateSomeValue() {");
             printWriter.println("        int total = 0;");
@@ -65,18 +66,27 @@ public class JavaSourceGenerator extends ProjectFileGenerator {
             printWriter.println();
             printWriter.println("    // public method referenced by other classes");
             printWriter.println("    public static String getSomeValue() {");
+            printWriter.println("        doSomething();");
+            printWriter.println("        return STRING_CONST;");
+            printWriter.println("    }");
+            printWriter.println();
+            printWriter.println("    // public method referenced by other classes");
+            printWriter.println("    public static void doSomething() {");
+            printWriter.println("        if (!visited) {");
+            printWriter.println("            System.out.println(\"visit \" + STRING_CONST);");
             for (String method : javaClass.getMethodReferences()) {
-                printWriter.println("        " + method + ";");
+                printWriter.println("            " + method + ";");
             }
             for (String field : javaClass.getFieldReferences()) {
-                printWriter.println("        String.valueOf(" + field + ");");
+                printWriter.println("            String.valueOf(" + field + ");");
             }
-            printWriter.println("        return STRING_CONST;");
+            printWriter.println("            visited = true;");
+            printWriter.println("        }");
             printWriter.println("    }");
             if (javaClass.role(AppEntryPoint.class) != null) {
                 printWriter.println();
                 printWriter.println("    public static void main(String[] args) {");
-                printWriter.println("        System.out.println(\"greetings from \" + getSomeValue());");
+                printWriter.println("        doSomething();");
                 printWriter.println("    }");
             }
             if (javaClass.role(AndroidActivity.class) != null) {

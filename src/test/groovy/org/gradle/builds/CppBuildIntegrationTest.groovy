@@ -3,10 +3,6 @@ package org.gradle.builds
 import spock.lang.Unroll
 
 class CppBuildIntegrationTest extends AbstractIntegrationTest {
-    def setup() {
-        gradleVersion = "4.8"
-    }
-
     def "can generate single project build"() {
         when:
         new Main().run("cpp", "--dir", projectDir.absolutePath)

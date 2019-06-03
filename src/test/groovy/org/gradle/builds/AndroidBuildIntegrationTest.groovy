@@ -176,7 +176,6 @@ class AndroidBuildIntegrationTest extends AbstractAndroidIntegrationTest {
 
     def "can generate composite build"() {
         when:
-        gradleVersion = "4.2"
         new Main().run("android", "--dir", projectDir.absolutePath, "--included-builds", "1")
 
         then:

@@ -1,10 +1,6 @@
 package org.gradle.builds
 
 class AndroidBuildSourceDepsIntegrationTest extends AbstractAndroidIntegrationTest {
-    def setup() {
-        gradleVersion = "4.6"
-    }
-
     def "can generate build with source dependencies"() {
         when:
         new Main().run("android", "--dir", projectDir.absolutePath, "--source-dep-builds", "2")

@@ -14,8 +14,8 @@ class JavaBuildHttpRepoIntegrationTest extends AbstractIntegrationTest {
         def rootProject = build.project(":").isJavaApplication()
 
         def buildFile = rootProject.file("build.gradle")
-        buildFile.text.contains("compile 'org.gradle.example:extlibapi1:1.0.0'")
-        buildFile.text.contains("compile 'org.gradle.example:extlibapi2:1.0.0'")
+        buildFile.text.contains("implementation 'org.gradle.example:extlibapi1:1.0.0'")
+        buildFile.text.contains("implementation 'org.gradle.example:extlibapi2:1.0.0'")
 
         def repoBuild = build(file('external/v1'))
         repoBuild.isBuild()
@@ -45,7 +45,7 @@ class JavaBuildHttpRepoIntegrationTest extends AbstractIntegrationTest {
 
         def app = build.app("build/install/testApp/bin/testApp")
         app.isApp()
-        app.libDir.list() as Set == ["extlibapi1-1.0.0.jar", "extlibapi2-1.0.0.jar", "extlibcore-1.0.0.jar", "slf4j-api-1.7.25.jar", "testApp.jar"] as Set
+        app.libDir.list() as Set == ["extlibapi1-1.0.0.jar", "extlibapi2-1.0.0.jar", "extlibcore-1.0.0.jar", "slf4j-api-1.7.25.jar", "slf4j-simple-1.7.25.jar", "testApp.jar"] as Set
         app.succeeds()
 
         build.buildSucceeds("build")
@@ -57,7 +57,6 @@ class JavaBuildHttpRepoIntegrationTest extends AbstractIntegrationTest {
     def "can generate single project build with http repo with single library"() {
         given:
         useIsolatedUserHome()
-        gradleVersion = '4.1'
 
         when:
         new Main().run("java", "--http-repo", "--http-repo-libraries", "1", "--dir", projectDir.absolutePath)
@@ -87,7 +86,7 @@ class JavaBuildHttpRepoIntegrationTest extends AbstractIntegrationTest {
 
         def app = build.app("build/install/testApp/bin/testApp")
         app.isApp()
-        app.libDir.list() as Set == ["ext-1.0.0.jar", "slf4j-api-1.7.25.jar", "testApp.jar"] as Set
+        app.libDir.list() as Set == ["ext-1.0.0.jar", "slf4j-api-1.7.25.jar", "slf4j-simple-1.7.25.jar", "testApp.jar"] as Set
         app.succeeds()
 
         build.buildSucceeds("build")
@@ -135,7 +134,7 @@ class JavaBuildHttpRepoIntegrationTest extends AbstractIntegrationTest {
 
         def app = build.app("build/install/testApp/bin/testApp")
         app.isApp()
-        app.libDir.list() as Set == ["extlibapi1-1.0.0.jar", "extlibapi2-1.0.0.jar", "extlibcore-1.0.0.jar", "libapi.jar", "libcore.jar", "slf4j-api-1.7.25.jar", "testApp.jar"] as Set
+        app.libDir.list() as Set == ["extlibapi1-1.0.0.jar", "extlibapi2-1.0.0.jar", "extlibcore-1.0.0.jar", "libapi.jar", "libcore.jar", "slf4j-api-1.7.25.jar", "slf4j-simple-1.7.25.jar", "testApp.jar"] as Set
         app.succeeds()
 
         build.buildSucceeds("build")
@@ -157,8 +156,8 @@ class JavaBuildHttpRepoIntegrationTest extends AbstractIntegrationTest {
         def rootProject = build.project(":").isJavaApplication()
 
         def buildFile = rootProject.file("build.gradle")
-        buildFile.text.contains("compile 'org.gradle.example:extlibapi1:3.0.0'")
-        buildFile.text.contains("compile 'org.gradle.example:extlibapi2:3.0.0'")
+        buildFile.text.contains("implementation 'org.gradle.example:extlibapi1:3.0.0'")
+        buildFile.text.contains("implementation 'org.gradle.example:extlibapi2:3.0.0'")
 
         def repoBuild = build(file('external/v1'))
         repoBuild.isBuild()
@@ -188,7 +187,7 @@ class JavaBuildHttpRepoIntegrationTest extends AbstractIntegrationTest {
 
         def app = build.app("build/install/testApp/bin/testApp")
         app.isApp()
-        app.libDir.list() as Set == ["extlibapi1-3.0.0.jar", "extlibapi2-3.0.0.jar", "extlibcore-3.0.0.jar", "slf4j-api-1.7.25.jar", "testApp.jar"] as Set
+        app.libDir.list() as Set == ["extlibapi1-3.0.0.jar", "extlibapi2-3.0.0.jar", "extlibcore-3.0.0.jar", "slf4j-api-1.7.25.jar", "slf4j-simple-1.7.25.jar", "testApp.jar"] as Set
         app.succeeds()
 
         build.buildSucceeds("build")

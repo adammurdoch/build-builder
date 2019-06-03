@@ -1,10 +1,6 @@
 package org.gradle.builds
 
 class CppBuildComplexCompositionIntegrationTest extends AbstractIntegrationTest {
-    def setup() {
-        gradleVersion = "4.8"
-    }
-
     def "can generate build"() {
         given:
         useIsolatedUserHome()

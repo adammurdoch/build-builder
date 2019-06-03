@@ -1,10 +1,6 @@
 package org.gradle.builds
 
-class AndroidBuildBuildSrcIntegrationTest extends AbstractIntegrationTest {
-    def setup() {
-        gradleVersion = "4.1"
-    }
-
+class AndroidBuildBuildSrcIntegrationTest extends AbstractAndroidIntegrationTest {
     def "can generate buildsrc"() {
         when:
         new Main().run("android", "--dir", projectDir.absolutePath, "--buildsrc")

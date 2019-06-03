@@ -24,7 +24,7 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
 
         def app = build.app("build/install/testApp/bin/testApp")
         app.isApp()
-        app.libDir.list() as Set == ["slf4j-api-1.7.25.jar", "testApp.jar"] as Set
+        app.libDir.list() as Set == ["slf4j-api-1.7.25.jar", "slf4j-simple-1.7.25.jar", "testApp.jar"] as Set
         app.succeeds()
 
         build.buildSucceeds("build")
@@ -70,7 +70,7 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
 
         def app = build.app("build/install/testApp/bin/testApp")
         app.isApp()
-        app.libDir.list() as Set == ["lib.jar", "slf4j-api-1.7.25.jar", "testApp.jar"] as Set
+        app.libDir.list() as Set == ["lib.jar", "slf4j-api-1.7.25.jar", "slf4j-simple-1.7.25.jar", "testApp.jar"] as Set
         app.succeeds()
 
         build.buildSucceeds("build")
@@ -147,7 +147,7 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
 
         def app = build.app("build/install/testApp/bin/testApp")
         app.isApp()
-        app.libDir.list() as Set == ["childlibapi-1.0.0.jar", "childlibcore-1.0.0.jar", "slf4j-api-1.7.25.jar", "testApp.jar"] as Set
+        app.libDir.list() as Set == ["childlibapi-1.0.0.jar", "childlibcore-1.0.0.jar", "slf4j-api-1.7.25.jar", "slf4j-simple-1.7.25.jar", "testApp.jar"] as Set
         app.succeeds()
 
         build.buildSucceeds("build")
@@ -184,7 +184,7 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
 
         def app = build.app("build/install/testApp/bin/testApp")
         app.isApp()
-        app.libDir.list() as Set == ["childapilibapi-1.0.0.jar", "childapilibcore-1.0.0.jar", "childcorelibapi-1.0.0.jar", "childcorelibcore-1.0.0.jar", "slf4j-api-1.7.25.jar", "testApp.jar"] as Set
+        app.libDir.list() as Set == ["childapilibapi-1.0.0.jar", "childapilibcore-1.0.0.jar", "childcorelibapi-1.0.0.jar", "childcorelibcore-1.0.0.jar", "slf4j-api-1.7.25.jar", "slf4j-simple-1.7.25.jar", "testApp.jar"] as Set
         app.succeeds()
 
         build.buildSucceeds("build")

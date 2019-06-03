@@ -1,10 +1,6 @@
 package org.gradle.builds
 
 class SwiftBuildSourceDepsIntegrationTest extends AbstractIntegrationTest {
-    def setup() {
-        gradleVersion = "4.6"
-    }
-
     def "can generate build with source dependencies"() {
         when:
         new Main().run("swift", "--dir", projectDir.absolutePath, "--source-dep-builds", "2")

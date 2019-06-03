@@ -1,10 +1,6 @@
 package org.gradle.builds
 
 class JavaBuildSourceDepsIntegrationTest extends AbstractIntegrationTest {
-    def setup() {
-        gradleVersion = "4.6"
-    }
-
     def "can generate build with source dependencies"() {
         when:
         new Main().run("java", "--dir", projectDir.absolutePath, "--source-dep-builds", "2")
@@ -39,6 +35,7 @@ class JavaBuildSourceDepsIntegrationTest extends AbstractIntegrationTest {
                 "srccorelibapi-1.0.0.jar",
                 "srccorelibcore-1.0.0.jar",
                 "slf4j-api-1.7.25.jar",
+                "slf4j-simple-1.7.25.jar",
                 "testApp.jar"
         ] as Set
         app.succeeds()

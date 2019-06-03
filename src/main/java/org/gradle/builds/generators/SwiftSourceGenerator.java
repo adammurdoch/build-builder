@@ -37,14 +37,21 @@ public class SwiftSourceGenerator extends ProjectComponentSpecificGenerator<HasS
             for (SwiftClass swiftClass : swiftSource.getClasses()) {
                 printWriter.println();
                 printWriter.println("public class " + swiftClass.getName() + " {");
+                printWriter.println("    var visited = false");
+                printWriter.println();
                 printWriter.println("    public init() { }");
+                printWriter.println();
                 printWriter.println("    public func doSomething() {");
+                printWriter.println("        if (!visited) {");
+                printWriter.println("            print(\"visited " + swiftClass.getName() + "\")");
                 for (Dependency<SwiftClass> dep : swiftClass.getReferencedClasses()) {
                     SwiftClass targetClass = dep.getTarget();
                     String varName = targetClass.getName().toLowerCase();
-                    printWriter.println("        let " + varName + " = " + targetClass.getName() + "()");
-                    printWriter.println("        " + varName + ".doSomething()");
+                    printWriter.println("            let " + varName + " = " + targetClass.getName() + "()");
+                    printWriter.println("            " + varName + ".doSomething()");
                 }
+                printWriter.println("            visited = true");
+                printWriter.println("        }");
                 printWriter.println("    }");
                 printWriter.println("}");
             }
@@ -55,7 +62,6 @@ public class SwiftSourceGenerator extends ProjectComponentSpecificGenerator<HasS
                     printWriter.println("let " + varName + " = " + swiftClass.getName() + "()");
                     printWriter.println(varName + ".doSomething()");
                 }
-                printWriter.println("print(\"it works\");");
             }
             printWriter.println();
         });
@@ -75,7 +81,9 @@ public class SwiftSourceGenerator extends ProjectComponentSpecificGenerator<HasS
                 printWriter.println("    func testOk() {");
                 XCUnitTest unitTest = swiftClass.role(XCUnitTest.class);
                 if (unitTest != null) {
-                    printWriter.println("        let " + unitTest.getClassUnderTest().getName().toLowerCase() + " = " + unitTest.getClassUnderTest().getName() + "()");
+                    String varName = unitTest.getClassUnderTest().getName().toLowerCase();
+                    printWriter.println("        let " + varName + " = " + unitTest.getClassUnderTest().getName() + "()");
+                    printWriter.println("        " + varName + ".doSomething()");
                 }
                 printWriter.println("        XCTAssertEqual(1, 1)");
                 printWriter.println("    }");

@@ -26,6 +26,9 @@ public class Dependency<T> {
         return target;
     }
 
+    /**
+     * Should this dependency be exported as an API dependency?
+     */
     public boolean isApi() {
         return api;
     }

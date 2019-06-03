@@ -28,6 +28,7 @@ public class JavaModelAssembler extends JvmModelAssembler<JavaApplication, JavaL
     @Override
     protected void application(Settings settings, Project project, JavaApplication application) {
         project.requires(slfj4);
+        project.requires(slfj4Simple);
 
         JavaClass mainClass = application.addClass(project.getQualifiedNamespaceFor() + "." + project.getTypeNameFor());
         mainClass.addRole(new AppEntryPoint());
@@ -71,7 +72,7 @@ public class JavaModelAssembler extends JvmModelAssembler<JavaApplication, JavaL
     private void addDependencies(Project project, HasJavaSource<JavaLibraryApi> component, BuildScript buildScript) {
         // Don't use Android libraries, only java libraries
         for (Dependency<Library<? extends JavaLibraryApi>> library : project.getRequiredLibraries(JavaLibraryApi.class)) {
-            buildScript.dependsOn("compile", library.getTarget().getDependency());
+            buildScript.dependsOn("implementation", library.getTarget().getDependency());
             component.uses(library.withTarget(library.getTarget().getApi()));
         }
 

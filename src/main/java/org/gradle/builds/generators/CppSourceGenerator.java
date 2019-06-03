@@ -73,20 +73,25 @@ public class CppSourceGenerator extends ProjectComponentSpecificGenerator<HasCpp
                     printWriter.println("    " + cppClass.getName() + " " + varName + ";");
                     printWriter.println("    " + varName + ".doSomething();");
                 }
-                printWriter.println("    std::cout << \"it works\" << std::endl;");
                 printWriter.println("    return 0;");
                 printWriter.println("}");
             }
             for (CppClass cppClass : cppSource.getClasses()) {
                 printWriter.println();
+                printWriter.println("int " + cppClass.getName() + "::visited = 0;");
+                printWriter.println();
                 functionHeader(printWriter);
                 printWriter.println("void " + cppClass.getName() + "::doSomething() {");
+                printWriter.println("    if (visited == 0) {");
+                printWriter.println("        std::cout << \"visit " + cppClass.getName() + "\" << std::endl;");
                 for (Dependency<CppClass> dep : cppClass.getReferencedClasses()) {
                     CppClass targetClass = dep.getTarget();
                     String varName = targetClass.getName().toLowerCase();
-                    printWriter.println("    " + targetClass.getName() + " " + varName + ";");
-                    printWriter.println("    " + varName + ".doSomething();");
+                    printWriter.println("        " + targetClass.getName() + " " + varName + ";");
+                    printWriter.println("        " + varName + ".doSomething();");
                 }
+                printWriter.println("        visited = 1;");
+                printWriter.println("    }");
                 printWriter.println("}");
             }
             printWriter.println();
@@ -165,6 +170,8 @@ public class CppSourceGenerator extends ProjectComponentSpecificGenerator<HasCpp
                         printWriter.println("& p);");
                     }
                 }
+                printWriter.println("  private:");
+                printWriter.println("    static int visited;");
                 printWriter.println("};");
             }
             printWriter.println();
