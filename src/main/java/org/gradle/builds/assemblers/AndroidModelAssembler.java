@@ -24,6 +24,7 @@ public class AndroidModelAssembler extends JvmModelAssembler<AndroidApplication,
         buildScript.buildScriptBlock().google();
         buildScript.buildScriptBlock().jcenter();
         buildScript.requireOnBuildScriptClasspath("com.android.tools.build:gradle:" + pluginVersion);
+        buildScript.allProjects().google();
     }
 
     @Override
@@ -46,7 +47,6 @@ public class AndroidModelAssembler extends JvmModelAssembler<AndroidApplication,
         addApplicationResources(androidApplication);
 
         ScriptBlock androidBlock = buildScript.block("android");
-        androidBlock.property("buildToolsVersion", "26.0.2");
         androidBlock.property("compileSdkVersion", 26);
         ScriptBlock configBlock = androidBlock.block("defaultConfig");
         configBlock.property("applicationId", androidApplication.getPackageName());
@@ -80,7 +80,6 @@ public class AndroidModelAssembler extends JvmModelAssembler<AndroidApplication,
         addDependencies(project, androidLibrary, buildScript);
 
         ScriptBlock androidBlock = buildScript.block("android");
-        androidBlock.property("buildToolsVersion", "26.0.2");
         androidBlock.property("compileSdkVersion", 26);
         ScriptBlock configBlock = androidBlock.block("defaultConfig");
         configBlock.property("minSdkVersion", 21);
@@ -120,12 +119,16 @@ public class AndroidModelAssembler extends JvmModelAssembler<AndroidApplication,
 
     private void addDependencies(Project project, AndroidComponent component, BuildScript buildScript) {
         for (Dependency<Library<? extends JvmLibraryApi>> library : project.getRequiredLibraries(JvmLibraryApi.class)) {
-            buildScript.dependsOn("compile", library.getTarget().getDependency());
+            if (library.isApi()) {
+                buildScript.dependsOn("api", library.getTarget().getDependency());
+            } else {
+                buildScript.dependsOn("implementation", library.getTarget().getDependency());
+            }
             component.uses(library.withTarget(library.getTarget().getApi()));
         }
-        buildScript.dependsOnExternal("testCompile", "junit:junit:4.12");
-        buildScript.dependsOnExternal("androidTestCompile", "com.android.support:support-annotations:25.1.0");
-        buildScript.dependsOnExternal("androidTestCompile", "com.android.support.test:runner:0.5");
+        buildScript.dependsOnExternal("testImplementation", "junit:junit:4.12");
+        buildScript.dependsOnExternal("androidTestImplementation", "com.android.support:support-annotations:25.1.0");
+        buildScript.dependsOnExternal("androidTestImplementation", "com.android.support.test:runner:0.5");
     }
 
     @Override

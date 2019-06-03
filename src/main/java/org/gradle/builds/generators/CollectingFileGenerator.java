@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -20,7 +21,7 @@ public class CollectingFileGenerator implements FileGenerator {
     public void generate(Path file, InputStream content) throws IOException {
         generatedFiles.add(file);
         Files.createDirectories(file.getParent());
-        Files.copy(content, file);
+        Files.copy(content, file, StandardCopyOption.REPLACE_EXISTING);
     }
 
     @Override
