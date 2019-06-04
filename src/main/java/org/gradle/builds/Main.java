@@ -168,6 +168,7 @@ public class Main {
                                     new GradlePluginSourceGenerator(),
                                     new HttpServerMainGenerator(),
                                     new ReadmeGenerator(),
+                                    new GradlePropertiesGenerator(),
                                     new ScenarioFileGenerator())),
                     // Should be last to collect all generated files
                     new GitRepoGenerator());

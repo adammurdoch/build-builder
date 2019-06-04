@@ -69,15 +69,15 @@ public class ScenarioFileGenerator implements Generator<Build> {
         body.accept(printWriter);
         printWriter.println("}");
         printWriter.println();
-        printWriter.println(name + "InstantExecution {");
-        printWriter.println("    gradle-args = [\"-Dorg.gradle.unsafe.instant-execution=true\"]");
+        printWriter.println(name + "InstantExecutionParallel {");
+        printWriter.println("    gradle-args = [\"--parallel\", \"-Dorg.gradle.unsafe.instant-execution=true\"]");
         body.accept(printWriter);
         printWriter.println("}");
+        printWriter.println();
         printWriter.println(name + "Parallel {");
         printWriter.println("    gradle-args = [\"--parallel\"]");
         body.accept(printWriter);
         printWriter.println("}");
-        printWriter.println();
         if (cache) {
             printWriter.println();
             printWriter.println(name + "ParallelCache {");
