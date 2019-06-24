@@ -5,3 +5,6 @@ build
 *.iml
 
 .DS_Store
+
+# Project exclude paths
+/out/
