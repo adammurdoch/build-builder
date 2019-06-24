@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AndroidComponent extends HasJavaSource<JvmLibraryApi> {
+public class AndroidComponent extends HasJavaSource<JvmLibraryApi> implements HasHeapRequirements {
     private String packageName;
     private String labelResource;
     private final Map<String, String> stringResources = new LinkedHashMap<>();
@@ -41,5 +41,10 @@ public class AndroidComponent extends HasJavaSource<JvmLibraryApi> {
 
     public void activity(JavaClass javaClass) {
         activities.add(javaClass);
+    }
+
+    @Override
+    public int getMinHeapMegabytes() {
+        return 100;
     }
 }
