@@ -3,9 +3,9 @@ package org.gradle.builds;
 import io.airlift.airline.*;
 import org.gradle.builds.assemblers.*;
 import org.gradle.builds.generators.*;
+import org.gradle.builds.model.BuildTree;
 import org.gradle.builds.model.BuildTreeBuilder;
 import org.gradle.builds.model.MacroIncludes;
-import org.gradle.builds.model.BuildTree;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,6 +35,7 @@ public class Main {
     public void run(String[] args) throws Exception {
         Cli.CliBuilder<Callable<Void>> cliBuilder = new Cli.CliBuilder<>("build-builder");
         cliBuilder.withCommand(InitJavaBuild.class);
+        cliBuilder.withCommand(InitKotlinBuild.class);
         cliBuilder.withCommand(InitCppBuild.class);
         cliBuilder.withCommand(InitAndroidBuild.class);
         cliBuilder.withCommand(InitSwiftBuild.class);
@@ -259,6 +260,24 @@ public class Main {
         @Override
         protected ProjectConfigurer createModelAssembler() {
             return new JavaModelAssembler();
+        }
+    }
+
+    @Command(name = "kotlin", description = "Generates a Kotlin build with source files")
+    public static class InitKotlinBuild extends InitBinaryDependencyAwareBuild {
+        @Override
+        protected String getType() {
+            return "Kotlin";
+        }
+
+        @Override
+        protected ProjectInitializer createProjectInitializer() {
+            return new KotlinBuildProjectInitializer();
+        }
+
+        @Override
+        protected ProjectConfigurer createModelAssembler() {
+            return new KotlinModelAssembler();
         }
     }
 
