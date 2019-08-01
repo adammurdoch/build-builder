@@ -1,89 +1,74 @@
-package org.gradle.builds.generators;
+package org.gradle.builds.generators
 
-import org.gradle.builds.model.*;
+import org.gradle.builds.model.Build
+import org.gradle.builds.model.HasCppSource
+import org.gradle.builds.model.HasSource
+import java.io.PrintWriter
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.file.Path;
-import java.util.function.Consumer;
-
-public class ScenarioFileGenerator implements Generator<Build> {
-    @Override
-    public void generate(Build build, FileGenerator fileGenerator) throws IOException {
-        Path scenarioFile = build.getRootDir().resolve("performance.scenarios");
-        fileGenerator.generate(scenarioFile, printWriter -> {
-            printWriter.println("// GENERATED SCENARIO FILE");
-            if (build.getRootProject().component(HasCppSource.class) != null) {
-                scenario("assemble", printWriter, false, p -> {
-                    p.println("    tasks = [\":linkDebug\", \":linkRelease\"]");
-                });
-                scenario("cleanAssemble", printWriter, true, p -> {
-                    p.println("    cleanup-tasks = [\"clean\"]");
-                    p.println("    tasks = [\":linkDebug\", \":linkRelease\"]");
-                });
-                Project deepestProject = build.getDeepestProject();
-                HasCppSource component = deepestProject.component(HasCppSource.class);
-                String header;
-                if (!component.getPublicHeaderFiles().isEmpty()) {
-                    header = "src/main/public/" + component.getPublicHeaderFiles().iterator().next().getName();
+class ScenarioFileGenerator : Generator<Build> {
+    override fun generate(build: Build, fileGenerator: FileGenerator) {
+        val scenarioFile = build.rootDir.resolve("performance.scenarios")
+        fileGenerator.generate(scenarioFile) { printWriter ->
+            printWriter.println("// GENERATED SCENARIO FILE")
+            if (build.rootProject.component(HasSource::class.java) != null) {
+                scenario("assemble", printWriter) {
+                    println("    tasks = [\"assemble\"]")
+                }
+                scenario("build", printWriter) {
+                    println("    tasks = [\"build\"]")
+                }
+            }
+            if (build.rootProject.component(HasCppSource::class.java) != null) {
+                scenario("cleanAssemble", printWriter) {
+                    println("    cleanup-tasks = [\"clean\"]")
+                    println("    tasks = [\"assemble\"]")
+                }
+                val deepestProject = build.deepestProject
+                val component = deepestProject.component(HasCppSource::class.java)
+                val header = if (component.publicHeaderFiles.isNotEmpty()) {
+                    "src/main/public/" + component.publicHeaderFiles.iterator().next().name
                 } else {
-                    header = "src/main/headers/" + component.getImplementationHeaderFiles().iterator().next().getName();
+                    "src/main/headers/" + component.implementationHeaderFiles.iterator().next().name
                 }
-                CppSourceFile sourceFile = component.getSourceFiles().iterator().next();
-                String projectDir = build.getRootDir().relativize(deepestProject.getProjectDir()).toString();
-                if (!projectDir.isEmpty()) {
-                    projectDir = projectDir + "/";
+                val sourceFile = component.sourceFiles.iterator().next()
+                var projectDir = build.rootDir.relativize(deepestProject.projectDir).toString()
+                if (projectDir.isNotEmpty()) {
+                    projectDir = "$projectDir/"
                 }
-                String finalProjectDir = projectDir;
-                scenario("abiAssemble", printWriter, false, p -> {
-                    p.println("    tasks = [\":linkDebug\", \":linkRelease\"]");
-                    p.print("    apply-h-change-to = \"");
-                    p.print(finalProjectDir);
-                    p.print(header);
-                    p.println("\"");
-                });
-                scenario("nonAbiAssemble", printWriter, false, p -> {
-                    p.println("    tasks = [\":linkDebug\", \":linkRelease\"]");
-                    p.print("    apply-cpp-change-to = \"");
-                    p.print(finalProjectDir);
-                    p.print("src/main/cpp/");
-                    p.print(sourceFile.getName());
-                    p.println("\"");
-                });
-            } else if (build.getRootProject().component(HasJavaSource.class) != null) {
-                scenario("assemble", printWriter, false, p -> {
-                    p.println("    tasks = [\"assemble\"]");
-                });
-                scenario("build", printWriter, false, p -> {
-                    p.println("    tasks = [\"build\"]");
-                });
+                scenario("abiAssemble", printWriter) {
+                    println("    tasks = [\"assemble\"]")
+                    println("    apply-h-change-to = \"${projectDir}${header}\"")
+                }
+                scenario("nonAbiAssemble", printWriter) {
+                    println("    tasks = [\"assemble\"]")
+                    println("    apply-cpp-change-to = \"${projectDir}src/main/cpp/${sourceFile.name}\"")
+                }
             }
 
-            printWriter.println();
-        });
+            printWriter.println()
+        }
     }
 
-    private void scenario(String name, PrintWriter printWriter, boolean cache, Consumer<PrintWriter> body) {
-        printWriter.println();
-        printWriter.println(name + " {");
-        body.accept(printWriter);
-        printWriter.println("}");
-        printWriter.println();
-        printWriter.println(name + "InstantExecutionParallel {");
-        printWriter.println("    gradle-args = [\"--parallel\", \"-Dorg.gradle.unsafe.instant-execution=true\"]");
-        body.accept(printWriter);
-        printWriter.println("}");
-        printWriter.println();
-        printWriter.println(name + "Parallel {");
-        printWriter.println("    gradle-args = [\"--parallel\"]");
-        body.accept(printWriter);
-        printWriter.println("}");
-        if (cache) {
-            printWriter.println();
-            printWriter.println(name + "ParallelCache {");
-            printWriter.println("    gradle-args = [\"--parallel\", \"--build-cache\", \"-Dorg.gradle.caching.native=true\"]");
-            body.accept(printWriter);
-            printWriter.println("}");
-        }
+    private fun scenario(name: String, printWriter: PrintWriter, body: PrintWriter.() -> Unit) {
+        printWriter.println()
+        printWriter.println("$name {")
+        printWriter.println("    gradle-args = [\"--parallel\"]")
+        body(printWriter)
+        printWriter.println("}")
+        printWriter.println()
+        printWriter.println("${name}InstantExecution {")
+        printWriter.println("    gradle-args = [\"--parallel\", \"-Dorg.gradle.unsafe.instant-execution=true\"]")
+        body(printWriter)
+        printWriter.println("}")
+        printWriter.println()
+        printWriter.println("${name}DryRun {")
+        printWriter.println("    gradle-args = [\"--parallel\", \"--dry-run\"]")
+        body(printWriter)
+        printWriter.println("}")
+        printWriter.println()
+        printWriter.println("${name}InstantExecutionDryRun {")
+        printWriter.println("    gradle-args = [\"--parallel\", \"--dry-run\", \"-Dorg.gradle.unsafe.instant-execution=true\"]")
+        body(printWriter)
+        printWriter.println("}")
     }
 }
