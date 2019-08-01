@@ -10,7 +10,7 @@ class SwiftBuildBuildSrcIntegrationTest extends AbstractIntegrationTest {
 
         def buildSrc = build(file("buildSrc"))
         buildSrc.isBuild()
-        buildSrc.project(":").isJavaPlugin()
+        buildSrc.rootProject.isJavaPlugin()
 
         build.buildSucceeds(":show")
     }

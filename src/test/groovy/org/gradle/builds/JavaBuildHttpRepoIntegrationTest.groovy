@@ -11,7 +11,7 @@ class JavaBuildHttpRepoIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
 
-        def rootProject = build.project(":").isJavaApplication()
+        def rootProject = build.rootProject.isJavaApplication()
 
         def buildFile = rootProject.file("build.gradle")
         buildFile.text.contains("implementation 'org.gradle.example:extlibapi1:1.0.0'")
@@ -64,7 +64,7 @@ class JavaBuildHttpRepoIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
 
-        def rootProject = build.project(":").isJavaApplication()
+        def rootProject = build.rootProject.isJavaApplication()
 
         def repoBuild = build(file('external/v1'))
         repoBuild.isBuild()
@@ -104,7 +104,7 @@ class JavaBuildHttpRepoIntegrationTest extends AbstractIntegrationTest {
 
         then:
         build.isBuild()
-        def rootProject = build.project(":").isJavaApplication()
+        def rootProject = build.rootProject.isJavaApplication()
         def lib1 = build.project(":libapi").isJavaLibrary()
         def lib2 = build.project(":libcore").isJavaLibrary()
 
@@ -153,7 +153,7 @@ class JavaBuildHttpRepoIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
 
-        def rootProject = build.project(":").isJavaApplication()
+        def rootProject = build.rootProject.isJavaApplication()
 
         def buildFile = rootProject.file("build.gradle")
         buildFile.text.contains("implementation 'org.gradle.example:extlibapi1:3.0.0'")

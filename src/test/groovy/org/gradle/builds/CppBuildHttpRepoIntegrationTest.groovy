@@ -11,7 +11,7 @@ class CppBuildHttpRepoIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
 
-        def rootProject = build.project(":").isCppApplication()
+        def rootProject = build.rootProject.isCppApplication()
 
         def buildFile = rootProject.file("build.gradle")
         buildFile.text.contains("implementation 'org.gradle.example:extlibapi1:1.0.0'")
@@ -62,7 +62,7 @@ class CppBuildHttpRepoIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
 
-        def rootProject = build.project(":").isCppApplication()
+        def rootProject = build.rootProject.isCppApplication()
 
         def repoBuild = build(file('external/v1'))
         repoBuild.isBuild()
@@ -100,7 +100,7 @@ class CppBuildHttpRepoIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
 
-        def rootProject = build.project(":").isCppApplication()
+        def rootProject = build.rootProject.isCppApplication()
 
         def buildFile = rootProject.file("build.gradle")
         buildFile.text.contains("implementation 'org.gradle.example:extlibapi1:3.0.0'")

@@ -10,7 +10,7 @@ class AndroidBuildBuildSrcIntegrationTest extends AbstractAndroidIntegrationTest
 
         def buildSrc = build(file("buildSrc"))
         buildSrc.isBuild()
-        buildSrc.project(":").isJavaPlugin()
+        buildSrc.rootProject.isJavaPlugin()
 
         build.buildSucceeds(":show")
     }

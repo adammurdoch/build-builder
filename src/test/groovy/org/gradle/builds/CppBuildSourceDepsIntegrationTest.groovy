@@ -8,17 +8,17 @@ class CppBuildSourceDepsIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
 
-        def rootProject = build.project(":").isCppApplication()
+        def rootProject = build.rootProject.isCppApplication()
 
         def child1 = build(file("external/sourceApi"))
         child1.isBuild()
-        child1.project(":").isEmptyProject()
+        child1.rootProject.isEmptyProject()
         def child1lib1 = child1.project(":srcapilibapi").isCppLibrary()
         def child1lib2 = child1.project(":srcapilibcore").isCppLibrary()
 
         def child2 = build(file("external/sourceCore"))
         child2.isBuild()
-        child2.project(":").isEmptyProject()
+        child2.rootProject.isEmptyProject()
         def child2lib1 = child2.project(":srccorelibapi").isCppLibrary()
         def child2lib2 = child2.project(":srccorelibcore").isCppLibrary()
 
@@ -43,11 +43,11 @@ class CppBuildSourceDepsIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
 
-        def rootProject = build.project(":").isCppApplication()
+        def rootProject = build.rootProject.isCppApplication()
 
         def child1 = build(file("external/sourceApi1"))
         child1.isBuild()
-        child1.project(":").isEmptyProject()
+        child1.rootProject.isEmptyProject()
         def child1lib1 = child1.project(":srcapi1libapi").isCppLibrary()
         def child1lib2 = child1.project(":srcapi1libcore").isCppLibrary()
 

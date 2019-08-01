@@ -7,7 +7,7 @@ class KotlinBuildIntegrationTest extends AbstractIntegrationTest {
 
         then:
         build.isBuild()
-        build.project(".").isEmptyProject()
+        build.rootProject.isKotlinApplication()
     }
 
     def "can generate multi-project Kotlin application"() {
@@ -16,8 +16,8 @@ class KotlinBuildIntegrationTest extends AbstractIntegrationTest {
 
         then:
         build.isBuild()
-        build.project(".").isEmptyProject()
-        build.project("libapi").isEmptyProject()
-        build.project("libcore").isEmptyProject()
+        build.rootProject.isKotlinApplication()
+        build.project("libapi").isKotlinLibrary()
+        build.project("libcore").isKotlinLibrary()
     }
 }

@@ -11,11 +11,11 @@ class AndroidBuildHttpRepoIntegrationTest extends AbstractAndroidIntegrationTest
         then:
         build.isBuild()
 
-        def rootProject = build.project(":").isAndroidApplication()
+        def rootProject = build.rootProject.isAndroidApplication()
 
         def repoBuild = build(file('external/v1'))
         repoBuild.isBuild()
-        repoBuild.project(':').isEmptyProject()
+        repoBuild.rootProject.isEmptyProject()
         def lib1 = repoBuild.project(':extlibapi1').isAndroidLibrary()
         def lib2 = repoBuild.project(':extlibapi2').isAndroidLibrary()
         def lib3 = repoBuild.project(':extlibcore').isAndroidLibrary()
@@ -53,14 +53,14 @@ class AndroidBuildHttpRepoIntegrationTest extends AbstractAndroidIntegrationTest
         then:
         build.isBuild()
 
-        def rootProject = build.project(":").isAndroidApplication()
+        def rootProject = build.rootProject.isAndroidApplication()
 
         def lib1 = build.project(":libapi").isAndroidLibrary()
         def lib2 = build.project(":libcore").isJavaLibrary()
 
         def repoBuild = build(file('external/v1'))
         repoBuild.isBuild()
-        repoBuild.project(':').isEmptyProject()
+        repoBuild.rootProject.isEmptyProject()
         def extlib1 = repoBuild.project(':extlibapi1').isAndroidLibrary()
         def extlib2 = repoBuild.project(':extlibapi2').isJavaLibrary()
         def extlib3 = repoBuild.project(':extlibcore').isJavaLibrary()

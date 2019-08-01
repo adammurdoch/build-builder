@@ -11,7 +11,7 @@ class JavaBuildBuildSrcIntegrationTest extends AbstractIntegrationTest {
         def buildSrc = build(file("buildSrc"))
         buildSrc.isBuild()
 
-        def lib = buildSrc.project(":").isJavaPlugin()
+        def lib = buildSrc.rootProject.isJavaPlugin()
         lib.src.contains("org/gradle/example/buildsrc/ShowPlugin.java")
 
         build.buildSucceeds(":show")

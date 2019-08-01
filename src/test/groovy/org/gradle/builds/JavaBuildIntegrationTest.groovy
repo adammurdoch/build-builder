@@ -11,8 +11,8 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         build.isBuild()
         build.isCleanGitRepo()
 
-        build.project(":").isJavaApplication()
-        def srcDir = build.project(":").file("src/main/java/org/gradle/example/app")
+        build.rootProject.isJavaApplication()
+        def srcDir = build.rootProject.file("src/main/java/org/gradle/example/app")
         srcDir.list() as Set == ["App.java", "AppImplApi.java", "AppImplCore.java"] as Set
         new File(srcDir, "App.java").text.contains("org.gradle.example.app.AppImplApi.getSomeValue()")
         new File(srcDir, "App.java").text.contains("org.gradle.example.app.AppImplApi.INT_CONST")
@@ -38,9 +38,9 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
 
-        build.project(":").isJavaApplication()
-        build.project(":").file("src/main/java/org/gradle/example/app").list().size() == sourceFiles
-        build.project(":").file("src/test/java/org/gradle/example/app").list().size() == sourceFiles
+        build.rootProject.isJavaApplication()
+        build.rootProject.file("src/main/java/org/gradle/example/app").list().size() == sourceFiles
+        build.rootProject.file("src/test/java/org/gradle/example/app").list().size() == sourceFiles
 
         build.buildSucceeds(":installDist")
         build.app("build/install/testApp/bin/testApp").succeeds()
@@ -57,8 +57,8 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
 
         then:
         build.isBuild()
-        build.project(":").isJavaApplication()
-        def srcDir = build.project(":").file("src/main/java/org/gradle/example/app")
+        build.rootProject.isJavaApplication()
+        def srcDir = build.rootProject.file("src/main/java/org/gradle/example/app")
         srcDir.list() as Set == ["App.java", "AppImplApi.java", "AppImplCore.java"] as Set
         new File(srcDir, "AppImplApi.java").text.contains("org.gradle.example.lib.Lib.getSomeValue()")
         new File(srcDir, "AppImplApi.java").text.contains("org.gradle.example.lib.Lib.INT_CONST")
@@ -84,8 +84,8 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
 
-        build.project(":").isJavaApplication()
-        build.project(":").file("src/main/java/org/gradle/example/app").list() as Set == ["App.java", "AppImplApi.java", "AppImplCore.java"] as Set
+        build.rootProject.isJavaApplication()
+        build.rootProject.file("src/main/java/org/gradle/example/app").list() as Set == ["App.java", "AppImplApi.java", "AppImplCore.java"] as Set
 
         build.buildSucceeds(":installDist")
         build.app("build/install/testApp/bin/testApp").succeeds()
@@ -104,9 +104,9 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
 
-        build.project(":").isJavaApplication()
-        build.project(":").file("src/main/java/org/gradle/example/app").list().size() == sourceFiles
-        build.project(":").file("src/test/java/org/gradle/example/app").list().size() == sourceFiles
+        build.rootProject.isJavaApplication()
+        build.rootProject.file("src/main/java/org/gradle/example/app").list().size() == sourceFiles
+        build.rootProject.file("src/test/java/org/gradle/example/app").list().size() == sourceFiles
 
         build.project(":libapi1").isJavaLibrary()
         build.project(":libapi1").file("src/main/java/org/gradle/example/libapi1").list().size() == sourceFiles
@@ -131,11 +131,11 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
 
-        def rootProject = build.project(":").isJavaApplication()
+        def rootProject = build.rootProject.isJavaApplication()
 
         def child = build(file("child"))
         child.isBuild()
-        child.project(":").isEmptyProject()
+        child.rootProject.isEmptyProject()
         def lib1 = child.project(":childlibapi").isJavaLibrary()
         def lib2 = child.project(":childlibcore").isJavaLibrary()
 
@@ -160,17 +160,17 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
 
-        def rootProject = build.project(":").isJavaApplication()
+        def rootProject = build.rootProject.isJavaApplication()
 
         def child1 = build(file("childapi"))
         child1.isBuild()
-        child1.project(":").isEmptyProject()
+        child1.rootProject.isEmptyProject()
         def child1lib1 = child1.project(":childapilibapi").isJavaLibrary()
         def child1lib2 = child1.project(":childapilibcore").isJavaLibrary()
 
         def child2 = build(file("childcore"))
         child2.isBuild()
-        child2.project(":").isEmptyProject()
+        child2.rootProject.isEmptyProject()
         def child2lib1 = child2.project(":childcorelibapi").isJavaLibrary()
         def child2lib2 = child2.project(":childcorelibcore").isJavaLibrary()
 

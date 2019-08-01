@@ -149,10 +149,14 @@ abstract class AbstractIntegrationTest extends Specification {
         void isBuild() {
             assert rootDir.directory
             assert file("settings.gradle").file
-            project(':').isProject()
+            rootProject.isProject()
             if (file(".git").directory) {
                 isCleanGitRepo()
             }
+        }
+
+        ProjectLayout getRootProject() {
+            return project(":")
         }
 
         ProjectLayout project(String path) {
@@ -247,7 +251,7 @@ abstract class AbstractIntegrationTest extends Specification {
         // TODO - add more checks
         void isEmptyProject() {
             isProject()
-            !buildFile.text.contains('plugin')
+            assert !buildFile.text.contains('plugin')
         }
 
         void containsFilesWithExtension(File dir, String extension) {
@@ -307,6 +311,15 @@ abstract class AbstractIntegrationTest extends Specification {
             isJavaProject()
             appliesPlugin('java-gradle-plugin')
             return new JavaProject(path, projectDir, rootDir)
+        }
+
+        void isKotlinApplication() {
+            appliesPlugin("kotlin")
+            appliesPlugin("application")
+        }
+
+        void isKotlinLibrary() {
+            appliesPlugin("kotlin")
         }
 
         // TODO - add more checks

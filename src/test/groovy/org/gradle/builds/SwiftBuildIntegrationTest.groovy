@@ -13,14 +13,14 @@ class SwiftBuildIntegrationTest extends AbstractIntegrationTest {
 
         then:
         build.isBuild()
-        build.project(":").isSwiftApplication()
+        build.rootProject.isSwiftApplication()
 
-        def srcDir = build.project(":").file("src/main/swift")
+        def srcDir = build.rootProject.file("src/main/swift")
         srcDir.list() as Set == ["main.swift", "AppImplApi.swift", "AppImplCore.swift"] as Set
         new File(srcDir, "main.swift").text.contains("AppImplApi()")
         new File(srcDir, "AppImplApi.swift").text.contains("let appimplcore = AppImplCore()")
 
-        def testDir = build.project(":").file("src/test/swift")
+        def testDir = build.rootProject.file("src/test/swift")
         testDir.list() as Set == ["AppTest.swift", "AppImplApiTest.swift", "AppImplCoreTest.swift"] as Set
         new File(testDir, "AppTest.swift").text.contains("import TestApp")
         new File(testDir, "AppTest.swift").text.contains("let app = App()")
@@ -37,14 +37,14 @@ class SwiftBuildIntegrationTest extends AbstractIntegrationTest {
 
         then:
         build.isBuild()
-        build.project(":").isSwiftApplication()
+        build.rootProject.isSwiftApplication()
 
-        def srcDir = build.project(":").file("src/main/swift")
+        def srcDir = build.rootProject.file("src/main/swift")
         srcDir.list() as Set == ["main.swift", "AppImplApi.swift", "AppImplCore.swift"] as Set
         new File(srcDir, "AppImplApi.swift").text.contains("import Lib")
         new File(srcDir, "AppImplApi.swift").text.contains("let lib = Lib()")
 
-        build.project(":").file("src/test/swift").list() as Set == ["AppTest.swift", "AppImplApiTest.swift", "AppImplCoreTest.swift"] as Set
+        build.rootProject.file("src/test/swift").list() as Set == ["AppTest.swift", "AppImplApiTest.swift", "AppImplCoreTest.swift"] as Set
 
         build.project(":lib").isSwiftLibrary()
         build.project(":lib").file("src/main/swift").list() as Set == ["Lib.swift", "LibImplApi.swift", "LibImplCore.swift"] as Set
@@ -63,7 +63,7 @@ class SwiftBuildIntegrationTest extends AbstractIntegrationTest {
 
         then:
         build.isBuild()
-        build.project(":").isSwiftApplication()
+        build.rootProject.isSwiftApplication()
 
         build.buildSucceeds(":installDebug")
         build.app("build/install/main/debug/testApp").succeeds()
@@ -81,9 +81,9 @@ class SwiftBuildIntegrationTest extends AbstractIntegrationTest {
 
         then:
         build.isBuild()
-        build.project(":").isSwiftApplication()
-        build.project(":").file("src/main/swift").list().size() == count
-        build.project(":").file("src/test/swift").list().size() == count
+        build.rootProject.isSwiftApplication()
+        build.rootProject.file("src/main/swift").list().size() == count
+        build.rootProject.file("src/test/swift").list().size() == count
 
         build.project(":libapi1").isSwiftLibrary()
         build.project(":libapi1").file("src/main/swift").list().size() == count
@@ -107,7 +107,7 @@ class SwiftBuildIntegrationTest extends AbstractIntegrationTest {
 
         then:
         build.isBuild()
-        build.project(":").isSwiftPMProject()
+        build.rootProject.isSwiftPMProject()
 
         build.file("Package.swift").file
 
@@ -136,11 +136,11 @@ class SwiftBuildIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
 
-        def rootProject = build.project(":").isSwiftApplication()
+        def rootProject = build.rootProject.isSwiftApplication()
 
         def child = build(file("child"))
         child.isBuild()
-        child.project(":").isEmptyProject()
+        child.rootProject.isEmptyProject()
         def lib1 = child.project(":childlibapi").isSwiftLibrary()
         def lib2 = child.project(":childlibcore").isSwiftLibrary()
 

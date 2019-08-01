@@ -10,7 +10,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
 
-        def rootProject = build.project(":").isCppApplication()
+        def rootProject = build.rootProject.isCppApplication()
 
         rootProject.headers.contains("app.h", "app_defs1.h")
 
@@ -46,7 +46,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
 
-        def rootProject = build.project(":").isCppApplication()
+        def rootProject = build.rootProject.isCppApplication()
 
         rootProject.src.list().size() == sourceFiles + 1
 
@@ -66,7 +66,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
 
-        def rootProject = build.project(":").isCppApplication()
+        def rootProject = build.rootProject.isCppApplication()
 
         rootProject.headers.contains("app.h", "app_defs1.h")
 
@@ -123,7 +123,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
 
-        def rootProject = build.project(":").isCppApplication()
+        def rootProject = build.rootProject.isCppApplication()
         rootProject.headers.file("app.h").text.contains("void doSomethingWith(AppImpl2& p);")
 
         def lib1 = build.project(":lib1api1").isCppLibrary()
@@ -146,7 +146,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
 
-        def rootProject = build.project(":").isCppApplication()
+        def rootProject = build.rootProject.isCppApplication()
         rootProject.headers.file("app.h").text.contains("#include APP_DEFS1_H")
         rootProject.headers.file("app.h").text.contains('#define APP_DEFS1_H "app_defs1.h"')
 
@@ -163,7 +163,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
 
-        def rootProject= build.project(":").isCppApplication()
+        def rootProject= build.rootProject.isCppApplication()
         rootProject.headers.file("app.h").text.contains("#include APP_DEFS1_H")
         rootProject.headers.file("app.h").text.contains('#define APP_DEFS1_H __APP_DEFS1_H(app_defs1.h)')
 
@@ -180,7 +180,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
 
-        def rootProject = build.project(":").isCppApplication()
+        def rootProject = build.rootProject.isCppApplication()
         !rootProject.headers.file("app.h").text.contains("#include APP_DEFS1_H")
 
         build.buildSucceeds(":installDebug")
@@ -196,7 +196,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
 
-        def rootProject = build.project(":").isCppApplication()
+        def rootProject = build.rootProject.isCppApplication()
         rootProject.src.file("app_private.h").text.contains('#include <boost/asio.hpp>')
 
         def lib1 = build.project(":lib").isCppLibrary()
@@ -215,7 +215,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
 
-        def rootProject = build.project(":").isCppApplication()
+        def rootProject = build.rootProject.isCppApplication()
         def lib1 = build.project(":libapi").isCppLibrary()
         def lib2 = build.project(":libcore").isCppLibrary()
 
@@ -242,7 +242,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
 
-        def rootProject = build.project(":").isCppApplication()
+        def rootProject = build.rootProject.isCppApplication()
         rootProject.headers.contains("app.h", "app_defs1.h")
         rootProject.src.contains("app.cpp", "app_private.h", "appimplapi.cpp", "appimplcore.cpp")
 
@@ -266,7 +266,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
 
-        def rootProject = build.project(":").isCppApplication()
+        def rootProject = build.rootProject.isCppApplication()
         rootProject.src.list().size() == sourceFiles + 1
 
         def lib1 = build.project(":libapi1").isCppLibrary()
@@ -290,7 +290,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
 
         then:
         build.isBuild()
-        def rootProject = build.project(":").isCppApplication()
+        def rootProject = build.rootProject.isCppApplication()
         rootProject.headers.contains("app.h", "app_defs1.h")
         rootProject.src.contains("app_private.h", "app_private_defs1.h", "app.cpp", "appimplapi.cpp", "appimplcore.cpp")
 
@@ -312,7 +312,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
 
-        def rootProject = build.project(":").isCppApplication()
+        def rootProject = build.rootProject.isCppApplication()
         rootProject.headers.contains("app.h", "app_defs1.h", "app_defs2.h", "app_defs3.h")
         rootProject.src.contains("app_private.h", "app_private_defs1.h", "app_private_defs2.h", "app_private_defs3.h", "app.cpp", "appimplapi.cpp", "appimplcore.cpp")
 
@@ -334,7 +334,7 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
 
         then:
         build.isBuild()
-        build.project(":").isCppApplication()
+        build.rootProject.isCppApplication()
         build.project(":libapi1").isCppLibrary()
         build.project(":libapi2").isCppLibrary()
         build.project(":libcore").isCppLibrary()
@@ -355,11 +355,11 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
 
-        def rootProject = build.project(":").isCppApplication()
+        def rootProject = build.rootProject.isCppApplication()
 
         def child = build(file("child"))
         child.isBuild()
-        child.project(":").isEmptyProject()
+        child.rootProject.isEmptyProject()
         def lib1 = child.project(":childlibapi").isCppLibrary()
         def lib2 = child.project(":childlibcore").isCppLibrary()
 
@@ -382,14 +382,14 @@ class CppBuildIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
         build.isCleanGitRepo()
-        build.project(":").isCppApplication()
+        build.rootProject.isCppApplication()
         build.project(":lib").isCppLibrary()
 
         when:
         new Main().run("cpp", "--source-files", "1", "--dir", projectDir.absolutePath)
 
         then:
-        build.project(":").isCppApplication()
+        build.rootProject.isCppApplication()
         build.isCleanGitRepo()
     }
 

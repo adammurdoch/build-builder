@@ -10,8 +10,8 @@ class AndroidBuildIntegrationTest extends AbstractAndroidIntegrationTest {
         then:
         build.isBuild()
 
-        build.project(":").isAndroidApplication()
-        def srcDir = build.project(":").file("src/main/java/org/gradle/example/app")
+        build.rootProject.isAndroidApplication()
+        def srcDir = build.rootProject.file("src/main/java/org/gradle/example/app")
         srcDir.list() as Set == ["AppMainActivity.java", "AppImplApi.java", "AppImplCore.java"] as Set
         new File(srcDir, "AppMainActivity.java").text.contains("org.gradle.example.app.AppImplApi.getSomeValue()")
         new File(srcDir, "AppMainActivity.java").text.contains("org.gradle.example.app.AppImplApi.INT_CONST")
@@ -37,9 +37,9 @@ class AndroidBuildIntegrationTest extends AbstractAndroidIntegrationTest {
         then:
         build.isBuild()
 
-        build.project(":").isAndroidApplication()
-        build.project(":").file("src/main/java/org/gradle/example/app").list().size() == sourceFiles
-        build.project(":").file("src/test/java/org/gradle/example/app").list().size() == sourceFiles
+        build.rootProject.isAndroidApplication()
+        build.rootProject.file("src/main/java/org/gradle/example/app").list().size() == sourceFiles
+        build.rootProject.file("src/test/java/org/gradle/example/app").list().size() == sourceFiles
 
         build.buildSucceeds(":assembleDebug")
         file("build/outputs/apk/debug/testApp-debug.apk").exists()
@@ -57,8 +57,8 @@ class AndroidBuildIntegrationTest extends AbstractAndroidIntegrationTest {
         then:
         build.isBuild()
 
-        build.project(":").isAndroidApplication()
-        def srcDir = build.project(":").file("src/main/java/org/gradle/example/app")
+        build.rootProject.isAndroidApplication()
+        def srcDir = build.rootProject.file("src/main/java/org/gradle/example/app")
         srcDir.list() as Set == ["AppMainActivity.java", "AppImplApi.java", "AppImplCore.java"] as Set
         new File(srcDir, "AppImplApi.java").text.contains("org.gradle.example.lib.LibActivity.getSomeValue()")
         new File(srcDir, "AppImplApi.java").text.contains("org.gradle.example.lib.LibActivity.INT_CONST")
@@ -81,8 +81,8 @@ class AndroidBuildIntegrationTest extends AbstractAndroidIntegrationTest {
         then:
         build.isBuild()
 
-        build.project(":").isAndroidApplication()
-        build.project(":").file("src/main/java/org/gradle/example/app").list() as Set == ["AppMainActivity.java", "AppImplApi.java", "AppImplCore.java"] as Set
+        build.rootProject.isAndroidApplication()
+        build.rootProject.file("src/main/java/org/gradle/example/app").list() as Set == ["AppMainActivity.java", "AppImplApi.java", "AppImplCore.java"] as Set
 
         build.buildSucceeds(":assembleDebug")
         file("build/outputs/apk/debug/testApp-debug.apk").exists()
@@ -100,7 +100,7 @@ class AndroidBuildIntegrationTest extends AbstractAndroidIntegrationTest {
         then:
         build.isBuild()
 
-        build.project(":").isAndroidApplication()
+        build.rootProject.isAndroidApplication()
         build.project(":lib").isJavaLibrary()
 
         build.buildSucceeds(":assembleDebug")
@@ -116,7 +116,7 @@ class AndroidBuildIntegrationTest extends AbstractAndroidIntegrationTest {
         then:
         build.isBuild()
 
-        build.project(":").isAndroidApplication()
+        build.rootProject.isAndroidApplication()
         build.project(":libapi").isAndroidLibrary()
         build.project(":libcore").isJavaLibrary()
 
@@ -133,7 +133,7 @@ class AndroidBuildIntegrationTest extends AbstractAndroidIntegrationTest {
         then:
         build.isBuild()
 
-        build.project(":").isAndroidApplication()
+        build.rootProject.isAndroidApplication()
         build.project(":lib1api1").isAndroidLibrary()
         build.project(":lib1api2").isAndroidLibrary()
         build.project(":lib1impl").isAndroidLibrary()
@@ -154,9 +154,9 @@ class AndroidBuildIntegrationTest extends AbstractAndroidIntegrationTest {
         then:
         build.isBuild()
 
-        build.project(":").isAndroidApplication()
-        build.project(":").file("src/main/java/org/gradle/example/app").list().size() == sourceFiles
-        build.project(":").file("src/test/java/org/gradle/example/app").list().size() == sourceFiles
+        build.rootProject.isAndroidApplication()
+        build.rootProject.file("src/main/java/org/gradle/example/app").list().size() == sourceFiles
+        build.rootProject.file("src/test/java/org/gradle/example/app").list().size() == sourceFiles
 
         build.project(":libapi1").isAndroidLibrary()
         build.project(":libapi1").file("src/main/java/org/gradle/example/libapi1").list().size() == sourceFiles
@@ -181,11 +181,11 @@ class AndroidBuildIntegrationTest extends AbstractAndroidIntegrationTest {
         then:
         build.isBuild()
 
-        def rootProject = build.project(":").isAndroidApplication()
+        def rootProject = build.rootProject.isAndroidApplication()
 
         def child = build(file("child"))
         child.isBuild()
-        child.project(":").isEmptyProject()
+        child.rootProject.isEmptyProject()
         def lib1 = child.project(":childlibapi").isAndroidLibrary()
         def lib2 = child.project(":childlibcore").isAndroidLibrary()
 

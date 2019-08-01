@@ -8,20 +8,20 @@ class JavaBuildSourceDepsIntegrationTest extends AbstractIntegrationTest {
         then:
         build.isBuild()
 
-        build.project(":").isJavaApplication()
-        def srcDir = build.project(":").file("src/main/java/org/gradle/example/app")
+        build.rootProject.isJavaApplication()
+        def srcDir = build.rootProject.file("src/main/java/org/gradle/example/app")
         new File(srcDir, "AppImplApi.java").text.contains("org.gradle.example.srcapilibapi.SrcApiLibApi.getSomeValue()")
         new File(srcDir, "AppImplApi.java").text.contains("org.gradle.example.srcapilibapi.SrcApiLibApi.INT_CONST")
 
         def child1 = build(file("external/sourceApi"))
         child1.isBuild()
-        child1.project(":").isEmptyProject()
+        child1.rootProject.isEmptyProject()
         child1.project(":srcapilibapi").isJavaLibrary()
         child1.project(":srcapilibcore").isJavaLibrary()
 
         def child2 = build(file("external/sourceCore"))
         child2.isBuild()
-        child2.project(":").isEmptyProject()
+        child2.rootProject.isEmptyProject()
         child2.project(":srccorelibapi").isJavaLibrary()
         child2.project(":srccorelibcore").isJavaLibrary()
 
