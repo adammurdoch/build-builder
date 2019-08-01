@@ -19,7 +19,6 @@ public abstract class JvmModelAssembler<A extends Component, L extends Component
         BlockWithProjectTarget allProjects = rootProject.getBuildScript().allProjects();
         allProjects.jcenter();
         addIdePlugins(rootProject);
-        allProjects.block("tasks.withType(JavaCompile)").property("options.incremental", "true");
     }
 
     protected void addTests(Project project, HasJavaSource<?> application) {
