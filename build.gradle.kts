@@ -2,7 +2,7 @@ plugins {
     id("java")
     id("groovy")
     id("application")
-    id("org.jetbrains.kotlin.jvm").version("1.3.31")
+    id("org.jetbrains.kotlin.jvm").version("1.3.41")
 }
 
 repositories {
@@ -34,6 +34,7 @@ dependencies {
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
 }
+
 application {
     mainClassName = "org.gradle.builds.Main"
 }
