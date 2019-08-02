@@ -3,8 +3,8 @@ package org.gradle.builds;
 import io.airlift.airline.*;
 import org.gradle.builds.assemblers.*;
 import org.gradle.builds.generators.*;
+import org.gradle.builds.model.BuildProjectTreeBuilder;
 import org.gradle.builds.model.BuildTree;
-import org.gradle.builds.model.BuildTreeBuilder;
 import org.gradle.builds.model.DefaultBuildTreeBuilder;
 import org.gradle.builds.model.MacroIncludes;
 
@@ -148,7 +148,7 @@ public class Main {
                             graphAssembler));
         }
 
-        private Generator<BuildTree> createModelGenerator() {
+        private Generator<BuildTree<BuildProjectTreeBuilder>> createModelGenerator() {
             return new CompositeGenerator<>(
                     new DotGenerator(),
                     new ModelGenerator(

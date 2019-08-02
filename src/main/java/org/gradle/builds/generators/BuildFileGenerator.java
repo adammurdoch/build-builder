@@ -10,7 +10,7 @@ import java.util.Set;
 
 public class BuildFileGenerator extends ProjectFileGenerator {
     @Override
-    protected void generate(Build build, Project project, FileGenerator fileGenerator) throws IOException {
+    protected void generate(BuildProjectTreeBuilder build, Project project, FileGenerator fileGenerator) throws IOException {
         Path buildFile = project.getProjectDir().resolve("build.gradle");
         BuildScript buildScript = project.getBuildScript();
         fileGenerator.generate(buildFile, printWriter -> {

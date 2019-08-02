@@ -109,7 +109,7 @@ class StructureAssemblerTest extends Specification {
         builder.mainBuild.rootProjectName = 'test'
         builder.mainBuild.projectInitializer.add(initializer)
         builder.mainBuild.settings = new Settings(p, 3)
-        builder.toModel().build
+        builder.toModel().mainBuild
     }
 
     def api(Project p) {

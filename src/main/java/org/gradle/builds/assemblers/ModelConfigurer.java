@@ -1,6 +1,6 @@
 package org.gradle.builds.assemblers;
 
-import org.gradle.builds.model.Build;
+import org.gradle.builds.model.BuildProjectTreeBuilder;
 import org.gradle.builds.model.BuildTree;
 
 import java.util.HashSet;
@@ -16,15 +16,15 @@ public class ModelConfigurer {
     /**
      * Populates the model. The builds and their dependencies have been defined, but no projects have been configured.
      */
-    public void populate(BuildTree model) {
-        Set<Build> seen = new HashSet<>();
-        for (Build build : model.getBuilds()) {
+    public void populate(BuildTree<BuildProjectTreeBuilder> model) {
+        Set<BuildProjectTreeBuilder> seen = new HashSet<>();
+        for (BuildProjectTreeBuilder build : model.getBuilds()) {
             doPopulate(build, seen);
         }
     }
 
-    private void doPopulate(Build build, Set<Build> seen) {
-        for (Build depBuild : build.getDependsOn()) {
+    private void doPopulate(BuildProjectTreeBuilder build, Set<BuildProjectTreeBuilder> seen) {
+        for (BuildProjectTreeBuilder depBuild : build.getDependsOn()) {
             doPopulate(depBuild, seen);
         }
         if (seen.add(build)) {

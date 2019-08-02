@@ -5,10 +5,10 @@ import org.gradle.builds.model.*;
 import java.io.IOException;
 import java.nio.file.Path;
 
-public class DotGenerator implements Generator<BuildTree> {
+public class DotGenerator implements Generator<BuildTree<BuildProjectTreeBuilder>> {
     @Override
-    public void generate(BuildTree model, FileGenerator fileGenerator) throws IOException {
-        Path htmlFile = model.getBuild().getRootDir().resolve("dependencies.html");
+    public void generate(BuildTree<BuildProjectTreeBuilder> model, FileGenerator fileGenerator) throws IOException {
+        Path htmlFile = model.getMainBuild().getRootDir().resolve("dependencies.html");
         fileGenerator.generate(htmlFile, writer -> {
             writer.println("<!DOCTYPE html>");
             writer.println("<html>");
@@ -23,10 +23,10 @@ public class DotGenerator implements Generator<BuildTree> {
             writer.println("<h2>Build dependencies</h2>");
             writer.println("<div class=\"mermaid\">");
             writer.println("graph LR");
-            for (Build build : model.getBuilds()) {
+            for (BuildProjectTreeBuilder build : model.getBuilds()) {
                 writer.print("  ");
                 writer.println(build.getName());
-                for (Build dep : build.getDependsOn()) {
+                for (BuildProjectTreeBuilder dep : build.getDependsOn()) {
                     writer.print("  ");
                     writer.print(build.getName());
                     writer.print(" --> ");
@@ -39,7 +39,7 @@ public class DotGenerator implements Generator<BuildTree> {
             writer.println("<h2>Project dependencies</h2>");
             writer.println("<div class=\"mermaid\">");
             writer.println("graph LR");
-            for (Build build : model.getBuilds()) {
+            for (BuildProjectTreeBuilder build : model.getBuilds()) {
                 writer.println("  subgraph " + build.getName());
                 for (Project project : build.getProjects()) {
                     writer.print("  ");

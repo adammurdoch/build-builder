@@ -1,14 +1,14 @@
 package org.gradle.builds.generators;
 
-import org.gradle.builds.model.Build;
+import org.gradle.builds.model.BuildProjectTreeBuilder;
 import org.gradle.builds.model.Project;
 
 import java.io.IOException;
 import java.nio.file.Path;
 
-public class SettingsFileGenerator implements Generator<Build> {
+public class SettingsFileGenerator implements Generator<BuildProjectTreeBuilder> {
     @Override
-    public void generate(Build build, FileGenerator fileGenerator) throws IOException {
+    public void generate(BuildProjectTreeBuilder build, FileGenerator fileGenerator) throws IOException {
         Path settingsFile = build.getRootDir().resolve("settings.gradle");
         fileGenerator.generate(settingsFile, printWriter -> {
             printWriter.println("// GENERATED SETTINGS SCRIPT");
@@ -22,7 +22,7 @@ public class SettingsFileGenerator implements Generator<Build> {
 
             if (!build.getIncludedBuilds().isEmpty()) {
                 printWriter.println();
-                for (Build childBuild : build.getIncludedBuilds()) {
+                for (BuildProjectTreeBuilder childBuild : build.getIncludedBuilds()) {
                     printWriter.println("includeBuild '" + build.getRootDir().relativize(childBuild.getRootDir()) + "'");
                 }
             }
@@ -30,7 +30,7 @@ public class SettingsFileGenerator implements Generator<Build> {
             if (!build.getSourceBuilds().isEmpty()) {
                 printWriter.println();
                 printWriter.println("sourceControl.vcsMappings {");
-                for (Build childBuild : build.getSourceBuilds()) {
+                for (BuildProjectTreeBuilder childBuild : build.getSourceBuilds()) {
                     for (Project project : childBuild.getProjects()) {
                         printWriter.println("    withModule('org.gradle.example:" + project.getName() + "') { details ->");
                         printWriter.println("        from(GitVersionControlSpec) {");

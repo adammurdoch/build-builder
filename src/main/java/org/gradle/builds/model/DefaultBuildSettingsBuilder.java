@@ -30,16 +30,16 @@ public class DefaultBuildSettingsBuilder implements BuildSettingsBuilder {
         this.rootDir = rootDir;
     }
 
-    public Build toModel(Function<BuildSettingsBuilder, Build> otherBuildLookup) {
+    public BuildProjectTreeBuilder toModel(Function<BuildSettingsBuilder, BuildProjectTreeBuilder> otherBuildLookup) {
         assertNotNull("displayName", displayName);
         assertNotNull("rootProjectName", rootProjectName);
         assertNotNull("settings", settings);
         assertNotNull("projectInitializer", projectInitializer);
 
-        List<Build> dependsOnBuilds = dependsOn.stream().map(otherBuildLookup).collect(Collectors.toList());
-        List<Build> includedBuilds = this.includedBuilds.stream().map(otherBuildLookup).collect(Collectors.toList());
-        List<Build> sourceBuilds = this.sourceBuilds.stream().map(otherBuildLookup).collect(Collectors.toList());
-        return new DefaultBuild(rootDir, displayName, rootProjectName, settings, publicationTarget, typeNamePrefix, projectInitializer, version, dependsOnBuilds, includedBuilds, sourceBuilds);
+        List<BuildProjectTreeBuilder> dependsOnBuilds = dependsOn.stream().map(otherBuildLookup).collect(Collectors.toList());
+        List<BuildProjectTreeBuilder> includedBuilds = this.includedBuilds.stream().map(otherBuildLookup).collect(Collectors.toList());
+        List<BuildProjectTreeBuilder> sourceBuilds = this.sourceBuilds.stream().map(otherBuildLookup).collect(Collectors.toList());
+        return new DefaultBuildProjectTreeBuilder(rootDir, displayName, rootProjectName, settings, publicationTarget, typeNamePrefix, projectInitializer, version, dependsOnBuilds, includedBuilds, sourceBuilds);
     }
 
     private void assertNotNull(String name, @Nullable Object value) {

@@ -1,6 +1,6 @@
 package org.gradle.builds.generators;
 
-import org.gradle.builds.model.Build;
+import org.gradle.builds.model.BuildProjectTreeBuilder;
 import org.gradle.builds.model.Component;
 import org.gradle.builds.model.Project;
 
@@ -14,12 +14,12 @@ public abstract class ProjectComponentSpecificGenerator<T extends Component> ext
     }
 
     @Override
-    protected void generate(Build build, Project project, FileGenerator fileGenerator) throws IOException {
+    protected void generate(BuildProjectTreeBuilder build, Project project, FileGenerator fileGenerator) throws IOException {
         T component = project.component(type);
         if (component != null) {
             generate(build, project, component, fileGenerator);
         }
     }
 
-    protected abstract void generate(Build build, Project project, T component, FileGenerator fileGenerator) throws IOException;
+    protected abstract void generate(BuildProjectTreeBuilder build, Project project, T component, FileGenerator fileGenerator) throws IOException;
 }

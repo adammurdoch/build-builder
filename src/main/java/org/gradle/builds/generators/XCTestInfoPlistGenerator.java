@@ -1,6 +1,6 @@
 package org.gradle.builds.generators;
 
-import org.gradle.builds.model.Build;
+import org.gradle.builds.model.BuildProjectTreeBuilder;
 import org.gradle.builds.model.HasSwiftSource;
 import org.gradle.builds.model.Project;
 
@@ -13,7 +13,7 @@ public class XCTestInfoPlistGenerator extends ProjectComponentSpecificGenerator<
     }
 
     @Override
-    protected void generate(Build build, Project project, HasSwiftSource component, FileGenerator fileGenerator) throws IOException {
+    protected void generate(BuildProjectTreeBuilder build, Project project, HasSwiftSource component, FileGenerator fileGenerator) throws IOException {
         if (!component.getTestFiles().isEmpty()) {
             Path path = project.getProjectDir().resolve("src/test/resources/Info.plist");
             fileGenerator.generate(path, writer -> {

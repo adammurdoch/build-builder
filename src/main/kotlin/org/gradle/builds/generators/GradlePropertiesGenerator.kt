@@ -1,11 +1,11 @@
 package org.gradle.builds.generators
 
-import org.gradle.builds.model.Build
+import org.gradle.builds.model.BuildProjectTreeBuilder
 import org.gradle.builds.model.HasHeapRequirements
 import kotlin.math.max
 
-class GradlePropertiesGenerator: Generator<Build> {
-    override fun generate(build: Build, fileGenerator: FileGenerator) {
+class GradlePropertiesGenerator: Generator<BuildProjectTreeBuilder> {
+    override fun generate(build: BuildProjectTreeBuilder, fileGenerator: FileGenerator) {
         val readMe = build.rootDir.resolve("gradle.properties")
         val component = build.rootProject.component(HasHeapRequirements::class.java)
         val min = component?.minHeapMegabytes ?: 64

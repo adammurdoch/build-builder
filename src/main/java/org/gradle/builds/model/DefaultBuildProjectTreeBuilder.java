@@ -7,14 +7,14 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class DefaultBuild implements Build {
+public class DefaultBuildProjectTreeBuilder implements BuildProjectTreeBuilder {
     private final Path rootDir;
     private final String displayName;
     private final Project rootProject;
     private final Map<String, Project> projects = new LinkedHashMap<>();
-    private final List<Build> dependsOn;
-    private final List<Build> includedBuilds;
-    private final List<Build> sourceBuilds;
+    private final List<BuildProjectTreeBuilder> dependsOn;
+    private final List<BuildProjectTreeBuilder> includedBuilds;
+    private final List<BuildProjectTreeBuilder> sourceBuilds;
     private final List<Project> exportedProjects = new ArrayList<>();
     private final Settings settings;
     private final PublicationTarget publicationTarget;
@@ -23,7 +23,7 @@ public class DefaultBuild implements Build {
     private final String version;
     private Project deepestProject;
 
-    public DefaultBuild(Path rootDir, String displayName, String rootProjectName, Settings settings, PublicationTarget publicationTarget, String typeNamePrefix, ProjectInitializer projectInitializer, String version, List<Build> dependsOn, List<Build> includedBuilds, List<Build> sourceBuilds) {
+    public DefaultBuildProjectTreeBuilder(Path rootDir, String displayName, String rootProjectName, Settings settings, PublicationTarget publicationTarget, String typeNamePrefix, ProjectInitializer projectInitializer, String version, List<BuildProjectTreeBuilder> dependsOn, List<BuildProjectTreeBuilder> includedBuilds, List<BuildProjectTreeBuilder> sourceBuilds) {
         this.rootDir = rootDir;
         this.displayName = displayName;
         this.settings = settings;
@@ -124,7 +124,7 @@ public class DefaultBuild implements Build {
     }
 
     @Override
-    public List<Build> getDependsOn() {
+    public List<BuildProjectTreeBuilder> getDependsOn() {
         return dependsOn;
     }
 
@@ -134,7 +134,7 @@ public class DefaultBuild implements Build {
     }
 
     @Override
-    public List<Build> getIncludedBuilds() {
+    public List<BuildProjectTreeBuilder> getIncludedBuilds() {
         return includedBuilds;
     }
 
@@ -159,7 +159,7 @@ public class DefaultBuild implements Build {
     }
 
     @Override
-    public List<Build> getSourceBuilds() {
+    public List<BuildProjectTreeBuilder> getSourceBuilds() {
         return sourceBuilds;
     }
 

@@ -1,6 +1,6 @@
 package org.gradle.builds.assemblers;
 
-import org.gradle.builds.model.Build;
+import org.gradle.builds.model.BuildProjectTreeBuilder;
 import org.gradle.builds.model.Project;
 
 public class InitialProjectSetupBuildConfigurer implements BuildConfigurer {
@@ -13,7 +13,7 @@ public class InitialProjectSetupBuildConfigurer implements BuildConfigurer {
     }
 
     @Override
-    public void populate(Build build) {
+    public void populate(BuildProjectTreeBuilder build) {
         StructureAssembler structureAssembler = new StructureAssembler(graphAssembler);
         structureAssembler.arrangeProjects(build, build.getProjectInitializer());
         structureAssembler.arrangeClasses(build);
@@ -29,7 +29,7 @@ public class InitialProjectSetupBuildConfigurer implements BuildConfigurer {
         }
 
         // Add incoming dependencies
-        for (Build other: build.getDependsOn()) {
+        for (BuildProjectTreeBuilder other: build.getDependsOn()) {
             if (other.getPublicationTarget().getHttpRepository() != null) {
                 build.getRootProject().getBuildScript().allProjects().maven(other.getPublicationTarget().getHttpRepository());
             }

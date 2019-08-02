@@ -12,7 +12,7 @@ public class AndroidLayoutGenerator extends ProjectComponentSpecificGenerator<An
     }
 
     @Override
-    protected void generate(Build build, Project project, AndroidComponent component, FileGenerator fileGenerator) throws IOException {
+    protected void generate(BuildProjectTreeBuilder build, Project project, AndroidComponent component, FileGenerator fileGenerator) throws IOException {
         Path layoutXml = project.getProjectDir().resolve("src/main/res/layout/" + project.getName().toLowerCase() + "_layout.xml");
         fileGenerator.generate(layoutXml, printWriter -> {
             generate(project, component, printWriter);

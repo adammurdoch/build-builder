@@ -5,8 +5,9 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.InitCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
-import org.gradle.builds.model.GitRepo;
+import org.gradle.builds.model.BuildProjectTreeBuilder;
 import org.gradle.builds.model.BuildTree;
+import org.gradle.builds.model.GitRepo;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -15,16 +16,16 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-public class GitRepoGenerator implements Generator<BuildTree> {
+public class GitRepoGenerator implements Generator<BuildTree<BuildProjectTreeBuilder>> {
     @Override
-    public void generate(BuildTree model, FileGenerator fileGenerator) throws IOException {
-        List<GitRepo> repos = model.getRepos();
+    public void generate(BuildTree<BuildProjectTreeBuilder> model, FileGenerator fileGenerator) throws IOException {
+        List<? extends GitRepo> repos = model.getRepos();
         for (GitRepo repo : repos) {
             generate(repo, repos, fileGenerator);
         }
     }
 
-    private void generate(GitRepo repo, List<GitRepo> allRepos, FileGenerator fileGenerator) throws IOException {
+    private void generate(GitRepo repo, List<? extends GitRepo> allRepos, FileGenerator fileGenerator) throws IOException {
         Path rootDir = repo.getRootDir();
         List<GitRepo> children = new ArrayList<>();
         for (GitRepo other : allRepos) {

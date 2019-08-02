@@ -1,12 +1,12 @@
 package org.gradle.builds.generators
 
-import org.gradle.builds.model.Build
+import org.gradle.builds.model.BuildProjectTreeBuilder
 import org.gradle.builds.model.HasCppSource
 import org.gradle.builds.model.HasSource
 import java.io.PrintWriter
 
-class ScenarioFileGenerator : Generator<Build> {
-    override fun generate(build: Build, fileGenerator: FileGenerator) {
+class ScenarioFileGenerator : Generator<BuildProjectTreeBuilder> {
+    override fun generate(build: BuildProjectTreeBuilder, fileGenerator: FileGenerator) {
         val scenarioFile = build.rootDir.resolve("performance.scenarios")
         fileGenerator.generate(scenarioFile) { printWriter ->
             printWriter.println("// GENERATED SCENARIO FILE")

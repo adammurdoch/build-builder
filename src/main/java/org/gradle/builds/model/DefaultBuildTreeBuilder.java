@@ -27,33 +27,21 @@ public class DefaultBuildTreeBuilder implements BuildTreeBuilder {
         repos.add(repo);
     }
 
-    /**
-     * Returns the root directory of this tree.
-     */
     @Override
     public Path getRootDir() {
         return rootDir;
     }
 
-    /**
-     * Returns the main build for this model.
-     */
     @Override
     public BuildSettingsBuilder getMainBuild() {
         return build;
     }
 
-    /**
-     * Adds a build to this tree.
-     */
     @Override
     public BuildSettingsBuilder addBuild(String rootDir) {
         return addBuild(this.rootDir.resolve(rootDir));
     }
 
-    /**
-     * Adds a build to this tree.
-     */
     @Override
     public BuildSettingsBuilder addBuild(Path rootDir) {
         DefaultBuildSettingsBuilder build = new DefaultBuildSettingsBuilder(rootDir);
@@ -66,9 +54,6 @@ public class DefaultBuildTreeBuilder implements BuildTreeBuilder {
         return builds;
     }
 
-    /**
-     * Returns the main repo for this model.
-     */
     @Override
     public GitRepoBuilder getRepo() {
         return repo;
@@ -81,23 +66,28 @@ public class DefaultBuildTreeBuilder implements BuildTreeBuilder {
         return repo;
     }
 
+    @Override
+    public List<? extends GitRepo> getRepos() {
+        return repos;
+    }
+
     /**
      * Constructs the build tree from this builder.
      */
-    public BuildTree toModel() {
-        Function<BuildSettingsBuilder, Build> mapper = new BuildConstructor();
-        Build mainBuild = mapper.apply(build);
-        List<Build> builds = this.builds.stream().map(mapper).collect(Collectors.toList());
-        List<GitRepo> repos = this.repos.stream().map(r -> new GitRepo(r.getRootDir(), r.getVersion())).collect(Collectors.toList());
+    public BuildTree<BuildProjectTreeBuilder> toModel() {
+        Function<BuildSettingsBuilder, BuildProjectTreeBuilder> mapper = new BuildConstructor();
+        BuildProjectTreeBuilder mainBuild = mapper.apply(build);
+        List<BuildProjectTreeBuilder> builds = this.builds.stream().map(mapper).collect(Collectors.toList());
+        List<GitRepo> repos = this.repos.stream().map(r -> new DefaultGitRepo(r.getRootDir(), r.getVersion())).collect(Collectors.toList());
         return new DefaultBuildTree(mainBuild, builds, repos);
     }
 
-    private static class BuildConstructor implements Function<BuildSettingsBuilder, Build> {
-        Map<BuildSettingsBuilder, Build> results = new HashMap<>();
+    private static class BuildConstructor implements Function<BuildSettingsBuilder, BuildProjectTreeBuilder> {
+        Map<BuildSettingsBuilder, BuildProjectTreeBuilder> results = new HashMap<>();
 
         @Override
-        public Build apply(BuildSettingsBuilder builder) {
-            Build build = results.get(builder);
+        public BuildProjectTreeBuilder apply(BuildSettingsBuilder builder) {
+            BuildProjectTreeBuilder build = results.get(builder);
             if (build == null) {
                 build = ((DefaultBuildSettingsBuilder)builder).toModel(this);
                 results.put(builder, build);

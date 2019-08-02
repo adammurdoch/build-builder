@@ -5,7 +5,7 @@ import org.gradle.builds.assemblers.Settings;
 
 import java.nio.file.Path;
 
-public interface BuildSettingsBuilder {
+public interface BuildSettingsBuilder extends Build {
     Path getRootDir();
 
     void setDisplayName(String displayName);

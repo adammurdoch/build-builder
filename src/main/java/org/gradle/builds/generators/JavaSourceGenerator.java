@@ -9,7 +9,7 @@ public class JavaSourceGenerator extends ProjectFileGenerator {
     private int counter = 1000;
 
     @Override
-    protected void generate(Build build, Project project, FileGenerator fileGenerator) throws IOException {
+    protected void generate(BuildProjectTreeBuilder build, Project project, FileGenerator fileGenerator) throws IOException {
         HasJavaSource<?> component = project.component(HasJavaSource.class);
         if (component != null) {
             generate(project, component, fileGenerator);

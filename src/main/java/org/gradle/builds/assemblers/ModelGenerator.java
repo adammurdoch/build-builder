@@ -2,21 +2,21 @@ package org.gradle.builds.assemblers;
 
 import org.gradle.builds.generators.FileGenerator;
 import org.gradle.builds.generators.Generator;
-import org.gradle.builds.model.Build;
+import org.gradle.builds.model.BuildProjectTreeBuilder;
 import org.gradle.builds.model.BuildTree;
 
 import java.io.IOException;
 
-public class ModelGenerator implements Generator<BuildTree> {
-    private final Generator<Build> buildGenerator;
+public class ModelGenerator implements Generator<BuildTree<BuildProjectTreeBuilder>> {
+    private final Generator<BuildProjectTreeBuilder> buildGenerator;
 
-    public ModelGenerator(Generator<Build> buildGenerator) {
+    public ModelGenerator(Generator<BuildProjectTreeBuilder> buildGenerator) {
         this.buildGenerator = buildGenerator;
     }
 
     @Override
-    public void generate(BuildTree model, FileGenerator fileGenerator) throws IOException {
-        for (Build build : model.getBuilds()) {
+    public void generate(BuildTree<BuildProjectTreeBuilder> model, FileGenerator fileGenerator) throws IOException {
+        for (BuildProjectTreeBuilder build : model.getBuilds()) {
             System.out.println("* Generating " + build);
             buildGenerator.generate(build, fileGenerator);
         }
