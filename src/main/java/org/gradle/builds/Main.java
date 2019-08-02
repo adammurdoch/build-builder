@@ -161,6 +161,7 @@ public class Main {
                                     new AndroidImageGenerator(),
                                     new JavaSourceGenerator(),
                                     new JavaResourceGenerator(),
+                                    new KotlinSourceGenerator(),
                                     new CppSourceGenerator(),
                                     new SwiftPackageManagerManifestGenerator(),
                                     new SwiftSourceGenerator(),

@@ -1,4 +1,4 @@
 package org.gradle.builds.model
 
-class KotlinApplication: Component {
+class KotlinApplication: HasKotlinSource() {
 }

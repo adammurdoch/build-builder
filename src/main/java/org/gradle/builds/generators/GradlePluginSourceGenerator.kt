@@ -15,7 +15,7 @@ class GradlePluginSourceGenerator: ProjectFileGenerator() {
         val sourceFile = project.projectDir.resolve("src/main/java/" + javaClass.name.replace('.', '/') + ".java")
         fileGenerator.generate(sourceFile) { writer ->
             writer.println("// GENERATED SOURCE FILE")
-            writer.println("package " + javaClass.getPackage() + ";")
+            writer.println("package ${javaClass.packageName};")
             writer.println()
             writer.println("import org.gradle.api.Action;")
             writer.println("import org.gradle.api.Plugin;")
@@ -37,7 +37,7 @@ class GradlePluginSourceGenerator: ProjectFileGenerator() {
         val testFile = project.projectDir.resolve("src/test/java/" + javaClass.name.replace(".", "/") + "Test.java")
         fileGenerator.generate(testFile) { printWriter ->
             printWriter.println("// GENERATED SOURCE FILE")
-            printWriter.println("package " + javaClass.getPackage() + ";")
+            printWriter.println("package ${javaClass.packageName};")
             printWriter.println()
             printWriter.println("public class " + javaClass.simpleName + "Test {")
             printWriter.println("    @org.junit.Test")

@@ -1,4 +1,4 @@
 package org.gradle.builds.model
 
-class KotlinLibrary: Component {
+class KotlinLibrary: HasKotlinSource() {
 }

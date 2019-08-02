@@ -34,7 +34,7 @@ public class JavaSourceGenerator extends ProjectFileGenerator {
         Path sourceFile = project.getProjectDir().resolve("src/main/java/" + javaClass.getName().replace(".", "/") + ".java");
         fileGenerator.generate(sourceFile, printWriter -> {
             printWriter.println("// GENERATED SOURCE FILE");
-            printWriter.println("package " + javaClass.getPackage() + ";");
+            printWriter.println("package " + javaClass.getPackageName() + ";");
             printWriter.println();
             if (javaClass.role(AndroidActivity.class) != null) {
                 printWriter.println("public class " + javaClass.getSimpleName() + " extends android.app.Activity {");
@@ -119,7 +119,7 @@ public class JavaSourceGenerator extends ProjectFileGenerator {
         Path sourceFile = project.getProjectDir().resolve("src/test/java/" + javaClass.getName().replace(".", "/") + ".java");
         fileGenerator.generate(sourceFile, printWriter -> {
             printWriter.println("// GENERATED SOURCE FILE");
-            printWriter.println("package " + javaClass.getPackage() + ";");
+            printWriter.println("package " + javaClass.getPackageName() + ";");
             printWriter.println();
             printWriter.println("public class " + javaClass.getSimpleName() + " {");
             printWriter.println("    @org.junit.Test");
@@ -135,7 +135,7 @@ public class JavaSourceGenerator extends ProjectFileGenerator {
         Path sourceFile = project.getProjectDir().resolve("src/androidTest/java/" + javaClass.getName().replace(".", "/") + ".java");
         fileGenerator.generate(sourceFile, printWriter -> {
             printWriter.println("// GENERATED SOURCE FILE");
-            printWriter.println("package " + javaClass.getPackage() + ";");
+            printWriter.println("package " + javaClass.getPackageName() + ";");
             printWriter.println();
             printWriter.println("import android.support.test.runner.AndroidJUnit4;");
             printWriter.println("import org.junit.runner.RunWith;");

@@ -4,23 +4,11 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class JavaClass extends SourceClass<JavaClassApi> {
+public class JavaClass extends JvmClass<JavaClassApi> {
     private final Set<String> fieldReferences = new LinkedHashSet<>();
 
     public JavaClass(String name) {
         super(name);
-    }
-
-    public String getPackage() {
-        String name = getName();
-        int pos = name.lastIndexOf(".");
-        return name.substring(0, pos);
-    }
-
-    public String getSimpleName() {
-        String name = getName();
-        int pos = name.lastIndexOf(".");
-        return name.substring(pos+1);
     }
 
     public JavaClassApi getApi() {

@@ -6,17 +6,17 @@ import org.gradle.builds.model.Project
 
 
 class GradlePluginModelAssembler : ComponentSpecificProjectConfigurer<GradlePluginComponent>(GradlePluginComponent::class.java) {
-    override fun configure(settings: Settings, project: Project, plugin: GradlePluginComponent) {
+    override fun configure(settings: Settings, project: Project, component: GradlePluginComponent) {
         val buildScript = project.buildScript
         buildScript.requirePlugin("java-gradle-plugin")
         buildScript.jcenter()
         buildScript.dependsOnExternal("testCompile", "junit:junit:4.12")
 
-        val id = plugin.id!!
+        val id = component.id!!
         val pos = id.lastIndexOf(".")
         val baseName = id.substring(pos + 1)
         val impl = project.qualifiedNamespaceFor + '.' + baseName.capitalize() + "Plugin"
-        plugin.implClass = JavaClass(impl)
+        component.implClass = JavaClass(impl)
 
         val block = buildScript.block("gradlePlugin").block("plugins").block(baseName)
         block.property("id", id)

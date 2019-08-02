@@ -313,13 +313,20 @@ abstract class AbstractIntegrationTest extends Specification {
             return new JavaProject(path, projectDir, rootDir)
         }
 
-        void isKotlinApplication() {
+        void isKotlinProject() {
             appliesPlugin("kotlin")
+
+            def srcDir = file("src/main/kotlin")
+            containsFilesWithExtension(srcDir, "kt")
+        }
+
+        void isKotlinApplication() {
+            isKotlinProject()
             appliesPlugin("application")
         }
 
         void isKotlinLibrary() {
-            appliesPlugin("kotlin")
+            isKotlinProject()
         }
 
         // TODO - add more checks
