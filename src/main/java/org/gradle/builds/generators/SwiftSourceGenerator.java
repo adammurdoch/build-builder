@@ -61,6 +61,7 @@ public class SwiftSourceGenerator extends ProjectComponentSpecificGenerator<HasS
                     String varName = swiftClass.getName().toLowerCase();
                     printWriter.println("let " + varName + " = " + swiftClass.getName() + "()");
                     printWriter.println(varName + ".doSomething()");
+                    printWriter.println(varName + ".doSomething()");
                 }
             }
             printWriter.println();

@@ -87,6 +87,7 @@ public class JavaSourceGenerator extends ProjectFileGenerator {
                 printWriter.println();
                 printWriter.println("    public static void main(String[] args) {");
                 printWriter.println("        doSomething();");
+                printWriter.println("        doSomething();");
                 printWriter.println("    }");
             }
             if (javaClass.role(AndroidActivity.class) != null) {

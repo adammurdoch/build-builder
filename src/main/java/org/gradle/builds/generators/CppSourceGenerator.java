@@ -72,6 +72,7 @@ public class CppSourceGenerator extends ProjectComponentSpecificGenerator<HasCpp
                     String varName = cppClass.getName().toLowerCase();
                     printWriter.println("    " + cppClass.getName() + " " + varName + ";");
                     printWriter.println("    " + varName + ".doSomething();");
+                    printWriter.println("    " + varName + ".doSomething();");
                 }
                 printWriter.println("    return 0;");
                 printWriter.println("}");
