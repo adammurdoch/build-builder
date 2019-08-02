@@ -6,5 +6,5 @@ import org.gradle.builds.model.BuildTreeBuilder
  * Attaches builds and settings to the given build tree.
  */
 interface BuildTreeAssembler {
-    fun attachBuilds(settings: Settings, model: BuildTreeBuilder)
+    fun populate(settings: Settings, model: BuildTreeBuilder)
 }

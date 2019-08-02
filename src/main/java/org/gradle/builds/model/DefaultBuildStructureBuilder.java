@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 /**
  * Allows the settings for a build to be configured.
  */
-public class DefaultBuildSettingsBuilder implements BuildSettingsBuilder {
+public class DefaultBuildStructureBuilder implements BuildStructureBuilder {
     private final Path rootDir;
     private String displayName;
     private String rootProjectName;
@@ -22,24 +22,24 @@ public class DefaultBuildSettingsBuilder implements BuildSettingsBuilder {
     private PublicationTarget publicationTarget;
     private String typeNamePrefix = "";
     private String version = "1.0.0";
-    private final List<BuildSettingsBuilder> dependsOn = new ArrayList<>();
-    private final List<BuildSettingsBuilder> includedBuilds = new ArrayList<>();
-    private final List<BuildSettingsBuilder> sourceBuilds = new ArrayList<>();
+    private final List<BuildStructureBuilder> dependsOn = new ArrayList<>();
+    private final List<BuildStructureBuilder> includedBuilds = new ArrayList<>();
+    private final List<BuildStructureBuilder> sourceBuilds = new ArrayList<>();
 
-    public DefaultBuildSettingsBuilder(Path rootDir) {
+    public DefaultBuildStructureBuilder(Path rootDir) {
         this.rootDir = rootDir;
     }
 
-    public BuildProjectTreeBuilder toModel(Function<BuildSettingsBuilder, BuildProjectTreeBuilder> otherBuildLookup) {
+    public BuildProjectStructureBuilder toModel(Function<BuildStructureBuilder, BuildProjectStructureBuilder> otherBuildLookup) {
         assertNotNull("displayName", displayName);
         assertNotNull("rootProjectName", rootProjectName);
         assertNotNull("settings", settings);
         assertNotNull("projectInitializer", projectInitializer);
 
-        List<BuildProjectTreeBuilder> dependsOnBuilds = dependsOn.stream().map(otherBuildLookup).collect(Collectors.toList());
-        List<BuildProjectTreeBuilder> includedBuilds = this.includedBuilds.stream().map(otherBuildLookup).collect(Collectors.toList());
-        List<BuildProjectTreeBuilder> sourceBuilds = this.sourceBuilds.stream().map(otherBuildLookup).collect(Collectors.toList());
-        return new DefaultBuildProjectTreeBuilder(rootDir, displayName, rootProjectName, settings, publicationTarget, typeNamePrefix, projectInitializer, version, dependsOnBuilds, includedBuilds, sourceBuilds);
+        List<BuildProjectStructureBuilder> dependsOnBuilds = dependsOn.stream().map(otherBuildLookup).collect(Collectors.toList());
+        List<BuildProjectStructureBuilder> includedBuilds = this.includedBuilds.stream().map(otherBuildLookup).collect(Collectors.toList());
+        List<BuildProjectStructureBuilder> sourceBuilds = this.sourceBuilds.stream().map(otherBuildLookup).collect(Collectors.toList());
+        return new DefaultBuildProjectStructureBuilder(rootDir, displayName, rootProjectName, settings, publicationTarget, typeNamePrefix, projectInitializer, version, dependsOnBuilds, includedBuilds, sourceBuilds);
     }
 
     private void assertNotNull(String name, @Nullable Object value) {
@@ -114,17 +114,17 @@ public class DefaultBuildSettingsBuilder implements BuildSettingsBuilder {
     }
 
     @Override
-    public void sourceDependency(BuildSettingsBuilder childBuild) {
+    public void sourceDependency(BuildStructureBuilder childBuild) {
         this.sourceBuilds.add(childBuild);
     }
 
     @Override
-    public void dependsOn(BuildSettingsBuilder childBuild) {
+    public void dependsOn(BuildStructureBuilder childBuild) {
         this.dependsOn.add(childBuild);
     }
 
     @Override
-    public void includeBuild(BuildSettingsBuilder childBuild) {
+    public void includeBuild(BuildStructureBuilder childBuild) {
         this.includedBuilds.add(childBuild);
     }
 }

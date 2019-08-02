@@ -1,6 +1,6 @@
 package org.gradle.builds.assemblers;
 
-import org.gradle.builds.model.BuildProjectTreeBuilder;
+import org.gradle.builds.model.BuildProjectStructureBuilder;
 import org.gradle.builds.model.Dependency;
 import org.gradle.builds.model.Project;
 
@@ -15,7 +15,7 @@ public class ProjectDepOrderBuildConfigurer implements BuildConfigurer {
     }
 
     @Override
-    public void populate(BuildProjectTreeBuilder build) {
+    public void populate(BuildProjectStructureBuilder build) {
         Set<Project> seen = new HashSet<>();
         for (Project project : build.getProjects()) {
             populate(build.getSettings(), project, seen);

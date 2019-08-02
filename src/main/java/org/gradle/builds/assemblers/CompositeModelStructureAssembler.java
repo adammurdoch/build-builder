@@ -14,9 +14,9 @@ public class CompositeModelStructureAssembler implements BuildTreeAssembler {
     }
 
     @Override
-    public void attachBuilds(Settings settings, BuildTreeBuilder model) {
+    public void populate(Settings settings, BuildTreeBuilder model) {
         for (BuildTreeAssembler assembler : assemblers) {
-            assembler.attachBuilds(settings, model);
+            assembler.populate(settings, model);
         }
     }
 }

@@ -1,6 +1,6 @@
 package org.gradle.builds.assemblers;
 
-import org.gradle.builds.model.BuildSettingsBuilder;
+import org.gradle.builds.model.BuildStructureBuilder;
 import org.gradle.builds.model.BuildTreeBuilder;
 import org.gradle.builds.model.Dependency;
 import org.gradle.builds.model.PublicationTarget;
@@ -17,16 +17,16 @@ public class SourceDependencyBuildAssembler implements BuildTreeAssembler {
     }
 
     @Override
-    public void attachBuilds(Settings settings, BuildTreeBuilder model) {
+    public void populate(Settings settings, BuildTreeBuilder model) {
         Graph graph = graphAssembler.arrange(sourceDependencyBuilds + 1);
-        graph.visit((Graph.Visitor<BuildSettingsBuilder>) (node, dependencies) -> {
-            BuildSettingsBuilder build;
+        graph.visit((Graph.Visitor<BuildStructureBuilder>) (node, dependencies) -> {
+            BuildStructureBuilder build;
             if (node.getLayer() == 0) {
                 build = model.getMainBuild();
             } else {
                 String name = "src" + node.getNameSuffix();
                 String typeName = "Src" + node.getNameSuffix();
-                BuildSettingsBuilder childBuild = model.addBuild("external/source" + node.getNameSuffix());
+                BuildStructureBuilder childBuild = model.addBuild("external/source" + node.getNameSuffix());
                 childBuild.setDisplayName("source dependency build " + name);
                 childBuild.setRootProjectName(name);
                 childBuild.setSettings(new Settings(3, settings.getSourceFileCount()));
@@ -37,7 +37,7 @@ public class SourceDependencyBuildAssembler implements BuildTreeAssembler {
                 childRepo.setVersion(childBuild.getVersion());
                 build = childBuild;
             }
-            for (Dependency<BuildSettingsBuilder> childBuild : dependencies) {
+            for (Dependency<BuildStructureBuilder> childBuild : dependencies) {
                 build.sourceDependency(childBuild.getTarget());
                 build.dependsOn(childBuild.getTarget());
             }

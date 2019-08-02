@@ -1,6 +1,6 @@
 package org.gradle.builds.generators;
 
-import org.gradle.builds.model.BuildProjectTreeBuilder;
+import org.gradle.builds.model.BuildProjectStructureBuilder;
 import org.gradle.builds.model.Dependency;
 import org.gradle.builds.model.HasSwiftSource;
 import org.gradle.builds.model.Project;
@@ -8,9 +8,9 @@ import org.gradle.builds.model.Project;
 import java.io.IOException;
 import java.nio.file.Path;
 
-public class SwiftPackageManagerManifestGenerator implements Generator<BuildProjectTreeBuilder> {
+public class SwiftPackageManagerManifestGenerator implements Generator<BuildProjectStructureBuilder> {
     @Override
-    public void generate(BuildProjectTreeBuilder build, FileGenerator fileGenerator) throws IOException {
+    public void generate(BuildProjectStructureBuilder build, FileGenerator fileGenerator) throws IOException {
         HasSwiftSource component = build.getRootProject().component(HasSwiftSource.class);
         if (component == null) {
             return;

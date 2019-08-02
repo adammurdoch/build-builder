@@ -2,14 +2,14 @@ package org.gradle.builds.generators;
 
 import org.gradle.builds.assemblers.CppSettings;
 import org.gradle.builds.assemblers.Settings;
-import org.gradle.builds.model.BuildProjectTreeBuilder;
+import org.gradle.builds.model.BuildProjectStructureBuilder;
 
 import java.io.IOException;
 import java.nio.file.Path;
 
-public class ReadmeGenerator implements Generator<BuildProjectTreeBuilder> {
+public class ReadmeGenerator implements Generator<BuildProjectStructureBuilder> {
     @Override
-    public void generate(BuildProjectTreeBuilder build, FileGenerator fileGenerator) throws IOException {
+    public void generate(BuildProjectStructureBuilder build, FileGenerator fileGenerator) throws IOException {
         Path readMe = build.getRootDir().resolve("README.md");
         fileGenerator.generate(readMe, printWriter -> {
             printWriter.println("<!-- GENERATED FILE -->");

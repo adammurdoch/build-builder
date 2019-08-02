@@ -1,20 +1,18 @@
-package org.gradle.builds.model;
+package org.gradle.builds.model
 
-import java.util.List;
-
-public interface BuildTree<T> {
+interface BuildTree<T> {
     /**
      * Returns the main build for this model.
      */
-    T getMainBuild();
+    val mainBuild: T
 
     /**
      * Returns all of the builds that make up this tree.
      */
-    List<? extends T> getBuilds();
+    val builds: List<@JvmWildcard T>
 
     /**
      * Returns all of the git repos that make up this tree.
      */
-    List<? extends GitRepo> getRepos();
+    val repos: List<@JvmWildcard GitRepo>
 }

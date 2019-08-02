@@ -1,6 +1,6 @@
 package org.gradle.builds.assemblers;
 
-import org.gradle.builds.model.BuildProjectTreeBuilder;
+import org.gradle.builds.model.BuildProjectStructureBuilder;
 import org.gradle.builds.model.Dependency;
 import org.gradle.builds.model.Project;
 
@@ -12,7 +12,7 @@ public class StructureAssembler {
         this.graphAssembler = graphAssembler;
     }
 
-    public void arrangeClasses(BuildProjectTreeBuilder build) {
+    public void arrangeClasses(BuildProjectStructureBuilder build) {
         Settings settings = build.getSettings();
         Graph classGraph = graphAssembler.arrange(settings.getSourceFileCount());
         for (Project project : build.getProjects()) {
@@ -20,7 +20,7 @@ public class StructureAssembler {
         }
     }
 
-    public void arrangeProjects(BuildProjectTreeBuilder build, ProjectInitializer projectInitializer) {
+    public void arrangeProjects(BuildProjectStructureBuilder build, ProjectInitializer projectInitializer) {
         Settings settings = build.getSettings();
         Graph projectGraph = graphAssembler.arrange(settings.getProjectCount());
 

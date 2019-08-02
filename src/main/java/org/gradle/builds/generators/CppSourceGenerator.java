@@ -12,7 +12,7 @@ public class CppSourceGenerator extends ProjectComponentSpecificGenerator<HasCpp
     }
 
     @Override
-    protected void generate(BuildProjectTreeBuilder build, Project project, HasCppSource component, FileGenerator fileGenerator) throws IOException {
+    protected void generate(BuildProjectStructureBuilder build, Project project, HasCppSource component, FileGenerator fileGenerator) throws IOException {
         MacroIncludes macroIncludes = component.getMacroIncludes();
         for (CppSourceFile cppSource : component.getSourceFiles()) {
             Path sourceFile = project.getProjectDir().resolve("src/main/cpp/" + cppSource.getName());

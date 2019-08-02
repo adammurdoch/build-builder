@@ -5,7 +5,7 @@ import org.gradle.builds.model.GradlePluginComponent
 
 
 class BuildSrcBuildAssembler : BuildTreeAssembler {
-    override fun attachBuilds(settings: Settings, model: BuildTreeBuilder) {
+    override fun populate(settings: Settings, model: BuildTreeBuilder) {
         val plugin = GradlePluginComponent()
         plugin.id = "org.gradle.example.show"
 

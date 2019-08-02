@@ -1,6 +1,6 @@
 package org.gradle.builds.generators;
 
-import org.gradle.builds.model.BuildProjectTreeBuilder;
+import org.gradle.builds.model.BuildProjectStructureBuilder;
 import org.gradle.builds.model.HasJavaSource;
 import org.gradle.builds.model.Project;
 
@@ -13,7 +13,7 @@ public class JavaResourceGenerator extends ProjectComponentSpecificGenerator<Has
     }
 
     @Override
-    protected void generate(BuildProjectTreeBuilder build, Project project, HasJavaSource component, FileGenerator fileGenerator) throws IOException {
+    protected void generate(BuildProjectStructureBuilder build, Project project, HasJavaSource component, FileGenerator fileGenerator) throws IOException {
         Path resourceFile = project.getProjectDir().resolve("src/main/resources/" + project.getName() + ".properties");
         fileGenerator.generate(resourceFile, printWriter -> {
             printWriter.println("# GENERATED SOURCE FILE");

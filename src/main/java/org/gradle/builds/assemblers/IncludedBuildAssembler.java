@@ -1,6 +1,6 @@
 package org.gradle.builds.assemblers;
 
-import org.gradle.builds.model.BuildSettingsBuilder;
+import org.gradle.builds.model.BuildStructureBuilder;
 import org.gradle.builds.model.BuildTreeBuilder;
 import org.gradle.builds.model.Dependency;
 import org.gradle.builds.model.PublicationTarget;
@@ -17,16 +17,16 @@ public class IncludedBuildAssembler implements BuildTreeAssembler {
     }
 
     @Override
-    public void attachBuilds(Settings settings, BuildTreeBuilder model) {
+    public void populate(Settings settings, BuildTreeBuilder model) {
         Graph graph = graphAssembler.arrange(includedBuilds + 1);
-        graph.visit((Graph.Visitor<BuildSettingsBuilder>) (node, dependencies) -> {
-            BuildSettingsBuilder build;
+        graph.visit((Graph.Visitor<BuildStructureBuilder>) (node, dependencies) -> {
+            BuildStructureBuilder build;
             if (node.getLayer() == 0) {
                 build = model.getMainBuild();
             } else {
                 String name = "child" + node.getNameSuffix();
                 String typeName = "Child" + node.getNameSuffix();
-                BuildSettingsBuilder childBuild = model.addBuild(name);
+                BuildStructureBuilder childBuild = model.addBuild(name);
                 childBuild.setDisplayName("included build " + name);
                 childBuild.setRootProjectName(name);
                 childBuild.setSettings(new Settings(3, settings.getSourceFileCount()));
@@ -37,7 +37,7 @@ public class IncludedBuildAssembler implements BuildTreeAssembler {
                 model.getMainBuild().includeBuild(childBuild);
                 build = childBuild;
             }
-            for (Dependency<BuildSettingsBuilder> dependency : dependencies) {
+            for (Dependency<BuildStructureBuilder> dependency : dependencies) {
                 build.dependsOn(dependency.getTarget());
             }
             return build;

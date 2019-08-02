@@ -10,7 +10,7 @@ public class MainBuildModelStructureAssembler implements BuildTreeAssembler {
     }
 
     @Override
-    public void attachBuilds(Settings settings, BuildTreeBuilder model) {
+    public void populate(Settings settings, BuildTreeBuilder model) {
         model.getMainBuild().setDisplayName("main build");
         model.getMainBuild().setRootProjectName("testApp");
         model.getMainBuild().setSettings(settings);

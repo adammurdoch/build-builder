@@ -16,8 +16,8 @@ public class HttpRepoModelStructureAssembler implements BuildTreeAssembler {
     }
 
     @Override
-    public void attachBuilds(Settings settings, BuildTreeBuilder model) {
-        BuildSettingsBuilder serverBuild = model.addBuild("repo-server");
+    public void populate(Settings settings, BuildTreeBuilder model) {
+        BuildStructureBuilder serverBuild = model.addBuild("repo-server");
         serverBuild.setDisplayName("HTTP server build");
         serverBuild.setRootProjectName("repo");
 
@@ -34,7 +34,7 @@ public class HttpRepoModelStructureAssembler implements BuildTreeAssembler {
 
         for (int i = 1; i <= versionCount; i++) {
             Path externalSourceDir = model.getRootDir().resolve("external/v" + i);
-            BuildSettingsBuilder libraryBuild = model.addBuild(externalSourceDir);
+            BuildStructureBuilder libraryBuild = model.addBuild(externalSourceDir);
             libraryBuild.setDisplayName("external libraries build v" + i);
             libraryBuild.setRootProjectName("ext");
             if (libraryCount == 1) {

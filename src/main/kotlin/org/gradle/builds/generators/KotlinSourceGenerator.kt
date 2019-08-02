@@ -3,7 +3,7 @@ package org.gradle.builds.generators
 import org.gradle.builds.model.*
 
 class KotlinSourceGenerator : ProjectComponentSpecificGenerator<HasKotlinSource>(HasKotlinSource::class.java) {
-    override fun generate(build: BuildProjectTreeBuilder, project: Project, component: HasKotlinSource, fileGenerator: FileGenerator) {
+    override fun generate(build: BuildProjectStructureBuilder, project: Project, component: HasKotlinSource, fileGenerator: FileGenerator) {
         for (kotlinClass in component.sourceFiles) {
             generateMainClass(project, kotlinClass, fileGenerator)
         }

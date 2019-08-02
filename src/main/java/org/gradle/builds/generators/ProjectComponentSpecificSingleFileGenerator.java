@@ -1,6 +1,6 @@
 package org.gradle.builds.generators;
 
-import org.gradle.builds.model.BuildProjectTreeBuilder;
+import org.gradle.builds.model.BuildProjectStructureBuilder;
 import org.gradle.builds.model.Component;
 import org.gradle.builds.model.Project;
 
@@ -17,7 +17,7 @@ public abstract class ProjectComponentSpecificSingleFileGenerator<T extends Comp
     }
 
     @Override
-    protected void generate(BuildProjectTreeBuilder build, Project project, T component, FileGenerator fileGenerator) throws IOException {
+    protected void generate(BuildProjectStructureBuilder build, Project project, T component, FileGenerator fileGenerator) throws IOException {
         Path file = project.getProjectDir().resolve(filePath);
         fileGenerator.generate(file, printWriter -> {
             generate(project, component, printWriter);

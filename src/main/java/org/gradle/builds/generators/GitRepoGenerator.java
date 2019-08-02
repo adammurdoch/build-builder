@@ -5,7 +5,7 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.InitCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
-import org.gradle.builds.model.BuildProjectTreeBuilder;
+import org.gradle.builds.model.BuildProjectStructureBuilder;
 import org.gradle.builds.model.BuildTree;
 import org.gradle.builds.model.GitRepo;
 
@@ -16,9 +16,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-public class GitRepoGenerator implements Generator<BuildTree<BuildProjectTreeBuilder>> {
+public class GitRepoGenerator implements Generator<BuildTree<BuildProjectStructureBuilder>> {
     @Override
-    public void generate(BuildTree<BuildProjectTreeBuilder> model, FileGenerator fileGenerator) throws IOException {
+    public void generate(BuildTree<BuildProjectStructureBuilder> model, FileGenerator fileGenerator) throws IOException {
         List<? extends GitRepo> repos = model.getRepos();
         for (GitRepo repo : repos) {
             generate(repo, repos, fileGenerator);

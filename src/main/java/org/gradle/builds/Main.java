@@ -3,7 +3,7 @@ package org.gradle.builds;
 import io.airlift.airline.*;
 import org.gradle.builds.assemblers.*;
 import org.gradle.builds.generators.*;
-import org.gradle.builds.model.BuildProjectTreeBuilder;
+import org.gradle.builds.model.BuildProjectStructureBuilder;
 import org.gradle.builds.model.BuildTree;
 import org.gradle.builds.model.DefaultBuildTreeBuilder;
 import org.gradle.builds.model.MacroIncludes;
@@ -99,10 +99,10 @@ public class Main {
 
             // Create build tree
             DefaultBuildTreeBuilder buildTree = new DefaultBuildTreeBuilder(rootDir);
-            createModelStructureAssembler().attachBuilds(settings, buildTree);
+            createBuildTreeAssembler().populate(settings, buildTree);
 
-            // Configure projects
-            BuildTree model = buildTree.toModel();
+            // Create and configure projects
+            BuildTree<BuildProjectStructureBuilder> model = buildTree.toModel();
             createModelConfigurer().populate(model);
 
             // Generate files
@@ -148,7 +148,7 @@ public class Main {
                             graphAssembler));
         }
 
-        private Generator<BuildTree<BuildProjectTreeBuilder>> createModelGenerator() {
+        private Generator<BuildTree<BuildProjectStructureBuilder>> createModelGenerator() {
             return new CompositeGenerator<>(
                     new DotGenerator(),
                     new ModelGenerator(
@@ -177,7 +177,7 @@ public class Main {
                     new GitRepoGenerator());
         }
 
-        private BuildTreeAssembler createModelStructureAssembler() {
+        private BuildTreeAssembler createBuildTreeAssembler() {
             ProjectInitializer projectInitializer = createProjectInitializer();
             List<BuildTreeAssembler> assemblers = new ArrayList<>();
             assemblers.add(new MainBuildModelStructureAssembler(projectInitializer));
