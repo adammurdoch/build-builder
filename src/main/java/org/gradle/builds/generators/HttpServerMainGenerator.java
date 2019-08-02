@@ -1,7 +1,7 @@
 package org.gradle.builds.generators;
 
+import org.gradle.builds.model.ConfiguredProject;
 import org.gradle.builds.model.HttpServerImplementation;
-import org.gradle.builds.model.Project;
 
 import java.io.PrintWriter;
 
@@ -11,7 +11,7 @@ public class HttpServerMainGenerator extends ProjectComponentSpecificSingleFileG
     }
 
     @Override
-    protected void generate(Project project, HttpServerImplementation component, PrintWriter printWriter) {
+    protected void generate(ConfiguredProject project, HttpServerImplementation component, PrintWriter printWriter) {
         printWriter.println("package org.gradle.example.http;");
         printWriter.println();
         printWriter.println("import com.sun.net.httpserver.HttpServer;");

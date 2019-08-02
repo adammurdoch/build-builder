@@ -238,7 +238,7 @@ public class CppModelAssembler extends LanguageSpecificProjectConfigurer<CppAppl
     }
 
     private void addDependencies(Project project, HasCppSource component, BuildScript buildScript) {
-        for (Dependency<Library<? extends CppLibraryApi>> dependency : project.getRequiredLibraries(CppLibraryApi.class)) {
+        for (Dependency<Library<? extends CppLibraryApi>> dependency : project.requiredLibraries(CppLibraryApi.class)) {
             Library<? extends CppLibraryApi> library = dependency.getTarget();
             if (dependency.isApi() && component instanceof CppLibrary) {
                 buildScript.dependsOn("api", library.getDependency());

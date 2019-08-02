@@ -1,16 +1,16 @@
 package org.gradle.builds.generators;
 
-import org.gradle.builds.model.BuildProjectStructureBuilder;
+import org.gradle.builds.model.ConfiguredBuild;
+import org.gradle.builds.model.ConfiguredProject;
 import org.gradle.builds.model.Dependency;
 import org.gradle.builds.model.HasSwiftSource;
-import org.gradle.builds.model.Project;
 
 import java.io.IOException;
 import java.nio.file.Path;
 
-public class SwiftPackageManagerManifestGenerator implements Generator<BuildProjectStructureBuilder> {
+public class SwiftPackageManagerManifestGenerator implements Generator<ConfiguredBuild> {
     @Override
-    public void generate(BuildProjectStructureBuilder build, FileGenerator fileGenerator) throws IOException {
+    public void generate(ConfiguredBuild build, FileGenerator fileGenerator) throws IOException {
         HasSwiftSource component = build.getRootProject().component(HasSwiftSource.class);
         if (component == null) {
             return;
@@ -28,12 +28,12 @@ public class SwiftPackageManagerManifestGenerator implements Generator<BuildProj
             writer.print(build.getRootProject().getName());
             writer.println("\",");
             writer.println("    targets: [");
-            for (Project project : build.getProjects()) {
+            for (ConfiguredProject project : build.getProjects()) {
                 writer.print("        Target(name: \"" + project.getName() + "\"");
                 if (!project.getRequiredProjects().isEmpty()) {
                     writer.print(", dependencies: [");
                     // TODO - should use required libraries instead
-                    for (Dependency<Project> dep : project.getRequiredProjects()) {
+                    for (Dependency<ConfiguredProject> dep : project.getRequiredProjects()) {
                         writer.print("\"" + dep.getTarget().getName() + "\", ");
                     }
                     writer.print("]");

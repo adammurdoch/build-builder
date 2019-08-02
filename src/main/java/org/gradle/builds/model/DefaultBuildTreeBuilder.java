@@ -4,10 +4,7 @@ import org.gradle.builds.assemblers.GitRepoBuilder;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -15,7 +12,7 @@ import java.util.stream.Collectors;
  */
 public class DefaultBuildTreeBuilder implements BuildTreeBuilder {
     private final Path rootDir;
-    private final BuildStructureBuilder build;
+    private final DefaultBuildStructureBuilder build;
     private final List<DefaultBuildStructureBuilder> builds = new ArrayList<>();
     private final List<GitRepoBuilder> repos = new ArrayList<>();
     private final GitRepoBuilder repo;
@@ -43,7 +40,7 @@ public class DefaultBuildTreeBuilder implements BuildTreeBuilder {
     }
 
     @Override
-    public BuildStructureBuilder addBuild(Path rootDir) {
+    public DefaultBuildStructureBuilder addBuild(Path rootDir) {
         DefaultBuildStructureBuilder build = new DefaultBuildStructureBuilder(rootDir);
         builds.add(build);
         return build;
@@ -74,25 +71,10 @@ public class DefaultBuildTreeBuilder implements BuildTreeBuilder {
     /**
      * Constructs the build tree from this builder.
      */
-    public BuildTree<BuildProjectStructureBuilder> toModel() {
-        Function<BuildStructureBuilder, BuildProjectStructureBuilder> mapper = new BuildConstructor();
-        BuildProjectStructureBuilder mainBuild = mapper.apply(build);
-        List<BuildProjectStructureBuilder> builds = this.builds.stream().map(mapper).collect(Collectors.toList());
+    public DefaultBuildProjectStructureTree toModel() {
+        DefaultBuildProjectStructureBuilder mainBuild = build.toModel();
+        List<DefaultBuildProjectStructureBuilder> builds = this.builds.stream().map(b -> b.toModel()).collect(Collectors.toList());
         List<GitRepo> repos = this.repos.stream().map(r -> new DefaultGitRepo(r.getRootDir(), r.getVersion())).collect(Collectors.toList());
-        return new DefaultBuildTree(mainBuild, builds, repos);
-    }
-
-    private static class BuildConstructor implements Function<BuildStructureBuilder, BuildProjectStructureBuilder> {
-        Map<BuildStructureBuilder, BuildProjectStructureBuilder> results = new HashMap<>();
-
-        @Override
-        public BuildProjectStructureBuilder apply(BuildStructureBuilder builder) {
-            BuildProjectStructureBuilder build = results.get(builder);
-            if (build == null) {
-                build = ((DefaultBuildStructureBuilder)builder).toModel(this);
-                results.put(builder, build);
-            }
-            return build;
-        }
+        return new DefaultBuildProjectStructureTree(mainBuild, builds, repos);
     }
 }

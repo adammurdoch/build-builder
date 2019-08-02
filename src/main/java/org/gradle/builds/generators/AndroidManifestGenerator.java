@@ -2,8 +2,8 @@ package org.gradle.builds.generators;
 
 import org.gradle.builds.model.AndroidApplication;
 import org.gradle.builds.model.AndroidComponent;
+import org.gradle.builds.model.ConfiguredProject;
 import org.gradle.builds.model.JavaClass;
-import org.gradle.builds.model.Project;
 
 import java.io.PrintWriter;
 
@@ -13,7 +13,7 @@ public class AndroidManifestGenerator extends ProjectComponentSpecificSingleFile
     }
 
     @Override
-    protected void generate(Project project, AndroidComponent component, PrintWriter printWriter) {
+    protected void generate(ConfiguredProject project, AndroidComponent component, PrintWriter printWriter) {
         printWriter.println("<!-- GENERATED SOURCE FILE -->");
         printWriter.println("<manifest xmlns:android='http://schemas.android.com/apk/res/android'");
         printWriter.println("        package='" + component.getPackageName() + "'>");

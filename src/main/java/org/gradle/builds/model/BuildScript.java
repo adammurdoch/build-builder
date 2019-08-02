@@ -5,12 +5,18 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class BuildScript extends BlockWithProjectTarget {
+public class BuildScript extends BlockWithProjectTarget implements ConfiguredBuildScript {
     private final Set<ExternalDependencyDeclaration> buildScriptClasspath = new LinkedHashSet<>();
     private final Map<String, Set<DependencyDeclaration>> dependencies = new LinkedHashMap<>();
     private BlockWithProjectTarget allProjects;
     private BlockWithRepositories buildscriptBlock;
 
+    @Override
+    public Scope getAsBlock() {
+        return this;
+    }
+
+    @Override
     public BlockWithProjectTarget getAllProjects() {
         return allProjects;
     }
@@ -22,6 +28,7 @@ public class BuildScript extends BlockWithProjectTarget {
         return allProjects;
     }
 
+    @Override
     public BlockWithRepositories getBuildScriptBlock() {
         return buildscriptBlock;
     }
@@ -33,6 +40,7 @@ public class BuildScript extends BlockWithProjectTarget {
         return buildscriptBlock;
     }
 
+    @Override
     public Set<ExternalDependencyDeclaration> getBuildScriptClasspath() {
         return buildScriptClasspath;
     }
@@ -41,6 +49,7 @@ public class BuildScript extends BlockWithProjectTarget {
         buildScriptClasspath.add(new ExternalDependencyDeclaration(gav));
     }
 
+    @Override
     public Map<String, Set<DependencyDeclaration>> getDependencies() {
         return dependencies;
     }

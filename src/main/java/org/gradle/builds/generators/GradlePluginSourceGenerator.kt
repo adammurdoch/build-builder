@@ -1,12 +1,12 @@
 package org.gradle.builds.generators
 
-import org.gradle.builds.model.BuildProjectStructureBuilder
+import org.gradle.builds.model.ConfiguredBuild
+import org.gradle.builds.model.ConfiguredProject
 import org.gradle.builds.model.GradlePluginComponent
-import org.gradle.builds.model.Project
 
 
 class GradlePluginSourceGenerator: ProjectFileGenerator() {
-    override fun generate(build: BuildProjectStructureBuilder, project: Project, fileGenerator: FileGenerator) {
+    override fun generate(build: ConfiguredBuild, project: ConfiguredProject, fileGenerator: FileGenerator) {
         val component = project.component(GradlePluginComponent::class.java)
         if (component == null) {
             return

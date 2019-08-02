@@ -10,9 +10,9 @@ import java.util.Set;
 
 public class BuildFileGenerator extends ProjectFileGenerator {
     @Override
-    protected void generate(BuildProjectStructureBuilder build, Project project, FileGenerator fileGenerator) throws IOException {
+    protected void generate(ConfiguredBuild build, ConfiguredProject project, FileGenerator fileGenerator) throws IOException {
         Path buildFile = project.getProjectDir().resolve("build.gradle");
-        BuildScript buildScript = project.getBuildScript();
+        ConfiguredBuildScript buildScript = project.getBuildScript();
         fileGenerator.generate(buildFile, printWriter -> {
             printWriter.println("// GENERATED BUILD SCRIPT");
             printWriter.println("import org.gradle.util.GradleVersion");
@@ -80,7 +80,7 @@ public class BuildFileGenerator extends ProjectFileGenerator {
                 }
                 printWriter.println("}");
             }
-            writeBlockContents(buildScript, "", printWriter);
+            writeBlockContents(buildScript.getAsBlock(), "", printWriter);
             printWriter.println();
         });
     }

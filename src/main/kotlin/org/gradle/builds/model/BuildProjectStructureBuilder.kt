@@ -8,14 +8,15 @@ import java.nio.file.Path
 /**
  * A build whose relationships to other builds are read-only, and whose project structure is mutable.
  */
-interface BuildProjectStructureBuilder : Build {
-    val rootDir: Path
-
+interface BuildProjectStructureBuilder : Build<BuildProjectStructureBuilder> {
     val rootProject: Project
 
-    val projects: Set<Project>
+    /**
+     * All projects of this build, including the root project.
+     */
+    val projects: Set<@JvmWildcard Project>
 
-    val subprojects: Set<Project>
+    val subprojects: Set<@JvmWildcard Project>
 
     val projectInitializer: ProjectInitializer
 
@@ -23,21 +24,15 @@ interface BuildProjectStructureBuilder : Build {
 
     val exportedLibraries: List<PublishedLibrary<*>>
 
-    val publicationTarget: PublicationTarget
-
-    val dependsOn: List<BuildProjectStructureBuilder>
+    val publicationTarget: PublicationTarget?
 
     val typeNamePrefix: String
-
-    val includedBuilds: List<BuildProjectStructureBuilder>
 
     val name: String
 
     var deepestProject: Project
 
     val version: String
-
-    val sourceBuilds: List<BuildProjectStructureBuilder>
 
     fun addProject(name: String): Project
 

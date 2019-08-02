@@ -9,14 +9,14 @@ public class JavaSourceGenerator extends ProjectFileGenerator {
     private int counter = 1000;
 
     @Override
-    protected void generate(BuildProjectStructureBuilder build, Project project, FileGenerator fileGenerator) throws IOException {
+    protected void generate(ConfiguredBuild build, ConfiguredProject project, FileGenerator fileGenerator) throws IOException {
         HasJavaSource<?> component = project.component(HasJavaSource.class);
         if (component != null) {
             generate(project, component, fileGenerator);
         }
     }
 
-    private void generate(Project project, HasJavaSource<?> component, FileGenerator fileGenerator) throws IOException {
+    private void generate(ConfiguredProject project, HasJavaSource<?> component, FileGenerator fileGenerator) throws IOException {
         for (JavaClass javaClass : component.getSourceFiles()) {
             generateMainClass(project, javaClass, fileGenerator);
         }
@@ -30,7 +30,7 @@ public class JavaSourceGenerator extends ProjectFileGenerator {
         }
     }
 
-    private void generateMainClass(Project project, JavaClass javaClass, FileGenerator fileGenerator) throws IOException {
+    private void generateMainClass(ConfiguredProject project, JavaClass javaClass, FileGenerator fileGenerator) throws IOException {
         Path sourceFile = project.getProjectDir().resolve("src/main/java/" + javaClass.getName().replace(".", "/") + ".java");
         fileGenerator.generate(sourceFile, printWriter -> {
             printWriter.println("// GENERATED SOURCE FILE");
@@ -116,7 +116,7 @@ public class JavaSourceGenerator extends ProjectFileGenerator {
         });
     }
 
-    private void generateUnitTest(Project project, JavaClass javaClass, UnitTest unitTest, FileGenerator fileGenerator) throws IOException {
+    private void generateUnitTest(ConfiguredProject project, JavaClass javaClass, UnitTest unitTest, FileGenerator fileGenerator) throws IOException {
         Path sourceFile = project.getProjectDir().resolve("src/test/java/" + javaClass.getName().replace(".", "/") + ".java");
         fileGenerator.generate(sourceFile, printWriter -> {
             printWriter.println("// GENERATED SOURCE FILE");
@@ -132,7 +132,7 @@ public class JavaSourceGenerator extends ProjectFileGenerator {
         });
     }
 
-    private void generateInstrumentedTest(Project project, JavaClass javaClass, FileGenerator fileGenerator) throws IOException {
+    private void generateInstrumentedTest(ConfiguredProject project, JavaClass javaClass, FileGenerator fileGenerator) throws IOException {
         Path sourceFile = project.getProjectDir().resolve("src/androidTest/java/" + javaClass.getName().replace(".", "/") + ".java");
         fileGenerator.generate(sourceFile, printWriter -> {
             printWriter.println("// GENERATED SOURCE FILE");

@@ -118,7 +118,7 @@ public class AndroidModelAssembler extends JvmModelAssembler<AndroidApplication,
     }
 
     private void addDependencies(Project project, AndroidComponent component, BuildScript buildScript) {
-        for (Dependency<Library<? extends JvmLibraryApi>> library : project.getRequiredLibraries(JvmLibraryApi.class)) {
+        for (Dependency<Library<? extends JvmLibraryApi>> library : project.requiredLibraries(JvmLibraryApi.class)) {
             if (library.isApi()) {
                 buildScript.dependsOn("api", library.getTarget().getDependency());
             } else {

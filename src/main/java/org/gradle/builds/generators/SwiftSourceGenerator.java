@@ -11,7 +11,7 @@ public class SwiftSourceGenerator extends ProjectComponentSpecificGenerator<HasS
     }
 
     @Override
-    protected void generate(BuildProjectStructureBuilder build, Project project, HasSwiftSource component, FileGenerator fileGenerator) throws IOException {
+    protected void generate(ConfiguredBuild build, ConfiguredProject project, HasSwiftSource component, FileGenerator fileGenerator) throws IOException {
         Path srcDir = component.isSwiftPm() ? build.getRootDir().resolve("Sources/" + project.getName()) : project.getProjectDir().resolve("src/main/swift/");
         for (SwiftSourceFile swiftSource : component.getSourceFiles()) {
             generateSourceFile(srcDir, swiftSource, fileGenerator);

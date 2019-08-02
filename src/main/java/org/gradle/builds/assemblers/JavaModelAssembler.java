@@ -71,7 +71,7 @@ public class JavaModelAssembler extends JvmModelAssembler<JavaApplication, JavaL
 
     private void addDependencies(Project project, HasJavaSource<JavaLibraryApi> component, BuildScript buildScript) {
         // Don't use Android libraries, only java libraries
-        for (Dependency<Library<? extends JavaLibraryApi>> library : project.getRequiredLibraries(JavaLibraryApi.class)) {
+        for (Dependency<Library<? extends JavaLibraryApi>> library : project.requiredLibraries(JavaLibraryApi.class)) {
             buildScript.dependsOn("implementation", library.getTarget().getDependency());
             component.uses(library.withTarget(library.getTarget().getApi()));
         }

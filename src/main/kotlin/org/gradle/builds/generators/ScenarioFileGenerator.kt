@@ -1,12 +1,12 @@
 package org.gradle.builds.generators
 
-import org.gradle.builds.model.BuildProjectStructureBuilder
+import org.gradle.builds.model.ConfiguredBuild
 import org.gradle.builds.model.HasCppSource
 import org.gradle.builds.model.HasSource
 import java.io.PrintWriter
 
-class ScenarioFileGenerator : Generator<BuildProjectStructureBuilder> {
-    override fun generate(build: BuildProjectStructureBuilder, fileGenerator: FileGenerator) {
+class ScenarioFileGenerator : Generator<ConfiguredBuild> {
+    override fun generate(build: ConfiguredBuild, fileGenerator: FileGenerator) {
         val scenarioFile = build.rootDir.resolve("performance.scenarios")
         fileGenerator.generate(scenarioFile) { printWriter ->
             printWriter.println("// GENERATED SCENARIO FILE")
@@ -24,7 +24,7 @@ class ScenarioFileGenerator : Generator<BuildProjectStructureBuilder> {
                     println("    tasks = [\"assemble\"]")
                 }
                 val deepestProject = build.deepestProject
-                val component = deepestProject.component(HasCppSource::class.java)
+                val component = deepestProject.component(HasCppSource::class.java)!!
                 val header = if (component.publicHeaderFiles.isNotEmpty()) {
                     "src/main/public/" + component.publicHeaderFiles.iterator().next().name
                 } else {

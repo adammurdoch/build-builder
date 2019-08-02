@@ -3,208 +3,83 @@ package org.gradle.builds.model;
 import org.gradle.builds.assemblers.Graph;
 
 import java.nio.file.Path;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Collection;
+import java.util.List;
 
-public class Project {
-    private final Project parent;
-    private final String name;
-    private final Path projectDir;
-    private final BuildScript buildScript = new BuildScript();
-    private final List<Dependency<Project>> requiredProjects = new ArrayList<>();
-    private final Set<Component> components = new LinkedHashSet<>();
-    private final List<LocalLibrary<?>> exportedLibraries = new ArrayList<>();
-    private final List<Dependency<Library<?>>> requiredLibraries = new ArrayList<>();
-    private String typeName;
-    private Graph classGraph;
-    private PublicationTarget publicationTarget;
-    private String version;
+public interface Project {
+    String getName();
 
-    public Project(Project parent, String name, Path projectDir) {
-        this.parent = parent;
-        this.name = name;
-        this.projectDir = projectDir;
-    }
-
-    @Override
-    public String toString() {
-        return getPath();
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getPath() {
-        if (parent == null) {
-            return ":";
-        }
-        String parentPath = parent.getPath();
-        if (parentPath.equals(":")) {
-            return ":" + name;
-        }
-        return parentPath + ":" + name;
-    }
+    String getPath();
 
     /**
      * Returns lower case '.' separated namespace for this project.
      */
-    public String getQualifiedNamespaceFor() {
-        if (parent == null) {
-            return "org.gradle.example." + getTypeNameFor().toLowerCase();
-        }
-        return "org.gradle.example" + mapName(name, (src, startOffset, endOffset, dest) -> {
-            String element = src.substring(startOffset, endOffset).toLowerCase();
-            if (Character.isJavaIdentifierStart(element.charAt(0))) {
-                dest.append(".");
-            }
-            dest.append(element);
-        });
-    }
+    String getQualifiedNamespaceFor();
 
     /**
      * Returns a capital-cased identifier that can be used as a type name for this project.
      */
-    public String getTypeNameFor() {
-        if (typeName != null) {
-            return typeName;
-        }
-        return mapName(name, (src, startOffset, endOffset, dest) -> {
-            dest.append(Character.toUpperCase(src.charAt(startOffset)));
-            dest.append(src.substring(startOffset + 1, endOffset));
-        });
-    }
+    String getTypeNameFor();
 
-    public void setTypeName(String typeName) {
-        this.typeName = typeName;
-    }
+    void setTypeName(String typeName);
 
     /**
      * Returns a base name that can be used as a file name for this project.
      */
-    public String getFileNameFor() {
-        return typeName.toLowerCase();
-    }
+    String getFileNameFor();
 
-    public void setVersion(String version) {
-        this.version = version;
-    }
+    void setVersion(String version);
 
-    public String getVersion() {
-        return version;
-    }
+    String getVersion();
 
-    private interface NameCollector {
-        void append(String src, int startOffset, int endOffset, StringBuilder dest);
-    }
+    Path getProjectDir();
 
-    private String mapName(String name, NameCollector collector) {
-        StringBuilder builder = new StringBuilder();
-        int pos = 0;
-        while (pos < name.length()) {
-            int sep = name.indexOf('_', pos);
-            if (sep < 0) {
-                collector.append(name, pos, name.length(), builder);
-                break;
-            }
-            collector.append(name, pos, sep, builder);
-            pos = sep + 1;
-        }
-        return builder.toString();
-    }
+    Project getParent();
 
-    public Path getProjectDir() {
-        return projectDir;
-    }
+    BuildScript getBuildScript();
 
-    public Project getParent() {
-        return parent;
-    }
+    List<Dependency<Project>> getRequiredProjects();
 
-    public BuildScript getBuildScript() {
-        return buildScript;
-    }
+    void requiresProject(Dependency<Project> project);
 
-    public List<Dependency<Project>> getRequiredProjects() {
-        return requiredProjects;
-    }
+    void setClassGraph(Graph classGraph);
 
-    public void requiresProject(Dependency<Project> project) {
-        this.requiredProjects.add(project);
-    }
+    Graph getClassGraph();
 
-    public void setClassGraph(Graph classGraph) {
-        this.classGraph = classGraph;
-    }
+    <T extends Component> T component(Class<T> type);
 
-    public Graph getClassGraph() {
-        return classGraph;
-    }
+    <T extends Component> T addComponent(T component);
 
-    public <T extends Component> T component(Class<T> type) {
-        for (Component component : components) {
-            if (type.isInstance(component)) {
-                return type.cast(component);
-            }
-        }
-        return null;
-    }
+    PublicationTarget getPublicationTarget();
 
-    public <T extends Component> T addComponent(T component) {
-        components.add(component);
-        return component;
-    }
-
-    public PublicationTarget getPublicationTarget() {
-        return publicationTarget;
-    }
-
-    public void publishAs(PublicationTarget publicationTarget) {
-        this.publicationTarget = publicationTarget;
-    }
+    void publishAs(PublicationTarget publicationTarget);
 
     /**
      * Returns the libraries published by this project, if any.
      */
-    public List<PublishedLibrary<?>> getPublishedLibraries() {
-        return exportedLibraries.stream().filter(d -> d.getPublished() != null).map(LocalLibrary::getPublished).collect(Collectors.toList());
-    }
+    List<PublishedLibrary<?>> getPublishedLibraries();
 
     /**
      * Returns the local libraries provided by this project, if any.
      */
-    public <T> List<LocalLibrary<? extends T>> getExportedLibraries(Class<T> type) {
-        return exportedLibraries.stream().filter(d -> type.isInstance(d.getApi())).map(d -> (LocalLibrary<T>) d).collect(Collectors.toList());
-    }
+    <T> List<LocalLibrary<? extends T>> getExportedLibraries(Class<T> type);
 
-    public void export(LocalLibrary<?> library) {
-        exportedLibraries.add(library);
-    }
+    void export(LocalLibrary<?> library);
 
     /**
      * Returns the libraries required by this project, if any.
      */
-    public <T> List<Dependency<Library<? extends T>>> getRequiredLibraries(Class<T> type) {
-        return (List) requiredLibraries.stream().filter(d -> type.isInstance(d.getTarget().getApi())).collect(Collectors.toList());
-    }
+    <T> List<Dependency<Library<? extends T>>> requiredLibraries(Class<T> type);
 
-    public void requires(Dependency<Library<?>> dependency) {
-        requiredLibraries.add(dependency);
-    }
+    void requires(Dependency<Library<?>> dependency);
 
     /**
      * Adds an implementation dependency on the given library.
      */
-    public void requires(Library<?> library) {
-        this.requiredLibraries.add(Dependency.implementation(library));
-    }
+    void requires(Library<?> library);
 
     /**
      * Adds implementation dependencies on the given libraries.
      */
-    public void requires(Collection<? extends Library<?>> libraries) {
-        for (Library<?> library : libraries) {
-            requires(library);
-        }
-    }
+    void requires(Collection<? extends Library<?>> libraries);
 }

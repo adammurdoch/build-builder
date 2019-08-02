@@ -3,14 +3,10 @@ package org.gradle.builds.model
 import org.gradle.builds.assemblers.ComposableProjectInitializer
 import org.gradle.builds.assemblers.Settings
 
-import java.nio.file.Path
-
 /**
  * A build whose relationships to other builds are mutable.
  */
-interface BuildStructureBuilder : Build {
-    val rootDir: Path
-
+interface BuildStructureBuilder : Build<BuildStructureBuilder> {
     var displayName: String
 
     var rootProjectName: String

@@ -5,9 +5,9 @@ import org.gradle.builds.model.*;
 import java.io.IOException;
 import java.nio.file.Path;
 
-public class DotGenerator implements Generator<BuildTree<BuildProjectStructureBuilder>> {
+public class DotGenerator implements Generator<BuildTree<ConfiguredBuild>> {
     @Override
-    public void generate(BuildTree<BuildProjectStructureBuilder> model, FileGenerator fileGenerator) throws IOException {
+    public void generate(BuildTree<ConfiguredBuild> model, FileGenerator fileGenerator) throws IOException {
         Path htmlFile = model.getMainBuild().getRootDir().resolve("dependencies.html");
         fileGenerator.generate(htmlFile, writer -> {
             writer.println("<!DOCTYPE html>");
@@ -23,10 +23,10 @@ public class DotGenerator implements Generator<BuildTree<BuildProjectStructureBu
             writer.println("<h2>Build dependencies</h2>");
             writer.println("<div class=\"mermaid\">");
             writer.println("graph LR");
-            for (BuildProjectStructureBuilder build : model.getBuilds()) {
+            for (ConfiguredBuild build : model.getBuilds()) {
                 writer.print("  ");
                 writer.println(build.getName());
-                for (BuildProjectStructureBuilder dep : build.getDependsOn()) {
+                for (ConfiguredBuild dep : build.getDependsOn()) {
                     writer.print("  ");
                     writer.print(build.getName());
                     writer.print(" --> ");
@@ -39,16 +39,16 @@ public class DotGenerator implements Generator<BuildTree<BuildProjectStructureBu
             writer.println("<h2>Project dependencies</h2>");
             writer.println("<div class=\"mermaid\">");
             writer.println("graph LR");
-            for (BuildProjectStructureBuilder build : model.getBuilds()) {
+            for (ConfiguredBuild build : model.getBuilds()) {
                 writer.println("  subgraph " + build.getName());
-                for (Project project : build.getProjects()) {
+                for (ConfiguredProject project : build.getProjects()) {
                     writer.print("  ");
                     writer.print(project.getName());
                     writer.println();
                 }
                 writer.println("  end");
-                for (Project project : build.getProjects()) {
-                    for (Dependency<Library<?>> library : project.getRequiredLibraries(Object.class)) {
+                for (ConfiguredProject project : build.getProjects()) {
+                    for (Dependency<Library<Object>> library : project.requiredLibraries(Object.class)) {
                         writer.print("  ");
                         writer.print(project.getName());
                         writer.print(library.isApi() ? " -- API --> " : " --> ");

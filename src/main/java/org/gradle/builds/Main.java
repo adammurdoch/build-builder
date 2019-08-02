@@ -3,10 +3,7 @@ package org.gradle.builds;
 import io.airlift.airline.*;
 import org.gradle.builds.assemblers.*;
 import org.gradle.builds.generators.*;
-import org.gradle.builds.model.BuildProjectStructureBuilder;
-import org.gradle.builds.model.BuildTree;
-import org.gradle.builds.model.DefaultBuildTreeBuilder;
-import org.gradle.builds.model.MacroIncludes;
+import org.gradle.builds.model.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -97,16 +94,21 @@ public class Main {
 
             Settings settings = createSettings();
 
-            // Create build tree
-            DefaultBuildTreeBuilder buildTree = new DefaultBuildTreeBuilder(rootDir);
-            createBuildTreeAssembler().populate(settings, buildTree);
+            // Create builds
+            DefaultBuildTreeBuilder buildStructureModel = new DefaultBuildTreeBuilder(rootDir);
+            createBuildTreeAssembler().populate(settings, buildStructureModel);
 
-            // Create and configure projects
-            BuildTree<BuildProjectStructureBuilder> model = buildTree.toModel();
-            createModelConfigurer().populate(model);
+            // Create projects
+            DefaultBuildProjectStructureTree buildProjectStructureModel = buildStructureModel.toModel();
+            createProjectAssembler().populate(buildProjectStructureModel);
+
+            // Configure projects
+            DefaultBuildProjectTree buildProjectTree = buildProjectStructureModel.toModel();
+            createProjectConfigurer().populate(buildProjectTree);
 
             // Generate files
-            createModelGenerator().generate(model, new CollectingFileGenerator());
+            BuildTree<ConfiguredBuild> configuredTree = buildProjectTree.toModel();
+            createModelGenerator().generate(configuredTree, new CollectingFileGenerator());
 
             return null;
         }
@@ -136,19 +138,24 @@ public class Main {
             }
         }
 
-        private ModelConfigurer createModelConfigurer() {
-            return new ModelConfigurer(
+        private ModelConfigurer<BuildProjectStructureBuilder> createProjectAssembler() {
+            return new ModelConfigurer<>(
                     new InitialProjectSetupBuildConfigurer(
-                            new ProjectDepOrderBuildConfigurer(
-                                    new CompositeProjectConfigurer(
-                                            new AttachDependenciesConfigurer(),
-                                            new HttpServerModelAssembler(),
-                                            new GradlePluginModelAssembler(),
-                                            createModelAssembler())),
                             graphAssembler));
         }
 
-        private Generator<BuildTree<BuildProjectStructureBuilder>> createModelGenerator() {
+        private ModelConfigurer<BuildProjectBuilder> createProjectConfigurer() {
+            return new ModelConfigurer<>(
+                    new ProjectDepOrderBuildConfigurer(
+                            new CompositeProjectConfigurer(
+                                    new AttachDependenciesConfigurer(),
+                                    new HttpServerModelAssembler(),
+                                    new GradlePluginModelAssembler(),
+                                    createModelAssembler()))
+            );
+        }
+
+        private Generator<BuildTree<ConfiguredBuild>> createModelGenerator() {
             return new CompositeGenerator<>(
                     new DotGenerator(),
                     new ModelGenerator(

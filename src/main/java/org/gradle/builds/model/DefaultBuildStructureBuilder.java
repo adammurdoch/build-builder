@@ -5,9 +5,8 @@ import org.gradle.builds.assemblers.Settings;
 
 import javax.annotation.Nullable;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Function;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -22,24 +21,28 @@ public class DefaultBuildStructureBuilder implements BuildStructureBuilder {
     private PublicationTarget publicationTarget;
     private String typeNamePrefix = "";
     private String version = "1.0.0";
-    private final List<BuildStructureBuilder> dependsOn = new ArrayList<>();
-    private final List<BuildStructureBuilder> includedBuilds = new ArrayList<>();
-    private final List<BuildStructureBuilder> sourceBuilds = new ArrayList<>();
+    private final Set<DefaultBuildStructureBuilder> dependsOn = new LinkedHashSet<>();
+    private final Set<DefaultBuildStructureBuilder> includedBuilds = new LinkedHashSet<>();
+    private final Set<DefaultBuildStructureBuilder> sourceBuilds = new LinkedHashSet<>();
+    private DefaultBuildProjectStructureBuilder model;
 
     public DefaultBuildStructureBuilder(Path rootDir) {
         this.rootDir = rootDir;
     }
 
-    public BuildProjectStructureBuilder toModel(Function<BuildStructureBuilder, BuildProjectStructureBuilder> otherBuildLookup) {
+    public DefaultBuildProjectStructureBuilder toModel() {
         assertNotNull("displayName", displayName);
         assertNotNull("rootProjectName", rootProjectName);
         assertNotNull("settings", settings);
         assertNotNull("projectInitializer", projectInitializer);
 
-        List<BuildProjectStructureBuilder> dependsOnBuilds = dependsOn.stream().map(otherBuildLookup).collect(Collectors.toList());
-        List<BuildProjectStructureBuilder> includedBuilds = this.includedBuilds.stream().map(otherBuildLookup).collect(Collectors.toList());
-        List<BuildProjectStructureBuilder> sourceBuilds = this.sourceBuilds.stream().map(otherBuildLookup).collect(Collectors.toList());
-        return new DefaultBuildProjectStructureBuilder(rootDir, displayName, rootProjectName, settings, publicationTarget, typeNamePrefix, projectInitializer, version, dependsOnBuilds, includedBuilds, sourceBuilds);
+        if (model == null) {
+            Set<DefaultBuildProjectStructureBuilder> dependsOnBuilds = dependsOn.stream().map(b -> b.toModel()).collect(Collectors.toSet());
+            Set<DefaultBuildProjectStructureBuilder> includedBuilds = this.includedBuilds.stream().map(b -> b.toModel()).collect(Collectors.toSet());
+            Set<DefaultBuildProjectStructureBuilder> sourceBuilds = this.sourceBuilds.stream().map(b -> b.toModel()).collect(Collectors.toSet());
+            model = new DefaultBuildProjectStructureBuilder(rootDir, displayName, rootProjectName, settings, publicationTarget, typeNamePrefix, projectInitializer, version, dependsOnBuilds, includedBuilds, sourceBuilds);
+        }
+        return model;
     }
 
     private void assertNotNull(String name, @Nullable Object value) {
@@ -115,16 +118,31 @@ public class DefaultBuildStructureBuilder implements BuildStructureBuilder {
 
     @Override
     public void sourceDependency(BuildStructureBuilder childBuild) {
-        this.sourceBuilds.add(childBuild);
+        this.sourceBuilds.add((DefaultBuildStructureBuilder) childBuild);
+    }
+
+    @Override
+    public Set<? extends BuildStructureBuilder> getSourceBuilds() {
+        return sourceBuilds;
     }
 
     @Override
     public void dependsOn(BuildStructureBuilder childBuild) {
-        this.dependsOn.add(childBuild);
+        this.dependsOn.add((DefaultBuildStructureBuilder) childBuild);
+    }
+
+    @Override
+    public Set<? extends BuildStructureBuilder> getDependsOn() {
+        return dependsOn;
     }
 
     @Override
     public void includeBuild(BuildStructureBuilder childBuild) {
-        this.includedBuilds.add(childBuild);
+        this.includedBuilds.add((DefaultBuildStructureBuilder) childBuild);
+    }
+
+    @Override
+    public Set<? extends BuildStructureBuilder> getIncludedBuilds() {
+        return includedBuilds;
     }
 }

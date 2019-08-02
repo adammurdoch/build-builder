@@ -105,7 +105,7 @@ public class SwiftModelAssembler extends LanguageSpecificProjectConfigurer<Swift
     private void addDependencies(Project project, HasSwiftSource component, BuildScript buildScript) {
         // TODO - remove this hack
         String configuration = component instanceof SwiftLibrary ? "api" : "implementation";
-        for (Dependency<Library<? extends SwiftLibraryApi>> library : project.getRequiredLibraries(SwiftLibraryApi.class)) {
+        for (Dependency<Library<? extends SwiftLibraryApi>> library : project.requiredLibraries(SwiftLibraryApi.class)) {
             buildScript.dependsOn(configuration, library.getTarget().getDependency());
             component.uses(library.withTarget(library.getTarget().getApi()));
         }

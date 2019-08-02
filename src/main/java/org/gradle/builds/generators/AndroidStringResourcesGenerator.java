@@ -1,7 +1,7 @@
 package org.gradle.builds.generators;
 
 import org.gradle.builds.model.AndroidComponent;
-import org.gradle.builds.model.Project;
+import org.gradle.builds.model.ConfiguredProject;
 
 import java.io.PrintWriter;
 import java.util.Map;
@@ -12,7 +12,7 @@ public class AndroidStringResourcesGenerator extends ProjectComponentSpecificSin
     }
 
     @Override
-    protected void generate(Project project, AndroidComponent component, PrintWriter printWriter) {
+    protected void generate(ConfiguredProject project, AndroidComponent component, PrintWriter printWriter) {
         printWriter.println("<!-- GENERATED SOURCE FILE -->");
         printWriter.println("<resources>");
         for (Map.Entry<String, String> entry : component.getStringResources().entrySet()) {

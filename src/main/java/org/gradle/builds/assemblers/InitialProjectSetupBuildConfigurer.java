@@ -3,12 +3,10 @@ package org.gradle.builds.assemblers;
 import org.gradle.builds.model.BuildProjectStructureBuilder;
 import org.gradle.builds.model.Project;
 
-public class InitialProjectSetupBuildConfigurer implements BuildConfigurer {
-    private final BuildConfigurer configurer;
+public class InitialProjectSetupBuildConfigurer implements BuildConfigurer<BuildProjectStructureBuilder> {
     private final GraphAssembler graphAssembler;
 
-    public InitialProjectSetupBuildConfigurer(BuildConfigurer configurer, GraphAssembler graphAssembler) {
-        this.configurer = configurer;
+    public InitialProjectSetupBuildConfigurer(GraphAssembler graphAssembler) {
         this.graphAssembler = graphAssembler;
     }
 
@@ -37,7 +35,5 @@ public class InitialProjectSetupBuildConfigurer implements BuildConfigurer {
                 project.requires(other.getExportedLibraries());
             }
         }
-
-        configurer.populate(build);
     }
 }
