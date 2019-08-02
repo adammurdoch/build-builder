@@ -5,6 +5,7 @@ import org.gradle.builds.assemblers.*;
 import org.gradle.builds.generators.*;
 import org.gradle.builds.model.BuildTree;
 import org.gradle.builds.model.BuildTreeBuilder;
+import org.gradle.builds.model.DefaultBuildTreeBuilder;
 import org.gradle.builds.model.MacroIncludes;
 
 import java.io.File;
@@ -97,7 +98,7 @@ public class Main {
             Settings settings = createSettings();
 
             // Create build tree
-            BuildTreeBuilder buildTree = new BuildTreeBuilder(rootDir);
+            DefaultBuildTreeBuilder buildTree = new DefaultBuildTreeBuilder(rootDir);
             createModelStructureAssembler().attachBuilds(settings, buildTree);
 
             // Configure projects

@@ -1,6 +1,7 @@
 package org.gradle.builds.assemblers
 
-import org.gradle.builds.model.BuildTreeBuilder
+
+import org.gradle.builds.model.DefaultBuildTreeBuilder
 import org.gradle.builds.model.Project
 import spock.lang.Specification
 
@@ -103,7 +104,7 @@ class StructureAssemblerTest extends Specification {
     }
 
     def projects(int p) {
-        def builder = new BuildTreeBuilder(Paths.get("dir"))
+        def builder = new DefaultBuildTreeBuilder(Paths.get("dir"))
         builder.mainBuild.displayName = 'test'
         builder.mainBuild.rootProjectName = 'test'
         builder.mainBuild.projectInitializer.add(initializer)
