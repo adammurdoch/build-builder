@@ -16,6 +16,7 @@ class KotlinModelAssembler: LanguageSpecificProjectConfigurer<KotlinApplication,
         buildScript.requirePlugin("application")
 
         addKotlinLibs(buildScript)
+        addDependencies(project, application, buildScript)
 
         val mainClass = application.addClass("${project.qualifiedNamespaceFor}.${project.typeNameFor}")
         mainClass.addRole(AppEntryPoint())
@@ -27,8 +28,16 @@ class KotlinModelAssembler: LanguageSpecificProjectConfigurer<KotlinApplication,
         buildScript.requirePlugin("kotlin")
 
         addKotlinLibs(buildScript)
+        addDependencies(project, library, buildScript)
 
         library.addClass("${project.qualifiedNamespaceFor}.${project.typeNameFor}")
+    }
+
+    private fun addDependencies(project: Project, component: HasKotlinSource, buildScript: BuildScript) {
+        for (library in project.requiredLibraries(KotlinLibraryApi::class.java)) {
+            buildScript.dependsOn("implementation", library.target.dependency)
+//            component.uses(library.withTarget<KotlinLibraryApi>(library.target.api))
+        }
     }
 
     private fun addKotlinLibs(buildScript: BuildScript) {

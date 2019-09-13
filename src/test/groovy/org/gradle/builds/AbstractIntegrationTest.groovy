@@ -159,6 +159,7 @@ abstract class AbstractIntegrationTest extends Specification {
         }
 
         ProjectLayout project(String path) {
+            assert path.startsWith(':')
             if (path == ':') {
                 return new ProjectLayout(path, rootDir, rootDir)
             } else {
@@ -316,13 +317,15 @@ abstract class AbstractIntegrationTest extends Specification {
             containsFilesWithExtension(srcDir, "kt")
         }
 
-        void isKotlinApplication() {
+        KotlinProject isKotlinApplication() {
             isKotlinProject()
             appliesPlugin("application")
+            return new KotlinProject(path, projectDir, rootDir)
         }
 
-        void isKotlinLibrary() {
+        KotlinProject isKotlinLibrary() {
             isKotlinProject()
+            return new KotlinProject(path, projectDir, rootDir)
         }
 
         void isAndroidProject() {
@@ -451,7 +454,9 @@ abstract class AbstractIntegrationTest extends Specification {
 
         protected File findImplSourceFile(String extension) {
             def files = src.listAll().findAll { it.name.endsWith(extension) }
-            def srcFile = files.size() == 1 ? files[0] : files.find { it.name.toLowerCase() == "${name}implapi${extension}" }
+            def srcFile = files.size() == 1 ? files[0] : files.find {
+                it.name.toLowerCase() == "${name}implapi${extension}"
+            }
             return srcFile
         }
 
@@ -550,6 +555,21 @@ abstract class AbstractIntegrationTest extends Specification {
                     assert srcText.contains("${project.name}.R.string.${project.name}_string")
                 }
             }
+        }
+    }
+
+    static class KotlinProject extends TypedProjectLayout {
+        KotlinProject(String path, File projectDir, File rootDir) {
+            super(path, projectDir, rootDir)
+        }
+
+        @Override
+        TestDir getSrc() {
+            return new TestDir(projectDir, "src/main/kotlin")
+        }
+
+        void dependsOn(KotlinProject... projects) {
+            assert extractDependenciesFromBuildScript() as Set == projects.name as Set
         }
     }
 

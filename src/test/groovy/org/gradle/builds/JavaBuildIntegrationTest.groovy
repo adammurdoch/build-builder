@@ -11,14 +11,16 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
         build.isBuild()
         build.isCleanGitRepo()
 
-        build.rootProject.isJavaApplication()
-        def srcDir = build.rootProject.file("src/main/java/org/gradle/example/app")
+        def rootProject = build.rootProject.isJavaApplication()
+        def srcDir = rootProject.file("src/main/java/org/gradle/example/app")
         srcDir.list() as Set == ["App.java", "AppImplApi.java", "AppImplCore.java"] as Set
         new File(srcDir, "App.java").text.contains("org.gradle.example.app.AppImplApi.getSomeValue()")
         new File(srcDir, "App.java").text.contains("org.gradle.example.app.AppImplApi.INT_CONST")
         new File(srcDir, "AppImplApi.java").text.contains("org.gradle.example.app.AppImplCore.getSomeValue()")
         new File(srcDir, "AppImplApi.java").text.contains("org.gradle.example.app.AppImplCore.INT_CONST")
         new File(srcDir, "AppImplApi.java").text.contains("org.slf4j.LoggerFactory.getLogger(\"abc\")")
+
+        rootProject.dependsOn()
 
         build.buildSucceeds(":installDist")
 
@@ -57,14 +59,15 @@ class JavaBuildIntegrationTest extends AbstractIntegrationTest {
 
         then:
         build.isBuild()
-        build.rootProject.isJavaApplication()
-        def srcDir = build.rootProject.file("src/main/java/org/gradle/example/app")
+        def rootProject = build.rootProject.isJavaApplication()
+        def srcDir = rootProject.file("src/main/java/org/gradle/example/app")
         srcDir.list() as Set == ["App.java", "AppImplApi.java", "AppImplCore.java"] as Set
-        new File(srcDir, "AppImplApi.java").text.contains("org.gradle.example.lib.Lib.getSomeValue()")
-        new File(srcDir, "AppImplApi.java").text.contains("org.gradle.example.lib.Lib.INT_CONST")
 
-        build.project(":lib").isJavaLibrary()
-        build.project(":lib").file("src/main/java/org/gradle/example/lib").list() as Set == ["Lib.java", "LibImplApi.java", "LibImplCore.java"] as Set
+        def libProject = build.project(":lib").isJavaLibrary()
+        libProject.file("src/main/java/org/gradle/example/lib").list() as Set == ["Lib.java", "LibImplApi.java", "LibImplCore.java"] as Set
+
+        rootProject.dependsOn(libProject)
+        libProject.dependsOn()
 
         build.buildSucceeds(":installDist")
 

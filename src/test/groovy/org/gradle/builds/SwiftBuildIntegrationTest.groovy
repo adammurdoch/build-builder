@@ -13,17 +13,19 @@ class SwiftBuildIntegrationTest extends AbstractIntegrationTest {
 
         then:
         build.isBuild()
-        build.rootProject.isSwiftApplication()
+        def rootProject = build.rootProject.isSwiftApplication()
 
-        def srcDir = build.rootProject.file("src/main/swift")
+        def srcDir = rootProject.file("src/main/swift")
         srcDir.list() as Set == ["main.swift", "AppImplApi.swift", "AppImplCore.swift"] as Set
         new File(srcDir, "main.swift").text.contains("AppImplApi()")
         new File(srcDir, "AppImplApi.swift").text.contains("let appimplcore = AppImplCore()")
 
-        def testDir = build.rootProject.file("src/test/swift")
+        def testDir = rootProject.file("src/test/swift")
         testDir.list() as Set == ["AppTest.swift", "AppImplApiTest.swift", "AppImplCoreTest.swift"] as Set
         new File(testDir, "AppTest.swift").text.contains("import TestApp")
         new File(testDir, "AppTest.swift").text.contains("let app = App()")
+
+        rootProject.dependsOn()
 
         build.buildSucceeds(":installDebug")
         build.app("build/install/main/debug/testApp").succeeds()
@@ -37,18 +39,19 @@ class SwiftBuildIntegrationTest extends AbstractIntegrationTest {
 
         then:
         build.isBuild()
-        build.rootProject.isSwiftApplication()
+        def rootProject = build.rootProject.isSwiftApplication()
 
-        def srcDir = build.rootProject.file("src/main/swift")
+        def srcDir = rootProject.file("src/main/swift")
         srcDir.list() as Set == ["main.swift", "AppImplApi.swift", "AppImplCore.swift"] as Set
-        new File(srcDir, "AppImplApi.swift").text.contains("import Lib")
-        new File(srcDir, "AppImplApi.swift").text.contains("let lib = Lib()")
 
-        build.rootProject.file("src/test/swift").list() as Set == ["AppTest.swift", "AppImplApiTest.swift", "AppImplCoreTest.swift"] as Set
+        rootProject.file("src/test/swift").list() as Set == ["AppTest.swift", "AppImplApiTest.swift", "AppImplCoreTest.swift"] as Set
 
-        build.project(":lib").isSwiftLibrary()
-        build.project(":lib").file("src/main/swift").list() as Set == ["Lib.swift", "LibImplApi.swift", "LibImplCore.swift"] as Set
-        build.project(":lib").file("src/test/swift").list() as Set == ["LibTest.swift", "LibImplApiTest.swift", "LibImplCoreTest.swift"] as Set
+        def libProject = build.project(":lib").isSwiftLibrary()
+        libProject.file("src/main/swift").list() as Set == ["Lib.swift", "LibImplApi.swift", "LibImplCore.swift"] as Set
+        libProject.file("src/test/swift").list() as Set == ["LibTest.swift", "LibImplApiTest.swift", "LibImplCoreTest.swift"] as Set
+
+        rootProject.dependsOn(libProject)
+        libProject.dependsOn()
 
         build.buildSucceeds(":installDebug")
         build.app("build/install/main/debug/testApp").succeeds()

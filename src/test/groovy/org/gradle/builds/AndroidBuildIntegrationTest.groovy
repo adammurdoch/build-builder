@@ -10,8 +10,8 @@ class AndroidBuildIntegrationTest extends AbstractAndroidIntegrationTest {
         then:
         build.isBuild()
 
-        build.rootProject.isAndroidApplication()
-        def srcDir = build.rootProject.file("src/main/java/org/gradle/example/app")
+        def rootProject = build.rootProject.isAndroidApplication()
+        def srcDir = rootProject.file("src/main/java/org/gradle/example/app")
         srcDir.list() as Set == ["AppMainActivity.java", "AppImplApi.java", "AppImplCore.java"] as Set
         new File(srcDir, "AppMainActivity.java").text.contains("org.gradle.example.app.AppImplApi.getSomeValue()")
         new File(srcDir, "AppMainActivity.java").text.contains("org.gradle.example.app.AppImplApi.INT_CONST")
@@ -22,6 +22,8 @@ class AndroidBuildIntegrationTest extends AbstractAndroidIntegrationTest {
         new File(srcDir, "AppImplApi.java").text.contains("org.gradle.example.app.R.string.testapp_string")
 
         // TODO check tests
+
+        rootProject.dependsOn()
 
         build.buildSucceeds(":assembleDebug")
         file("build/outputs/apk/debug/testApp-debug.apk").exists()
@@ -57,15 +59,18 @@ class AndroidBuildIntegrationTest extends AbstractAndroidIntegrationTest {
         then:
         build.isBuild()
 
-        build.rootProject.isAndroidApplication()
-        def srcDir = build.rootProject.file("src/main/java/org/gradle/example/app")
+        def rootProject = build.rootProject.isAndroidApplication()
+        def srcDir = rootProject.file("src/main/java/org/gradle/example/app")
         srcDir.list() as Set == ["AppMainActivity.java", "AppImplApi.java", "AppImplCore.java"] as Set
         new File(srcDir, "AppImplApi.java").text.contains("org.gradle.example.lib.LibActivity.getSomeValue()")
         new File(srcDir, "AppImplApi.java").text.contains("org.gradle.example.lib.LibActivity.INT_CONST")
         new File(srcDir, "AppImplApi.java").text.contains("org.gradle.example.lib.R.string.lib_string")
 
-        build.project(":lib").isAndroidLibrary()
-        build.project(":lib").file("src/main/java/org/gradle/example/lib").list() as Set == ["LibActivity.java", "LibImplApi.java", "LibImplCore.java"] as Set
+        def libProject = build.project(":lib").isAndroidLibrary()
+        libProject.file("src/main/java/org/gradle/example/lib").list() as Set == ["LibActivity.java", "LibImplApi.java", "LibImplCore.java"] as Set
+
+        rootProject.dependsOn(libProject)
+        libProject.dependsOn()
 
         build.buildSucceeds(":assembleDebug")
         file("build/outputs/apk/debug/testApp-debug.apk").exists()

@@ -17,16 +17,15 @@ class KotlinSourceGenerator : ProjectComponentSpecificGenerator<HasKotlinSource>
             it.println()
             if (kotlinClass.role(AppEntryPoint::class.java) != null) {
                 it.println("fun main(args: Array<String>) {")
+                it.println("  val app = App()")
                 it.println("  app.doSomething()")
                 it.println("  app.doSomething()")
                 it.println("}")
                 it.println()
             }
-            it.println("val app = App()")
+            it.println("private var visited = false")
             it.println()
             it.println("class ${kotlinClass.simpleName} {")
-            it.println("    private var visited = false")
-            it.println()
             it.println("    // public method referenced by other classes")
             it.println("    fun doSomething() {")
             it.println("        if (!visited) {")
