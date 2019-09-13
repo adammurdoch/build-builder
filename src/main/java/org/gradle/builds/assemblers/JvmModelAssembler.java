@@ -40,8 +40,8 @@ public abstract class JvmModelAssembler<A extends Component, L extends Component
             }
             if (nodeDetails.isReceiveIncoming()) {
                 for (Dependency<? extends JvmLibraryApi> dependency : component.getReferencedLibraries()) {
-                    for (JavaClassApi api : dependency.getTarget().getApiClasses()) {
-                        javaClass.uses(dependency.withTarget(api));
+                    for (JavaClassApi incomingApi : dependency.getTarget().getApiClasses()) {
+                        javaClass.uses(dependency.withTarget(incomingApi));
                     }
                 }
                 implClass.accept(javaClass);

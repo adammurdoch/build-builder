@@ -21,6 +21,7 @@ class KotlinModelAssembler: LanguageSpecificProjectConfigurer<KotlinApplication,
         val mainClass = application.addClass("${project.qualifiedNamespaceFor}.${project.typeNameFor}")
         mainClass.addRole(AppEntryPoint())
         buildScript.property("mainClassName", "${mainClass.name}Kt")
+        addDependencies(application, mainClass)
     }
 
     override fun library(settings: Settings, project: Project, library: KotlinLibrary) {
@@ -30,13 +31,22 @@ class KotlinModelAssembler: LanguageSpecificProjectConfigurer<KotlinApplication,
         addKotlinLibs(buildScript)
         addDependencies(project, library, buildScript)
 
-        library.addClass("${project.qualifiedNamespaceFor}.${project.typeNameFor}")
+        val apiClass = library.apiClass
+        addDependencies(library, apiClass)
+    }
+
+    private fun addDependencies(component: HasKotlinSource, apiClass: KotlinClass) {
+        for (incomingLibrary in component.referencedLibraries) {
+            for (incomingClass in incomingLibrary.target.apiClasses) {
+                apiClass.uses(incomingLibrary.withTarget(incomingClass))
+            }
+        }
     }
 
     private fun addDependencies(project: Project, component: HasKotlinSource, buildScript: BuildScript) {
         for (library in project.requiredLibraries(KotlinLibraryApi::class.java)) {
             buildScript.dependsOn("implementation", library.target.dependency)
-//            component.uses(library.withTarget<KotlinLibraryApi>(library.target.api))
+            component.uses(library.withTarget(library.target.api))
         }
     }
 

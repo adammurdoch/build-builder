@@ -19,7 +19,6 @@ class KotlinSourceGenerator : ProjectComponentSpecificGenerator<HasKotlinSource>
                 it.println("fun main(args: Array<String>) {")
                 it.println("  val app = App()")
                 it.println("  app.doSomething()")
-                it.println("  app.doSomething()")
                 it.println("}")
                 it.println()
             }
@@ -29,6 +28,12 @@ class KotlinSourceGenerator : ProjectComponentSpecificGenerator<HasKotlinSource>
             it.println("    // public method referenced by other classes")
             it.println("    fun doSomething() {")
             it.println("        if (!visited) {")
+            for (reference in kotlinClass.referencedClasses) {
+                val referencedClass = reference.target
+                val varName = referencedClass.simpleName.toLowerCase()
+                it.println("            val $varName = ${referencedClass.name}()")
+                it.println("            $varName.doSomething()")
+            }
             it.println("            println(\"visit ${kotlinClass.name}\")")
             it.println("            visited = true")
             it.println("        }")

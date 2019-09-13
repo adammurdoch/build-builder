@@ -10,6 +10,6 @@ class KotlinBuildProjectInitializer : ProjectInitializer() {
     }
 
     override fun initLibraryProject(project: Project) {
-        project.addComponent(KotlinLibrary())
+        project.addComponent(KotlinLibrary(project))
     }
 }

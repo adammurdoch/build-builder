@@ -1,5 +1,7 @@
 package org.gradle.builds.model
 
-class KotlinLibrary: HasKotlinSource(), HasApi {
-    override val api: LibraryApi = KotlinLibraryApi()
+class KotlinLibrary(project: Project): HasKotlinSource(), HasApi {
+    val apiClass = addClass("${project.qualifiedNamespaceFor}.${project.typeNameFor}")
+
+    override val api: LibraryApi = KotlinLibraryApi(apiClass)
 }
