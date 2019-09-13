@@ -138,14 +138,14 @@ public class Main {
             }
         }
 
-        private ModelConfigurer<BuildProjectStructureBuilder> createProjectAssembler() {
-            return new ModelConfigurer<>(
+        private BuildDepOrderModelConfigurer<BuildProjectStructureBuilder> createProjectAssembler() {
+            return new BuildDepOrderModelConfigurer<>(
                     new InitialProjectSetupBuildConfigurer(
                             graphAssembler));
         }
 
-        private ModelConfigurer<BuildProjectBuilder> createProjectConfigurer() {
-            return new ModelConfigurer<>(
+        private BuildDepOrderModelConfigurer<BuildProjectBuilder> createProjectConfigurer() {
+            return new BuildDepOrderModelConfigurer<>(
                     new ProjectDepOrderBuildConfigurer(
                             new CompositeProjectConfigurer(
                                     new AttachDependenciesConfigurer(),

@@ -62,7 +62,7 @@ public interface Project {
     /**
      * Returns the local libraries provided by this project, if any.
      */
-    <T> List<LocalLibrary<? extends T>> getExportedLibraries(Class<T> type);
+    <T extends LibraryApi> List<LocalLibrary<? extends T>> getExportedLibraries(Class<T> type);
 
     void export(LocalLibrary<?> library);
 

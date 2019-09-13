@@ -66,7 +66,7 @@ public class AndroidModelAssembler extends JvmModelAssembler<AndroidApplication,
 
         BuildScript buildScript = project.getBuildScript();
         buildScript.requirePlugin("com.android.library");
-        addPublishing(project, androidLibrary.getApi(), buildScript);
+        addPublishing(project, buildScript);
         addDependencies(project, androidLibrary, buildScript);
 
         ScriptBlock androidBlock = buildScript.block("android");
@@ -88,12 +88,10 @@ public class AndroidModelAssembler extends JvmModelAssembler<AndroidApplication,
         application.setLabelResource(labelResource);
     }
 
-    private void addPublishing(Project project, AndroidLibraryApi api, BuildScript buildScript) {
+    private void addPublishing(Project project, BuildScript buildScript) {
         if (project.getPublicationTarget() != null) {
             String group = "org.gradle.example";
-            String module = project.getName();
             String version = project.getVersion();
-            project.export(new LocalLibrary<>(project, new ExternalDependencyDeclaration(group, module, version), api));
             buildScript.property("group", group);
             buildScript.property("version", version);
             if (project.getPublicationTarget().getHttpRepository() != null) {
@@ -102,8 +100,6 @@ public class AndroidModelAssembler extends JvmModelAssembler<AndroidApplication,
                 deployerBlock.statement("repository(url: new URI('" + project.getPublicationTarget().getHttpRepository().getRootDir().toUri() + "'))");
                 buildScript.statement("task publish(dependsOn: uploadArchives)");
             }
-        } else {
-            project.export(new LocalLibrary<>(project, null, api));
         }
     }
 

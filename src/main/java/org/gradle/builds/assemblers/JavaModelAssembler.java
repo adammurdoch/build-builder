@@ -15,7 +15,7 @@ public class JavaModelAssembler extends JvmModelAssembler<JavaApplication, JavaL
 
         BuildScript buildScript = project.getBuildScript();
         buildScript.requirePlugin("java");
-        addPublishing(project, library.getApi(), buildScript);
+        addPublishing(project, buildScript);
         addDependencies(project, library, buildScript);
         addJavaVersion(library, buildScript);
 
@@ -42,12 +42,10 @@ public class JavaModelAssembler extends JvmModelAssembler<JavaApplication, JavaL
         addTests(project, application);
     }
 
-    private void addPublishing(Project project, JavaLibraryApi api, BuildScript buildScript) {
+    private void addPublishing(Project project, BuildScript buildScript) {
         if (project.getPublicationTarget() != null) {
             String group = "org.gradle.example";
-            String module = project.getName();
             String version = project.getVersion();
-            project.export(new LocalLibrary<>(project, new ExternalDependencyDeclaration(group, module, version), api));
             buildScript.property("group", group);
             buildScript.property("version", version);
             if (project.getPublicationTarget().getHttpRepository() != null) {
@@ -57,8 +55,6 @@ public class JavaModelAssembler extends JvmModelAssembler<JavaApplication, JavaL
                         "repository(url: new URI('" + project.getPublicationTarget().getHttpRepository().getRootDir().toUri() + "'))");
                 buildScript.statement("task publish(dependsOn: uploadArchives)");
             }
-        } else {
-            project.export(new LocalLibrary<>(project, null, api));
         }
     }
 

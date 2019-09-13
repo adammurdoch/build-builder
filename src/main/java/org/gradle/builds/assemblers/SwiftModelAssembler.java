@@ -44,7 +44,7 @@ public class SwiftModelAssembler extends LanguageSpecificProjectConfigurer<Swift
         BuildScript buildScript = project.getBuildScript();
         buildScript.requirePlugin("swift-library");
         buildScript.requirePlugin("xctest");
-        addPublishing(project, library, project.getBuildScript());
+        addPublishing(project, project.getBuildScript());
         addDependencies(project, library, buildScript);
         if (library.isSwiftPm()) {
             buildScript.block("library").property("source.from", new Scope.Code("rootProject.file('Sources/" + project.getName() + "')"));
@@ -54,16 +54,12 @@ public class SwiftModelAssembler extends LanguageSpecificProjectConfigurer<Swift
         addTests(library);
     }
 
-    private void addPublishing(Project project, SwiftLibrary library, BuildScript buildScript) {
+    private void addPublishing(Project project, BuildScript buildScript) {
         if (project.getPublicationTarget() != null) {
             String group = "org.gradle.example";
-            String module = project.getName();
             String version = project.getVersion();
-            project.export(new LocalLibrary<>(project, new ExternalDependencyDeclaration(group, module, version), library.getApi()));
             buildScript.property("group", group);
             buildScript.property("version", version);
-        } else {
-            project.export(new LocalLibrary<>(project, null, library.getApi()));
         }
     }
 

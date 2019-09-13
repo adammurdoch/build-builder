@@ -1,6 +1,6 @@
 package org.gradle.builds.model;
 
-public class LocalLibrary<T> implements Library<T> {
+public class LocalLibrary<T extends LibraryApi> implements Library<T> {
     private final String project;
     private final T api;
     private final ExternalDependencyDeclaration gav;

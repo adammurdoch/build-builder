@@ -103,7 +103,7 @@ public class CppModelAssembler extends LanguageSpecificProjectConfigurer<CppAppl
         BuildScript buildScript = project.getBuildScript();
         buildScript.requirePlugin("cpp-library");
         buildScript.requirePlugin("cpp-unit-test");
-        addPublishing(project, lib, project.getBuildScript());
+        addPublishing(project, project.getBuildScript());
         addDependencies(project, lib, buildScript);
         maybeAddBoost(privateHeader, buildScript);
 
@@ -130,12 +130,10 @@ public class CppModelAssembler extends LanguageSpecificProjectConfigurer<CppAppl
         }
     }
 
-    private void addPublishing(Project project, CppLibrary library, BuildScript buildScript) {
+    private void addPublishing(Project project, BuildScript buildScript) {
         if (project.getPublicationTarget() != null) {
             String group = "org.gradle.example";
-            String module = project.getName();
             String version = project.getVersion();
-            project.export(new LocalLibrary<>(project, new ExternalDependencyDeclaration(group, module, version), library.getApi()));
             buildScript.property("group", group);
             buildScript.property("version", version);
             if (project.getPublicationTarget().getHttpRepository() != null) {
@@ -143,8 +141,6 @@ public class CppModelAssembler extends LanguageSpecificProjectConfigurer<CppAppl
                 buildScript.block("publishing").block("repositories").block("maven").property("url",
                         new Scope.Code("uri('" + project.getPublicationTarget().getHttpRepository().getRootDir().toUri() + "')"));
             }
-        } else {
-            project.export(new LocalLibrary<>(project, null, library.getApi()));
         }
     }
 

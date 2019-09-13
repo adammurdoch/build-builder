@@ -1,7 +1,6 @@
 package org.gradle.builds.assemblers;
 
-import org.gradle.builds.model.BuildProjectStructureBuilder;
-import org.gradle.builds.model.Project;
+import org.gradle.builds.model.*;
 
 public class InitialProjectSetupBuildConfigurer implements BuildConfigurer<BuildProjectStructureBuilder> {
     private final GraphAssembler graphAssembler;
@@ -20,9 +19,18 @@ public class InitialProjectSetupBuildConfigurer implements BuildConfigurer<Build
         for (Project project: build.getProjects()) {
             project.setVersion(build.getVersion());
         }
-        if (build.getPublicationTarget() != null) {
-            for (Project project: build.getProjects()) {
-                project.publishAs(build.getPublicationTarget());
+        for (Project project: build.getProjects()) {
+            HasApi library = project.component(HasApi.class);
+            if (library != null) {
+                if (build.getPublicationTarget() != null) {
+                    project.publishAs(build.getPublicationTarget());
+                    String group = "org.gradle.example";
+                    String module = project.getName();
+                    String version = project.getVersion();
+                    project.export(new LocalLibrary<>(project, new ExternalDependencyDeclaration(group, module, version), library.getApi()));
+                } else {
+                    project.export(new LocalLibrary<>(project, null, library.getApi()));
+                }
             }
         }
 

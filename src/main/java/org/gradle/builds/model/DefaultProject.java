@@ -194,7 +194,7 @@ public class DefaultProject implements Project, ConfiguredProject {
      * Returns the local libraries provided by this project, if any.
      */
     @Override
-    public <T> List<LocalLibrary<? extends T>> getExportedLibraries(Class<T> type) {
+    public <T extends LibraryApi> List<LocalLibrary<? extends T>> getExportedLibraries(Class<T> type) {
         return exportedLibraries.stream().filter(d -> type.isInstance(d.getApi())).map(d -> (LocalLibrary<T>) d).collect(Collectors.toList());
     }
 
