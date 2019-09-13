@@ -1,6 +1,6 @@
 package org.gradle.builds.model;
 
-public class SwiftLibrary extends HasSwiftSource implements HasApi {
+public class SwiftLibrary extends HasSwiftSource implements HasApi<SwiftClass> {
     private SwiftClass apiClass;
 
     public SwiftLibrary(boolean swiftPm, String apiClass, String moduleName) {

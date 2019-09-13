@@ -28,28 +28,28 @@ public abstract class JvmModelAssembler<A extends Component, L extends Component
         }
     }
 
-    protected void addSource(Project project, HasJavaSource<?> component, JavaClass apiClass, Consumer<JavaClass> implClass) {
+    protected static <REF, T extends SourceClass<REF>, L extends LibraryApi<REF>> void addSource(Project project, HasClasses<REF, T, L> component, T entryPoint, Consumer<T> implClass) {
         String className = project.getQualifiedNamespaceFor() + "." + project.getTypeNameFor();
-        project.getClassGraph().visit((Graph.Visitor<JavaClass>) (nodeDetails, dependencies) -> {
-            JavaClass javaClass;
+        project.getClassGraph().visit((Graph.Visitor<T>) (nodeDetails, dependencies) -> {
+            T classNode;
             int layer = nodeDetails.getLayer();
             if (layer == 0) {
-                javaClass = apiClass;
+                classNode = entryPoint;
             } else {
-                javaClass = component.addClass(className + "Impl" + nodeDetails.getNameSuffix());
+                classNode = component.addClass(className + "Impl" + nodeDetails.getNameSuffix());
             }
             if (nodeDetails.isReceiveIncoming()) {
-                for (Dependency<? extends JvmLibraryApi> dependency : component.getReferencedLibraries()) {
-                    for (JavaClassApi incomingApi : dependency.getTarget().getApiClasses()) {
-                        javaClass.uses(dependency.withTarget(incomingApi));
+                for (Dependency<L> dependency : component.getReferencedLibraries()) {
+                    for (REF incomingApi : dependency.getTarget().getApiClasses()) {
+                        classNode.uses(dependency.withTarget(incomingApi));
                     }
                 }
-                implClass.accept(javaClass);
+                implClass.accept(classNode);
             }
-            for (Dependency<JavaClass> dep : dependencies) {
-                javaClass.uses(dep.withTarget(dep.getTarget().getApi()));
+            for (Dependency<T> dep : dependencies) {
+                classNode.uses(dep.withTarget(dep.getTarget().getApi()));
             }
-            return javaClass;
+            return classNode;
         });
     }
 }

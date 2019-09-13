@@ -40,6 +40,11 @@ public abstract class SourceClass<REF> {
         return null;
     }
 
+    /**
+     * Returns the public API for this class.
+     */
+    public abstract REF getApi();
+
     public void addRole(ClassRole role) {
         roles.add(role);
     }

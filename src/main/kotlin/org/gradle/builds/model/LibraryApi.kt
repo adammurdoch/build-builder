@@ -1,4 +1,5 @@
 package org.gradle.builds.model
 
-interface LibraryApi {
+interface LibraryApi<REF> {
+    val apiClasses: List<REF>
 }

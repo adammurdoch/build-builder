@@ -11,6 +11,7 @@ public class JavaClass extends JvmClass<JavaClassApi> {
         super(name);
     }
 
+    @Override
     public JavaClassApi getApi() {
         return new JavaClassApi(getName(), Collections.singleton("getSomeValue()"), Collections.singleton("INT_CONST"));
     }

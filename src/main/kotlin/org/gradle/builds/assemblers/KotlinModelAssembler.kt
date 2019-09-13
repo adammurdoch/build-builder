@@ -2,7 +2,7 @@ package org.gradle.builds.assemblers
 
 import org.gradle.builds.model.*
 
-class KotlinModelAssembler: LanguageSpecificProjectConfigurer<KotlinApplication, KotlinLibrary>(KotlinApplication::class.java, KotlinLibrary::class.java) {
+class KotlinModelAssembler : LanguageSpecificProjectConfigurer<KotlinApplication, KotlinLibrary>(KotlinApplication::class.java, KotlinLibrary::class.java) {
     override fun rootProject(settings: Settings, project: Project) {
         val buildScript = project.buildScript
         buildScript.buildScriptBlock().jcenter()
@@ -22,6 +22,8 @@ class KotlinModelAssembler: LanguageSpecificProjectConfigurer<KotlinApplication,
         mainClass.addRole(AppEntryPoint())
         buildScript.property("mainClassName", "${mainClass.name}Kt")
         addDependencies(application, mainClass)
+
+        JvmModelAssembler.addSource(project, application, mainClass) {}
     }
 
     override fun library(settings: Settings, project: Project, library: KotlinLibrary) {
@@ -33,6 +35,8 @@ class KotlinModelAssembler: LanguageSpecificProjectConfigurer<KotlinApplication,
 
         val apiClass = library.apiClass
         addDependencies(library, apiClass)
+
+        JvmModelAssembler.addSource(project, library, apiClass) {}
     }
 
     private fun addDependencies(component: HasKotlinSource, apiClass: KotlinClass) {

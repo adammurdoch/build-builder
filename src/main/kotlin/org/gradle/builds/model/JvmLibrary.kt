@@ -1,5 +1,5 @@
 package org.gradle.builds.model
 
-interface JvmLibrary : HasApi {
+interface JvmLibrary : HasApi<JavaClassApi> {
     override val api: JvmLibraryApi
 }

@@ -569,6 +569,23 @@ abstract class AbstractIntegrationTest extends Specification {
         }
 
         void dependsOn(KotlinProject... projects) {
+            def srcFile = findImplSourceFile(".kt")
+            def srcText = srcFile.text
+            def pattern = Pattern.compile("val (\\w+) = org\\.gradle\\.example\\.(\\w+)\\.(\\w+)\\(\\)")
+            def matcher = pattern.matcher(srcText)
+            def libs = []
+            while (matcher.find()) {
+                def packageName = matcher.group(1)
+                if (packageName == name) {
+                    continue
+                }
+                def className = matcher.group(2)
+                if (className.toLowerCase() != packageName) {
+                    continue
+                }
+                libs << packageName
+            }
+            assert libs as Set == projects.name as Set
             assert extractDependenciesFromBuildScript() as Set == projects.name as Set
         }
     }
