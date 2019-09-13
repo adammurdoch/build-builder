@@ -12,6 +12,6 @@ public class JavaBuildProjectInitializer extends ProjectInitializer {
 
     @Override
     public void initLibraryProject(Project project) {
-        project.addComponent(new JavaLibrary(project.getName()));
+        project.addComponent(new JavaLibrary(project));
     }
 }

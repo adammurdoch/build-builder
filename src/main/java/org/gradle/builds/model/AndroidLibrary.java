@@ -5,20 +5,21 @@ public class AndroidLibrary extends AndroidComponent implements JvmLibrary {
     private JavaClassApi rClass;
     private JavaClass activity;
 
-    public AndroidLibrary(String projectName) {
-        this.projectName = projectName;
+    public AndroidLibrary(Project project) {
+        super(project.getQualifiedNamespaceFor());
+        this.projectName = project.getName();
+        rClass = JavaClassApi.field(getPackageName() + ".R.string", project.getName().toLowerCase() + "_string");
+        activity = addClass(getPackageName() + "." + project.getTypeNameFor() + "Activity");
+        activity.addRole(new AndroidActivity());
+        activity(activity);
+    }
+
+    public JavaClass getActivity() {
+        return activity;
     }
 
     @Override
     public AndroidLibraryApi getApi() {
         return new AndroidLibraryApi(projectName, activity.getApi(), rClass);
-    }
-
-    public void setRClass(JavaClassApi rClass) {
-        this.rClass = rClass;
-    }
-
-    public void setActivity(JavaClass apiClass) {
-        this.activity = apiClass;
     }
 }

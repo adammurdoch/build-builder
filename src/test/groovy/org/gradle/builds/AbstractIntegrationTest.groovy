@@ -145,7 +145,6 @@ abstract class AbstractIntegrationTest extends Specification {
             }
         }
 
-        // TODO - add more checks
         void isBuild() {
             assert rootDir.directory
             assert file("settings.gradle").file
@@ -242,16 +241,16 @@ abstract class AbstractIntegrationTest extends Specification {
             return new File(projectDir, path)
         }
 
-        // TODO - add more checks
         void isProject() {
             assert projectDir.directory
             assert buildFile.file
         }
 
-        // TODO - add more checks
         void isEmptyProject() {
             isProject()
-            assert !buildFile.text.contains('plugin')
+            def text = buildFile.text
+            // Could find a better way to verify this
+            assert !text.contains('java') && !text.contains('application') && !text.contains('swift') && !text.contains('android') && !text.contains('cpp')
         }
 
         void containsFilesWithExtension(File dir, String extension) {
@@ -265,7 +264,6 @@ abstract class AbstractIntegrationTest extends Specification {
             assert !found.empty
         }
 
-        // TODO - add more checks
         void hasJavaSource() {
             def srcDir = file("src/main/java")
             containsFilesWithExtension(srcDir, "java")
@@ -299,14 +297,12 @@ abstract class AbstractIntegrationTest extends Specification {
             return new JavaProject(path, projectDir, rootDir)
         }
 
-        // TODO - add more checks
         JavaProject isJavaApplication() {
             isJavaProject()
             appliesPlugin('application')
             return new JavaProject(path, projectDir, rootDir)
         }
 
-        // TODO - add more checks
         JavaProject isJavaPlugin() {
             isJavaProject()
             appliesPlugin('java-gradle-plugin')
@@ -329,7 +325,6 @@ abstract class AbstractIntegrationTest extends Specification {
             isKotlinProject()
         }
 
-        // TODO - add more checks
         void isAndroidProject() {
             isProject()
             assert file("src/main/AndroidManifest.xml").file
@@ -343,7 +338,6 @@ abstract class AbstractIntegrationTest extends Specification {
             containsFilesWithExtension(testSrcDir, "java")
         }
 
-        // TODO - add more checks
         AndroidProject isAndroidLibrary() {
             isAndroidProject()
             appliesPlugin('com.android.library')
@@ -351,7 +345,6 @@ abstract class AbstractIntegrationTest extends Specification {
             return new AndroidProject(path, projectDir, rootDir)
         }
 
-        // TODO - add more checks
         AndroidProject isAndroidApplication() {
             isAndroidProject()
             doesNotApplyPlugin('com.android.library')
@@ -359,7 +352,6 @@ abstract class AbstractIntegrationTest extends Specification {
             return new AndroidProject(path, projectDir, rootDir)
         }
 
-        // TODO - add more checks
         void isCppProject() {
             isProject()
 
@@ -385,7 +377,6 @@ abstract class AbstractIntegrationTest extends Specification {
             return new CppProject(path, projectDir, rootDir)
         }
 
-        // TODO - add more checks
         void isSwiftProject() {
             isProject()
 
@@ -414,7 +405,6 @@ abstract class AbstractIntegrationTest extends Specification {
             return new SwiftProject(path, projectDir, rootDir)
         }
 
-        // TODO - add more checks
         void isSwiftPMProject() {
             isProject()
 

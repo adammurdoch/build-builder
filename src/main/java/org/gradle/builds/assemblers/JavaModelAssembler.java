@@ -11,8 +11,7 @@ public class JavaModelAssembler extends JvmModelAssembler<JavaApplication, JavaL
     protected void library(Settings settings, Project project, JavaLibrary library) {
         project.requires(slfj4);
 
-        JavaClass apiClass = library.addClass(project.getQualifiedNamespaceFor() + "." + project.getTypeNameFor());
-        library.setApiClass(apiClass);
+        JavaClass apiClass = library.getApiClass();
 
         BuildScript buildScript = project.getBuildScript();
         buildScript.requirePlugin("java");

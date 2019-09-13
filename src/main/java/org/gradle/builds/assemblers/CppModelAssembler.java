@@ -72,12 +72,10 @@ public class CppModelAssembler extends LanguageSpecificProjectConfigurer<CppAppl
 
     @Override
     protected void library(Settings settings, Project project, CppLibrary lib) {
-        CppClass apiClass = new CppClass(project.getTypeNameFor());
-        lib.setApiClass(apiClass);
+        CppClass apiClass = lib.getApiClass();
 
-        CppHeaderFile apiHeader = lib.addPublicHeaderFile(project.getFileNameFor() + ".h");
+        CppHeaderFile apiHeader = lib.getApiHeader();
         apiHeader.addClass(apiClass);
-        lib.setApiHeader(apiHeader);
 
         for (int i = 0; i < libPublicHeaders; i++) {
             CppHeaderFile headerFile = lib.addPublicHeaderFile(project.getFileNameFor() + "_defs" + (i + 1) + ".h");

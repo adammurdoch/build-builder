@@ -29,9 +29,6 @@ public class AndroidModelAssembler extends JvmModelAssembler<AndroidApplication,
 
     @Override
     protected void application(Settings settings, Project project, AndroidApplication androidApplication) {
-        if (androidApplication.getPackageName() == null) {
-            androidApplication.setPackageName(project.getQualifiedNamespaceFor());
-        }
         project.requires(slfj4);
         project.requires(slfj4Simple);
         project.requires(supportUtils);
@@ -62,17 +59,10 @@ public class AndroidModelAssembler extends JvmModelAssembler<AndroidApplication,
 
     @Override
     protected void library(Settings settings, Project project, AndroidLibrary androidLibrary) {
-        if (androidLibrary.getPackageName() == null) {
-            androidLibrary.setPackageName(project.getQualifiedNamespaceFor());
-        }
         project.requires(slfj4);
         JavaClassApi rClass = JavaClassApi.field(androidLibrary.getPackageName() + ".R.string", project.getName().toLowerCase() + "_string");
 
-        JavaClass libraryActivity = androidLibrary.addClass(androidLibrary.getPackageName() + "." + project.getTypeNameFor() + "Activity");
-        libraryActivity.addRole(new AndroidActivity());
-        androidLibrary.setActivity(libraryActivity);
-        androidLibrary.setRClass(rClass);
-        androidLibrary.activity(libraryActivity);
+        JavaClass libraryActivity = androidLibrary.getActivity();
 
         BuildScript buildScript = project.getBuildScript();
         buildScript.requirePlugin("com.android.library");

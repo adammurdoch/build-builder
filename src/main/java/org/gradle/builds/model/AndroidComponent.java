@@ -11,12 +11,12 @@ public class AndroidComponent extends HasJavaSource<JvmLibraryApi> implements Ha
     private final Map<String, String> stringResources = new LinkedHashMap<>();
     private final List<JavaClass> activities = new ArrayList<>();
 
-    public String getPackageName() {
-        return packageName;
+    public AndroidComponent(String packageName) {
+        this.packageName = packageName;
     }
 
-    public void setPackageName(String packageName) {
-        this.packageName = packageName;
+    public String getPackageName() {
+        return packageName;
     }
 
     public String getLabelResource() {

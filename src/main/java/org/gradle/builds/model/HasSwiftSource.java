@@ -2,14 +2,11 @@ package org.gradle.builds.model;
 
 public class HasSwiftSource extends HasSource<SwiftSourceFile, SwiftLibraryApi> {
     private final boolean swiftPm;
-    private String module;
+    private final String module;
 
-    public HasSwiftSource(boolean swiftPm) {
+    public HasSwiftSource(boolean swiftPm, String moduleName) {
         this.swiftPm = swiftPm;
-    }
-
-    public void setModule(String module) {
-        this.module = module;
+        this.module = moduleName;
     }
 
     public String getModule() {

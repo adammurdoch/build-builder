@@ -1,9 +1,15 @@
 package org.gradle.builds.model;
 
-public class CppLibrary extends HasCppSource {
-    private CppClass apiClass;
-    private CppHeaderFile apiHeader;
+public class CppLibrary extends HasCppSource implements HasApi {
+    private final CppClass apiClass;
+    private final CppHeaderFile apiHeader;
 
+    public CppLibrary(String apiClass, String apiHeader) {
+        this.apiClass = new CppClass(apiClass);
+        this.apiHeader = addPublicHeaderFile(apiHeader);
+    }
+
+    @Override
     public CppLibraryApi getApi() {
         return new CppLibraryApi(apiClass, apiHeader);
     }
@@ -12,15 +18,7 @@ public class CppLibrary extends HasCppSource {
         return apiClass;
     }
 
-    public void setApiClass(CppClass apiClass) {
-        this.apiClass = apiClass;
-    }
-
     public CppHeaderFile getApiHeader() {
         return apiHeader;
-    }
-
-    public void setApiHeader(CppHeaderFile apiHeader) {
-        this.apiHeader = apiHeader;
     }
 }

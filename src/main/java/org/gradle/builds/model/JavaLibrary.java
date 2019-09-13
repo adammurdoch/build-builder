@@ -7,8 +7,9 @@ public class JavaLibrary extends HasJavaSource<JavaLibraryApi> implements JvmLib
     private String targetJavaVersion;
     private JavaClass apiClass;
 
-    public JavaLibrary(String projectName) {
-        this.projectName = projectName;
+    public JavaLibrary(Project project) {
+        this.projectName = project.getName();
+        apiClass = addClass(project.getQualifiedNamespaceFor() + "." + project.getTypeNameFor());
     }
 
     public String getTargetJavaVersion() {
@@ -19,12 +20,12 @@ public class JavaLibrary extends HasJavaSource<JavaLibraryApi> implements JvmLib
         this.targetJavaVersion = version;
     }
 
+    public JavaClass getApiClass() {
+        return apiClass;
+    }
+
     @Override
     public JavaLibraryApi getApi() {
         return new JavaLibraryApi(projectName, Collections.singletonList(apiClass.getApi()));
-    }
-
-    public void setApiClass(JavaClass apiClass) {
-        this.apiClass = apiClass;
     }
 }

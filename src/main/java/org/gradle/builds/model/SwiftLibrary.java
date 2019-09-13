@@ -1,16 +1,14 @@
 package org.gradle.builds.model;
 
-public class SwiftLibrary extends HasSwiftSource {
+public class SwiftLibrary extends HasSwiftSource implements HasApi {
     private SwiftClass apiClass;
 
-    public SwiftLibrary(boolean swiftPm) {
-        super(swiftPm);
+    public SwiftLibrary(boolean swiftPm, String apiClass, String moduleName) {
+        super(swiftPm, moduleName);
+        this.apiClass = new SwiftClass(apiClass);
     }
 
-    public void setApiClass(SwiftClass apiClass) {
-        this.apiClass = apiClass;
-    }
-
+    @Override
     public SwiftLibraryApi getApi() {
         return new SwiftLibraryApi(apiClass, getModule());
     }

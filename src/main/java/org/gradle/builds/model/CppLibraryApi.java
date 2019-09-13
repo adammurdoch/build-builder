@@ -1,6 +1,6 @@
 package org.gradle.builds.model;
 
-public class CppLibraryApi {
+public class CppLibraryApi implements LibraryApi {
     private final CppClass apiClass;
     private final CppHeaderFile apiHeader;
 

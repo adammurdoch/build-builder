@@ -1,6 +1,6 @@
 package org.gradle.builds.model;
 
-public class SwiftLibraryApi {
+public class SwiftLibraryApi implements LibraryApi {
     private final SwiftClass apiClass;
     private final String module;
 

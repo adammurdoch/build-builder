@@ -15,8 +15,6 @@ public class SwiftModelAssembler extends LanguageSpecificProjectConfigurer<Swift
 
     @Override
     protected void application(Settings settings, Project project, SwiftApplication application) {
-        application.setModule(capitalize(project.getName()));
-
         SwiftClass appClass = new SwiftClass(project.getTypeNameFor());
 
         SwiftSourceFile mainSourceFile = application.addSourceFile("main.swift");
@@ -38,9 +36,7 @@ public class SwiftModelAssembler extends LanguageSpecificProjectConfigurer<Swift
 
     @Override
     protected void library(Settings settings, Project project, SwiftLibrary library) {
-        SwiftClass apiClass = new SwiftClass(project.getTypeNameFor());
-        library.setApiClass(apiClass);
-        library.setModule(capitalize(project.getName()));
+        SwiftClass apiClass = library.getApiClass();
 
         SwiftSourceFile apiSourceFile = library.addSourceFile(apiClass.getName() + ".swift");
         apiSourceFile.addClass(apiClass);
